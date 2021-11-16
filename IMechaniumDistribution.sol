@@ -16,6 +16,11 @@ interface IMechaniumDistribution {
     function balanceOf(address account) external view returns (uint256);
     
     /**
+    * @dev Get unlockable tokens of an address
+    */
+    function unlockableTokens(address account) external view returns (uint256);
+
+    /**
     * @dev Transfers the allocated tokens to an address ( once the distribution has started )
     */
     function claimTokens(address account) external returns (bool);
