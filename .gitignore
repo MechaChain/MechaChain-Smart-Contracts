@@ -1,0 +1,4 @@
+.deps
+contracts/artifacts
+node_modules
+package-lock.json
