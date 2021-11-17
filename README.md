@@ -18,6 +18,7 @@ All smart contracts for the play to earn [Mechachain project](https://mechachain
   - [Guidelines](#guidelines)
   - [HOW TO USE AND DEPLOY](#how-to-use-and-deploy)
     - [Use with Remix](#use-with-remix)
+    - [Use on Testnets](#use-on-testnets)
   - [SMART CONTRACTS](#smart-contracts)
     - [Mechanium.sol](#mechaniumsol)
 
@@ -35,6 +36,20 @@ All smart contracts for the play to earn [Mechachain project](https://mechachain
 
 _For more informations : https://remix-ide.readthedocs.io/en/latest/remixd.html_
 
+### Use on Testnets
+
+Here are the different private keys of developer accounts on testnet
+
+**Admin account**
+
+Administrator of all smart contracts and keeps tokens
+```
+3851a32ae0f58665fcadb30cb9f66d96349b455554b8cd3a422c016888ae3e60
+```
+
+**Faucets for Goerli**
+
+For get more eth on Goerli, use this link : https://app.mycrypto.com/faucet
 ## SMART CONTRACTS
 
 ### Mechanium.sol
@@ -48,7 +63,7 @@ A simple ERC20 inheritance of lib from [OpenZeppelin](https://docs.openzeppelin.
 **Smart contract address**
 
 Testnets
-  - Goerli : ...
+  - Goerli : [0x1Be3C27E55867d9Ccc55765BbA14F350F9323539](https://goerli.etherscan.io/address/0x1be3c27e55867d9ccc55765bba14f350f9323539)
   - Mumbal : ...
 
 Mainnets
