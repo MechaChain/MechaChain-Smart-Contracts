@@ -147,6 +147,7 @@ contract MechaniumDistribution is AccessControl, IMechaniumDistribution {
         override
         onlyRole(ALLOCATOR_ROLE)
         tokensAvailable(amount)
+        vestingNotStarted
         returns (bool)
     {
         require(amount > 0, "Amount must be superior to 0");
@@ -157,10 +158,6 @@ contract MechaniumDistribution is AccessControl, IMechaniumDistribution {
             beneficiaryList.push(to);
         }
 
-        require(
-            !hasVestingStarted(),
-            "The vesting schedule has already started"
-        );
         allocatedTokens[to] = allocatedTokens[to].add(amount);
         totalAllocatedTokens = totalAllocatedTokens.add(amount);
 
