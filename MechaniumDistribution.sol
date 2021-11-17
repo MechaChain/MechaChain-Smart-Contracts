@@ -220,9 +220,15 @@ contract MechaniumDistribution is AccessControl, IMechaniumDistribution {
         public
         override
         onlyRole(DEFAULT_ADMIN_ROLE)
+        vestingStarted
         returns (bool)
     {
-        /// TODO: Set transfer logic
+        uint256 amount = totalUnallocatedTokens();
+
+        if (amount > 0) {
+            _token.safeTransfer(_ptePoolAddress, amount);
+        }
+
         return true;
     }
 
