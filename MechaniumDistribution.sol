@@ -63,7 +63,7 @@ contract MechaniumDistribution is AccessControl, IMechaniumDistribution {
     uint256 public totalAllocatedTokens = 0;
 
     /// Mapping of address/amount of transfered tokens
-    mapping(address => uint256) public releasedTokens;
+    mapping(address => uint256) private _releasedTokens;
     /// Total transfered tokens for all the addresses
     uint256 public totalReleasedTokens = 0;
 
@@ -315,12 +315,12 @@ contract MechaniumDistribution is AccessControl, IMechaniumDistribution {
      * @param amount Total token to send
      */
     function _releaseTokens(address to, uint256 amount) private {
-        assert(releasedTokens[to].add(amount) <= allocatedTokens[to]);
+        assert(releasedTokensOf(to).add(amount) <= allocatedTokens[to]);
 
         _token.safeTransfer(to, amount);
 
         // if transfer succeeded
-        releasedTokens[to] = releasedTokens[to].add(amount);
+        _releasedTokens[to] = releasedTokensOf(to).add(amount);
         totalReleasedTokens = totalReleasedTokens.add(amount);
     }
 
@@ -334,7 +334,7 @@ contract MechaniumDistribution is AccessControl, IMechaniumDistribution {
      * @return the amount of tokens locked for `account`
      */
     function balanceOf(address account) public view override returns (uint256) {
-        return allocatedTokens[account].sub(releasedTokens[account]);
+        return allocatedTokens[account].sub(releasedTokensOf(account));
     }
 
     /**
@@ -360,7 +360,7 @@ contract MechaniumDistribution is AccessControl, IMechaniumDistribution {
         }
         return
             allocatedTokens[account].mul(percentage).div(10**decimals).sub(
-                releasedTokens[account]
+                releasedTokensOf(account)
             );
     }
 
@@ -385,8 +385,12 @@ contract MechaniumDistribution is AccessControl, IMechaniumDistribution {
         }
         return
             allocatedTokens[account].mul(percentage).div(100).sub(
-                releasedTokens[account]
+                releasedTokensOf(account)
             );
+    }
+
+    function releasedTokensOf(address account) public view returns (uint256) {
+        return _releasedTokens[account];
     }
 
     /**
