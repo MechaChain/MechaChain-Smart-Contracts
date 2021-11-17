@@ -88,7 +88,8 @@ contract MechaniumDistribution is AccessControl, IMechaniumDistribution {
      */
     modifier tokensAvailable(uint256 amount) {
         require(
-            totalAllocatedTokens.add(amount) <= tokenBalance(),
+            totalAllocatedTokens.sub(totalReleasedTokens).add(amount) <=
+                tokenBalance(),
             "The contract does not have enough available token to allocate"
         );
         _;
