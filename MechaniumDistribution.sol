@@ -30,6 +30,9 @@ contract MechaniumDistribution is AccessControl, IMechaniumDistribution {
         uint256 beneficiariesNb,
         uint256 tokensUnlockNb
     );
+    event VestingStartingTimeChanged(uint256 vestingStartingTime);
+    event TransferToPTEPool(uint256 amount);
+    event TransferToStakingPool(address indexed account, uint256 amount);
 
     /**
      * ========================
@@ -177,6 +180,8 @@ contract MechaniumDistribution is AccessControl, IMechaniumDistribution {
         returns (bool)
     {
         vestingStartingTime = block.timestamp;
+
+        emit VestingStartingTimeChanged(vestingStartingTime);
         return true;
     }
 
@@ -196,6 +201,8 @@ contract MechaniumDistribution is AccessControl, IMechaniumDistribution {
             "Vesting start time must not be more than 6 months"
         );
         vestingStartingTime = startTime;
+
+        emit VestingStartingTimeChanged(vestingStartingTime);
         return true;
     }
 
@@ -227,6 +234,7 @@ contract MechaniumDistribution is AccessControl, IMechaniumDistribution {
 
         if (amount > 0) {
             _token.safeTransfer(_ptePoolAddress, amount);
+            emit TransferToPTEPool(amount);
         }
 
         return true;
@@ -257,6 +265,8 @@ contract MechaniumDistribution is AccessControl, IMechaniumDistribution {
         returns (bool)
     {
         /// TODO: Transfer account's tokens to staking pool
+        uint256 amount = 0;
+        emit TransferToStakingPool(account, amount);
         return true;
     }
 
