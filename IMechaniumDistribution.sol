@@ -71,9 +71,9 @@ interface IMechaniumDistribution {
     function pendingTokensOf(address account) external view returns (uint256);
 
     /**
-     * @dev Get remaining untransfered tokens
+     * @dev Get total tokens supply
      */
-    function totalUntransferedTokens() external view returns (uint256);
+    function totalSupply() external view returns (uint256);
 
     /**
      * @dev Get total unallocated tokens
