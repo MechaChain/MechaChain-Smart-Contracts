@@ -5,6 +5,7 @@ import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "./IMechaniumDistribution.sol";
+import "../MechaniumStaking/IStakingPool.sol";
 
 /**
  * @title MechaniumDistribution - Pre-sale distribution smart contract
@@ -76,8 +77,9 @@ contract MechaniumDistribution is AccessControl, IMechaniumDistribution {
     /// Play to earn pool address
     address public _ptePoolAddress;
 
-    /// Staking pool address
+    /// Staking pool address & interface
     address public _stakingPoolAddress;
+    IStakingPool public _stakingPool;
 
     /**
      * ========================
@@ -254,26 +256,26 @@ contract MechaniumDistribution is AccessControl, IMechaniumDistribution {
         returns (bool)
     {
         _stakingPoolAddress = stakingPoolAddress;
+        _stakingPool = IStakingPool(stakingPoolAddress);
         return true;
     }
 
     /**
-     * @notice Transfer account's token to the staking pool
-     * @param account the account to transfer tokens from
+     * @notice Transfer tokens balance ( allocated but not claimed ) to the staking pool
      */
-    function transfertToStakingPool(address account)
-        public
-        override
-        onlyRole(DEFAULT_ADMIN_ROLE)
-        returns (bool)
-    {
+    function transfertToStakingPool() public override returns (bool) {
         require(
             _stakingPoolAddress != address(0),
             "Staking pool address is not set"
         );
-        /// TODO: Transfer account's tokens to staking pool
-        uint256 amount = 0; /// Get the amount to transfer from account
+        address account = msg.sender;
+        uint256 amount = balanceOf(account);
         require(amount > 0);
+
+        _token.safeTransfer(_stakingPoolAddress, amount);
+        _stakingPool.stakeTokensFromDistribution(account, amount);
+        _releasedTokens[account] = releasedTokensOf(account).add(amount);
+
         emit TransferToStakingPool(account, amount);
         return true;
     }
@@ -407,7 +409,12 @@ contract MechaniumDistribution is AccessControl, IMechaniumDistribution {
             );
     }
 
-    function releasedTokensOf(address account) public view override returns (uint256) {
+    function releasedTokensOf(address account)
+        public
+        view
+        override
+        returns (uint256)
+    {
         return _releasedTokens[account];
     }
 

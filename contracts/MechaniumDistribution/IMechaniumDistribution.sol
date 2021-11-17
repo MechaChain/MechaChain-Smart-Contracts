@@ -63,7 +63,7 @@ interface IMechaniumDistribution {
     /**
      * @dev Transfer account's unlocked tokens to the staking pool
      */
-    function transfertToStakingPool(address account) external returns (bool);
+    function transfertToStakingPool() external returns (bool);
 
     /**
      * @dev Get pending tokens of an account ( amont / time )
