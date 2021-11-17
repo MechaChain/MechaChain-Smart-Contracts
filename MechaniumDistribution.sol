@@ -91,8 +91,7 @@ contract MechaniumDistribution is AccessControl, IMechaniumDistribution {
      */
     modifier tokensAvailable(uint256 amount) {
         require(
-            totalAllocatedTokens.sub(totalReleasedTokens).add(amount) <=
-                tokenBalance(),
+            totalAllocatedTokens.add(amount) <= totalSupply(),
             "The contract does not have enough available token to allocate"
         );
         _;
@@ -230,12 +229,16 @@ contract MechaniumDistribution is AccessControl, IMechaniumDistribution {
         vestingStarted
         returns (bool)
     {
+        require(
+            _ptePoolAddress != address(0),
+            "Play to earn pool address is not set"
+        );
         uint256 amount = totalUnallocatedTokens();
+        require(amount > 0);
 
-        if (amount > 0) {
-            _token.safeTransfer(_ptePoolAddress, amount);
-            emit TransferToPTEPool(amount);
-        }
+        _token.safeTransfer(_ptePoolAddress, amount);
+
+        emit TransferToPTEPool(amount);
 
         return true;
     }
@@ -264,8 +267,13 @@ contract MechaniumDistribution is AccessControl, IMechaniumDistribution {
         onlyRole(DEFAULT_ADMIN_ROLE)
         returns (bool)
     {
+        require(
+            _stakingPoolAddress != address(0),
+            "Staking pool address is not set"
+        );
         /// TODO: Transfer account's tokens to staking pool
-        uint256 amount = 0;
+        uint256 amount = 0; /// Get the amount to transfer from account
+        require(amount > 0);
         emit TransferToStakingPool(account, amount);
         return true;
     }
@@ -399,7 +407,7 @@ contract MechaniumDistribution is AccessControl, IMechaniumDistribution {
             );
     }
 
-    function releasedTokensOf(address account) public view returns (uint256) {
+    function releasedTokensOf(address account) public view override returns (uint256) {
         return _releasedTokens[account];
     }
 
@@ -411,17 +419,17 @@ contract MechaniumDistribution is AccessControl, IMechaniumDistribution {
     }
 
     /**
-     * @return the total token untransfered by the contract
+     * @return the total supply of tokens
      */
-    function totalUntransferedTokens() public view override returns (uint256) {
-        return tokenBalance().sub(totalReleasedTokens);
+    function totalSupply() public view override returns (uint256) {
+        return tokenBalance().add(totalReleasedTokens);
     }
 
     /**
      * @return the total token unallocated by the contract
      */
     function totalUnallocatedTokens() public view override returns (uint256) {
-        return tokenBalance().sub(totalAllocatedTokens);
+        return totalSupply().sub(totalAllocatedTokens);
     }
 
     /**
