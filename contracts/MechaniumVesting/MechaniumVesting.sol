@@ -101,6 +101,7 @@ abstract contract MechaniumVesting is AccessControl, IMechaniumVesting {
         uint256 vestingPerClock,
         uint256 vestingClockTime
     ) {
+        require(vestingPerClock <= 100, "Vesting can be greater than 100%");
         _token = token_;
         _vestingPerClock = vestingPerClock;
         _vestingClockTime = vestingClockTime;
