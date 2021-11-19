@@ -1,0 +1,104 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.2;
+
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import "@openzeppelin/contracts/utils/Counters.sol";
+import "./MechaniumTeamDistribution.sol";
+
+/**
+ * @title MechaniumFoundersDistribution - Vesting and distribution smart contract for the mechachain founders
+ * @notice Administrators have the right to whitdraw all tokens from the contract if the code fails the audit. If the contract is shifted secure, the whitdraw function is permanently blocked.
+ */
+contract MechaniumFoundersDistribution is MechaniumTeamDistribution {
+    using SafeERC20 for IERC20;
+    using Counters for Counters.Counter;
+    
+    /**
+     * ========================
+     *          Events
+     * ========================
+     */
+    event Withdraw(address indexed to, uint256 amount);
+    event WithdrawLocked(address indexed be);
+
+    /**
+     * ========================
+     *         Storage
+     * ========================
+     */
+
+    /// Determines if the administrator has the right to withdraw (cannot be changed once at true)
+    bool private _lockWithdraw;
+
+    /**
+     * ========================
+     *     Public Functions
+     * ========================
+     */
+    /**
+     * @dev Contract constructor sets the configuration of the vesting schedule
+     * @param token_ Address of the ERC20 token contract, this address cannot be changed later
+     */
+    constructor(IERC20 token_)
+        MechaniumTeamDistribution(token_, 360 days, 20, 180 days)
+    {
+        _lockWithdraw = false;
+    }
+    
+    /**
+     * @notice Lock permanently the withdraw function 
+     */
+    function lockWithdraw() external onlyRole(DEFAULT_ADMIN_ROLE) returns (bool) {
+        require(_lockWithdraw, "Whitdraw already locked");
+        
+        _lockWithdraw = true;
+
+        emit WithdrawLocked(msg.sender);
+        return true;
+    }
+
+    /**
+     * @notice Withdraw all tokens if the code fails the audit
+     */
+    function withdraw() external onlyRole(DEFAULT_ADMIN_ROLE) returns (bool) {
+        require(!_lockWithdraw, "Whitdraw function is permanently blocked");
+        uint256 amount = tokenBalance();
+
+        _token.safeTransfer(msg.sender, amount);
+        totalAllocatedTokens = totalReleasedTokens;
+
+        // reset allocations
+        for (uint256 i = 0; i < _allocationIdCounter.current(); i++) {
+            tokensPerAllocation[i] = 0;
+        }
+        _allocationIdCounter.reset();
+
+        // Set releasedTokens as unique allocation for each beneficiary
+        for (uint256 i = 0; i < beneficiaryList.length; i++) {
+            uint256 allocationId = _allocationIdCounter.current();
+            address beneficiary = beneficiaryList[i];
+            walletPerAllocation[allocationId] = beneficiary;
+            tokensPerAllocation[allocationId] = _releasedTokens[beneficiary];
+            uint256[1] memory newAllocationList;
+            newAllocationList[0] = allocationId;
+            _ownedAllocation[beneficiary] = newAllocationList;
+            _allocationIdCounter.increment();
+        }
+
+        emit Withdraw(msg.sender, amount);
+        return true;
+    }
+
+    /**
+     * ========================
+     *          Views
+     * ========================
+     */
+     
+    /**
+     * @return true if withdraw is permanently locked
+     */
+    function isWithdrawLocked() external view returns (bool) {
+        return _lockWithdraw;
+    }
+}
