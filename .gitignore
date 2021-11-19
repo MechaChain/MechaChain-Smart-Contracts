@@ -1,4 +1,5 @@
 .deps
+.VSCodeCounter
 contracts/artifacts
 contracts/MechaniumVesting/artifacts
 contracts/MechaniumStaking/artifacts

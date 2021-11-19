@@ -64,4 +64,14 @@ interface IMechaniumVesting {
      * @dev Get total unallocated tokens
      */
     function totalUnallocatedTokens() external view returns (uint256);
+
+    /**
+     * @return the total allocated tokens for all the addresses
+     */
+    function totalAllocatedTokens() external view returns (uint256);
+
+    /**
+     * @return the total tokens that have been transferred among all the addresses
+     */
+    function totalReleasedTokens() external view returns (uint256);
 }

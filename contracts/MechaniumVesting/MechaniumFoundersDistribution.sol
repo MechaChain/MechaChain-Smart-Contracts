@@ -69,20 +69,20 @@ contract MechaniumFoundersDistribution is MechaniumTeamDistribution {
         uint256 amount = tokenBalance();
 
         _token.safeTransfer(msg.sender, amount);
-        totalAllocatedTokens = totalReleasedTokens;
+        _totalAllocatedTokens = _totalReleasedTokens;
 
         // reset allocations
         for (uint256 i = 0; i < _allocationIdCounter.current(); i++) {
-            tokensPerAllocation[i] = 0;
+            _tokensPerAllocation[i] = 0;
         }
         _allocationIdCounter.reset();
 
         // Set releasedTokens as unique allocation for each beneficiary
-        for (uint256 i = 0; i < beneficiaryList.length; i++) {
+        for (uint256 i = 0; i < _beneficiaryList.length; i++) {
             uint256 allocationId = _allocationIdCounter.current();
-            address beneficiary = beneficiaryList[i];
-            walletPerAllocation[allocationId] = beneficiary;
-            tokensPerAllocation[allocationId] = _releasedTokens[beneficiary];
+            address beneficiary = _beneficiaryList[i];
+            _walletPerAllocation[allocationId] = beneficiary;
+            _tokensPerAllocation[allocationId] = _releasedTokens[beneficiary];
             uint256[1] memory newAllocationList;
             newAllocationList[0] = allocationId;
             _ownedAllocation[beneficiary] = newAllocationList;

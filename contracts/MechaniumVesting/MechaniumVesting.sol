@@ -58,13 +58,13 @@ abstract contract MechaniumVesting is AccessControl, IMechaniumVesting {
     mapping(address => uint256) internal _releasedTokens;
 
     /// List of all the addresses that have allocations
-    address[] public beneficiaryList;
+    address[] internal _beneficiaryList;
 
     /// Total allocated tokens for all the addresses
-    uint256 public totalAllocatedTokens = 0;
+    uint256 internal _totalAllocatedTokens = 0;
 
     /// Total transfered tokens for all the addresses
-    uint256 public totalReleasedTokens = 0;
+    uint256 internal _totalReleasedTokens = 0;
 
     /**
      * ========================
@@ -78,7 +78,7 @@ abstract contract MechaniumVesting is AccessControl, IMechaniumVesting {
      */
     modifier tokensAvailable(uint256 amount) {
         require(
-            totalAllocatedTokens.add(amount) <= totalSupply(),
+            _totalAllocatedTokens.add(amount) <= totalSupply(),
             "The contract does not have enough available token to allocate"
         );
         _;
@@ -141,8 +141,8 @@ abstract contract MechaniumVesting is AccessControl, IMechaniumVesting {
     function claimTokensForAll() public override returns (bool) {
         uint256 beneficiariesNb = 0;
         uint256 tokensUnlockNb = 0;
-        for (uint256 i = 0; i < beneficiaryList.length; i++) {
-            address beneficiary = beneficiaryList[i];
+        for (uint256 i = 0; i < _beneficiaryList.length; i++) {
+            address beneficiary = _beneficiaryList[i];
             uint256 pendingTokens = unlockableTokens(beneficiary);
             if (pendingTokens > 0) {
                 _releaseTokens(beneficiary, pendingTokens);
@@ -178,7 +178,7 @@ abstract contract MechaniumVesting is AccessControl, IMechaniumVesting {
 
         // if transfer succeeded
         _releasedTokens[to] = releasedTokensOf(to).add(amount);
-        totalReleasedTokens = totalReleasedTokens.add(amount);
+        _totalReleasedTokens = _totalReleasedTokens.add(amount);
     }
 
     /**
@@ -299,41 +299,27 @@ abstract contract MechaniumVesting is AccessControl, IMechaniumVesting {
      * @return the total supply of tokens
      */
     function totalSupply() public view override returns (uint256) {
-        return tokenBalance().add(totalReleasedTokens);
+        return tokenBalance().add(_totalReleasedTokens);
     }
 
     /**
      * @return the total token unallocated by the contract
      */
     function totalUnallocatedTokens() public view override returns (uint256) {
-        return totalSupply().sub(totalAllocatedTokens);
+        return totalSupply().sub(_totalAllocatedTokens);
     }
 
     /**
-     * ========================
-     *          Pures
-     * ========================
+     * @return the total allocated tokens for all the addresses
      */
-
-    /**
-     * @return the number of hours between the two timestamps
-     */
-    function diffInHours(uint256 startDate, uint256 endDate)
-        internal
-        pure
-        returns (uint256)
-    {
-        return endDate.sub(startDate).div(60).div(60);
+    function totalAllocatedTokens() public view override returns (uint256) {
+        return _totalAllocatedTokens;
     }
 
     /**
-     * @return the number of months between the two timestamps
+     * @return the total tokens that have been transferred among all the addresses
      */
-    function diffInMonths(uint256 startDate, uint256 endDate)
-        internal
-        pure
-        returns (uint256)
-    {
-        return diffInHours(startDate, endDate).div(24).div(30);
+    function totalReleasedTokens() public view override returns (uint256) {
+        return _totalReleasedTokens;
     }
 }

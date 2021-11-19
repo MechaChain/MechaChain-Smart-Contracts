@@ -38,17 +38,17 @@ contract MechaniumPresaleDistribution is MechaniumVesting {
      */
 
     /// Mapping of address/amount of allocated toknes
-    mapping(address => uint256) public allocatedTokens;
+    mapping(address => uint256) private _allocatedTokens;
 
     /// Starting time of the vesting schedule
-    uint256 public vestingStartingTime;
+    uint256 private _vestingStartingTime;
 
     /// Play to earn pool address
-    address public _ptePoolAddress;
+    address private _ptePoolAddress;
 
     /// Staking pool address & interface
-    address public _stakingPoolAddress;
-    IStakingPool public _stakingPool;
+    address private _stakingPoolAddress;
+    IStakingPool private _stakingPool;
 
     /**
      * ========================
@@ -89,7 +89,7 @@ contract MechaniumPresaleDistribution is MechaniumVesting {
      * @param token_ address of the ERC20 token contract, this address cannot be changed later
      */
     constructor(IERC20 token_) MechaniumVesting(token_, 20, 30 days) {
-        vestingStartingTime = block.timestamp.add(180 days);
+        _vestingStartingTime = block.timestamp.add(180 days);
         _maxVestingStartingTime = block.timestamp.add(180 days);
     }
 
@@ -109,13 +109,13 @@ contract MechaniumPresaleDistribution is MechaniumVesting {
         require(amount > 0, "Amount must be superior to 0");
         require(to != address(0), "Address must not be address(0)");
 
-        if (allocatedTokens[to] == 0) {
+        if (_allocatedTokens[to] == 0) {
             /// first allocation
-            beneficiaryList.push(to);
+            _beneficiaryList.push(to);
         }
 
-        allocatedTokens[to] = allocatedTokens[to].add(amount);
-        totalAllocatedTokens = totalAllocatedTokens.add(amount);
+        _allocatedTokens[to] = _allocatedTokens[to].add(amount);
+        _totalAllocatedTokens = _totalAllocatedTokens.add(amount);
 
         emit AllocationAddition(to, amount);
         return true;
@@ -130,9 +130,9 @@ contract MechaniumPresaleDistribution is MechaniumVesting {
         onlyRole(DEFAULT_ADMIN_ROLE)
         returns (bool)
     {
-        vestingStartingTime = block.timestamp;
+        _vestingStartingTime = block.timestamp;
 
-        emit VestingStartingTimeChanged(vestingStartingTime);
+        emit VestingStartingTimeChanged(_vestingStartingTime);
         return true;
     }
 
@@ -155,9 +155,9 @@ contract MechaniumPresaleDistribution is MechaniumVesting {
             "Vesting start time cannot be in the past"
         );
 
-        vestingStartingTime = startTime;
+        _vestingStartingTime = startTime;
 
-        emit VestingStartingTimeChanged(vestingStartingTime);
+        emit VestingStartingTimeChanged(_vestingStartingTime);
         return true;
     }
 
@@ -246,7 +246,7 @@ contract MechaniumPresaleDistribution is MechaniumVesting {
         override
         returns (uint256)
     {
-        return allocatedTokens[account];
+        return _allocatedTokens[account];
     }
 
     /**
@@ -259,7 +259,7 @@ contract MechaniumPresaleDistribution is MechaniumVesting {
         returns (uint256)
     {
         return
-            _pendingTokensCalc(vestingStartingTime, allocatedTokens[account])
+            _pendingTokensCalc(_vestingStartingTime, _allocatedTokens[account])
                 .sub(releasedTokensOf(account));
     }
 
@@ -273,7 +273,7 @@ contract MechaniumPresaleDistribution is MechaniumVesting {
         returns (uint256)
     {
         return
-            _unlockTokensCalc(vestingStartingTime, allocatedTokens[account])
+            _unlockTokensCalc(_vestingStartingTime, _allocatedTokens[account])
                 .sub(releasedTokensOf(account));
     }
 
@@ -281,6 +281,20 @@ contract MechaniumPresaleDistribution is MechaniumVesting {
      * @return true if the vesting schedule has started
      */
     function hasVestingStarted() public view returns (bool) {
-        return block.timestamp >= vestingStartingTime;
+        return block.timestamp >= _vestingStartingTime;
+    }
+
+    /**
+     * @return the starting time of the vesting schedule
+     */
+    function vestingStartingTime() external view returns (uint256) {
+        return _vestingStartingTime;
+    }
+
+    /**
+     * @return the unchangeable maximum vesting starting time
+     */
+    function maxVestingStartingTime() external view returns (uint256) {
+        return _maxVestingStartingTime;
     }
 }

@@ -32,13 +32,13 @@ contract MechaniumTeamDistribution is MechaniumVesting {
     Counters.Counter internal _allocationIdCounter;
 
     /// Mapping of allocationId/allocated tokens
-    mapping(uint256 => uint256) public tokensPerAllocation;
+    mapping(uint256 => uint256) internal _tokensPerAllocation;
 
     /// Mapping of allocationId/wallet tokens
-    mapping(uint256 => address) public walletPerAllocation;
+    mapping(uint256 => address) internal _walletPerAllocation;
 
     /// Mapping of startingTime/allocationId tokens
-    mapping(uint256 => uint256) public startingTimePerAllocation;
+    mapping(uint256 => uint256) internal _startingTimePerAllocation;
 
     /// Mapping of wallet/array of allocationId tokens
     mapping(address => uint256[]) internal _ownedAllocation;
@@ -81,19 +81,19 @@ contract MechaniumTeamDistribution is MechaniumVesting {
 
         if (_ownedAllocation[to].length == 0) {
             /// first allocation
-            beneficiaryList.push(to);
+            _beneficiaryList.push(to);
         }
         uint256 allocationId = _allocationIdCounter.current();
         _allocationIdCounter.increment();
 
-        tokensPerAllocation[allocationId] = amount;
-        walletPerAllocation[allocationId] = to;
-        startingTimePerAllocation[allocationId] = block.timestamp.add(
+        _tokensPerAllocation[allocationId] = amount;
+        _walletPerAllocation[allocationId] = to;
+        _startingTimePerAllocation[allocationId] = block.timestamp.add(
             _timeBeforeStarting
         );
         _ownedAllocation[to].push(allocationId);
 
-        totalAllocatedTokens = totalAllocatedTokens.add(amount);
+        _totalAllocatedTokens = _totalAllocatedTokens.add(amount);
 
         emit AllocationAddition(to, amount);
         return true;
@@ -118,7 +118,7 @@ contract MechaniumTeamDistribution is MechaniumVesting {
         for (uint256 i = 0; i < _ownedAllocation[account].length; i++) {
             uint256 allocationId = _ownedAllocation[account][i];
             allocatedTokens = allocatedTokens.add(
-                tokensPerAllocation[allocationId]
+                _tokensPerAllocation[allocationId]
             );
         }
         return allocatedTokens;
@@ -135,17 +135,15 @@ contract MechaniumTeamDistribution is MechaniumVesting {
     {
         uint256 pendingTokens = 0;
         for (uint256 i = 0; i < _ownedAllocation[account].length; i++) {
-            uint256 allocationId = _ownedAllocation[account][i];
-            uint256 allocationTokens = tokensPerAllocation[allocationId];
-            uint256 allocationStartingTime = startingTimePerAllocation[
-                allocationId
-            ];
+            uint256 allocId = _ownedAllocation[account][i];
+            uint256 allocTokens = allocationTokens(allocId);
+            uint256 allocStartingTime = allocationStartingTime(allocId);
 
-            uint256 allocationPendingTokens = _pendingTokensCalc(
-                allocationStartingTime,
-                allocationTokens
+            uint256 allocPendingTokens = _pendingTokensCalc(
+                allocStartingTime,
+                allocTokens
             );
-            pendingTokens = pendingTokens.add(allocationPendingTokens);
+            pendingTokens = pendingTokens.add(allocPendingTokens);
         }
         return pendingTokens.sub(releasedTokensOf(account));
     }
@@ -161,18 +159,79 @@ contract MechaniumTeamDistribution is MechaniumVesting {
     {
         uint256 unlockTokens = 0;
         for (uint256 i = 0; i < _ownedAllocation[account].length; i++) {
-            uint256 allocationId = _ownedAllocation[account][i];
-            uint256 allocationTokens = tokensPerAllocation[allocationId];
-            uint256 allocationStartingTime = startingTimePerAllocation[
-                allocationId
-            ];
+            uint256 allocId = _ownedAllocation[account][i];
+            uint256 allocTokens = allocationTokens(allocId);
+            uint256 allocStartingTime = allocationStartingTime(allocId);
 
-            uint256 allocationUnlockTokens = _unlockTokensCalc(
-                allocationStartingTime,
-                allocationTokens
+            uint256 allocUnlockTokens = _unlockTokensCalc(
+                allocStartingTime,
+                allocTokens
             );
-            unlockTokens = unlockTokens.add(allocationUnlockTokens);
+            unlockTokens = unlockTokens.add(allocUnlockTokens);
         }
         return unlockTokens.sub(releasedTokensOf(account));
+    }
+
+    /**
+     * @return the amount of tokens of the allocation
+     */
+    function allocationCount() public view returns (uint256) {
+        return _allocationIdCounter.current();
+    }
+
+    /**
+     * @return the amount of tokens of the allocation
+     */
+    function allocationTokens(uint256 allocationId)
+        public
+        view
+        returns (uint256)
+    {
+        require(
+            allocationId < _allocationIdCounter.current(),
+            "No allocation at this index"
+        );
+        return _tokensPerAllocation[allocationId];
+    }
+
+    /**
+     * @return the address of the allocation owner
+     */
+    function allocationOwner(uint256 allocationId)
+        public
+        view
+        returns (address)
+    {
+        require(
+            allocationId < allocationCount(),
+            "No allocation at this index"
+        );
+        return _walletPerAllocation[allocationId];
+    }
+
+    /**
+     * @return the starting time of the allocation
+     */
+    function allocationStartingTime(uint256 allocationId)
+        public
+        view
+        returns (uint256)
+    {
+        require(
+            allocationId < _allocationIdCounter.current(),
+            "No allocation at this index"
+        );
+        return _startingTimePerAllocation[allocationId];
+    }
+
+    /**
+     * @return the array of allocationId owned by 'wallet'
+     */
+    function allocationsOf(address wallet)
+        public
+        view
+        returns (uint256[] memory)
+    {
+        return _ownedAllocation[wallet];
     }
 }
