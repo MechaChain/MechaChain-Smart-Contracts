@@ -109,18 +109,19 @@ Return the unchangeable maximum vesting starting time
 
 ### `VestingStartingTimeChanged(uint256 vestingStartingTime)`
 
+Event emitted when the `vestingStartingTime` has changed
 
 
 
 ### `TransferUnsoldToPTEPool(uint256 amount)`
 
-
+Event emitted when `amount` tokens has been transferred to the play to earn pool
 
 
 
 ### `TransferToStakingPool(address account, uint256 amount)`
 
-
+Event emitted when `account` has transferred `amount` tokens to the staking pool
 
 
 

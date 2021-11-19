@@ -18,8 +18,20 @@ contract MechaniumPresaleDistribution is MechaniumVesting {
      *          Events
      * ========================
      */
+
+    /**
+     * @notice Event emitted when the `vestingStartingTime` has changed
+     */
     event VestingStartingTimeChanged(uint256 vestingStartingTime);
+
+    /**
+     * @notice Event emitted when `amount` tokens has been transferred to the play to earn pool
+     */
     event TransferUnsoldToPTEPool(uint256 amount);
+
+    /**
+     * @notice Event emitted when `account` has transferred `amount` tokens to the staking pool
+     */
     event TransferToStakingPool(address indexed account, uint256 amount);
 
     /**
@@ -117,7 +129,7 @@ contract MechaniumPresaleDistribution is MechaniumVesting {
         _allocatedTokens[to] = _allocatedTokens[to].add(amount);
         _totalAllocatedTokens = _totalAllocatedTokens.add(amount);
 
-        emit AllocationAddition(to, amount);
+        emit Allocated(to, amount);
         return true;
     }
 

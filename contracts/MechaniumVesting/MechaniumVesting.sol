@@ -18,14 +18,26 @@ abstract contract MechaniumVesting is AccessControl, IMechaniumVesting {
      *          Events
      * ========================
      */
-    event AllocationAddition(address indexed to, uint256 amount);
-    event DistributedTokens(
-        address indexed be,
+
+    /**
+     * @notice Event emitted when `amount` tokens have been allocated for `to` address
+     */
+    event Allocated(address indexed to, uint256 amount);
+
+    /**
+     * @notice Event emitted when `caller` claimed `amount` tokens for `to` address
+     */
+    event ClaimedTokens(
+        address indexed caller,
         address indexed to,
         uint256 amount
     );
-    event DistributedTokensToAll(
-        address indexed be,
+
+    /**
+     * @notice Event emitted when `caller` claimed the tokens for all beneficiary address
+     */
+    event ClaimedTokensToAll(
+        address indexed caller,
         uint256 beneficiariesNb,
         uint256 tokensUnlockNb
     );
@@ -131,7 +143,7 @@ abstract contract MechaniumVesting is AccessControl, IMechaniumVesting {
 
         _releaseTokens(account, pendingTokens);
 
-        emit DistributedTokens(msg.sender, account, pendingTokens);
+        emit ClaimedTokens(msg.sender, account, pendingTokens);
         return true;
     }
 
@@ -151,11 +163,7 @@ abstract contract MechaniumVesting is AccessControl, IMechaniumVesting {
             }
         }
         require(tokensUnlockNb > 0, "No token can be unlocked");
-        emit DistributedTokensToAll(
-            msg.sender,
-            beneficiariesNb,
-            tokensUnlockNb
-        );
+        emit ClaimedTokensToAll(msg.sender, beneficiariesNb, tokensUnlockNb);
         return true;
     }
 

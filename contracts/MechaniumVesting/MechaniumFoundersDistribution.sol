@@ -18,8 +18,16 @@ contract MechaniumFoundersDistribution is MechaniumTeamDistribution {
      *          Events
      * ========================
      */
-    event Withdraw(address indexed to, uint256 amount);
-    event WithdrawLocked(address indexed be);
+
+    /**
+     * @notice Event emitted when the `caller` administrator withdraw `amount` tokens (only if the code fails the audit)
+     */
+    event Withdraw(address indexed caller, uint256 amount);
+
+    /**
+     * @notice Event emitted when the administrator `caller` lock permanently the withdraw function
+     */
+    event WithdrawLocked(address indexed caller);
 
     /**
      * ========================

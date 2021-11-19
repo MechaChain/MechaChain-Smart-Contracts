@@ -31,13 +31,15 @@ Withdraw all tokens if the code fails the audit
 Return true if withdraw is permanently locked
 
 
-### `Withdraw(address to, uint256 amount)`
+### `Withdraw(address caller, uint256 amount)`
+
+Event emitted when the `caller` administrator withdraw `amount` tokens (only if the code fails the audit)
 
 
 
-### `WithdrawLocked(address be)`
+### `WithdrawLocked(address caller)`
 
-
+Event emitted when the administrator `caller` lock permanently the withdraw function
 
 
 

@@ -95,7 +95,7 @@ contract MechaniumTeamDistribution is MechaniumVesting {
 
         _totalAllocatedTokens = _totalAllocatedTokens.add(amount);
 
-        emit AllocationAddition(to, amount);
+        emit Allocated(to, amount);
         return true;
     }
 

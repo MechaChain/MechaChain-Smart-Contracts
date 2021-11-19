@@ -126,19 +126,21 @@ Return the total allocated tokens for all the addresses
 Return the total tokens that have been transferred among all the addresses
 
 
-### `AllocationAddition(address to, uint256 amount)`
+### `Allocated(address to, uint256 amount)`
+
+Event emitted when `amount` tokens have been allocated for `to` address
 
 
 
-### `DistributedTokens(address be, address to, uint256 amount)`
+### `ClaimedTokens(address caller, address to, uint256 amount)`
+
+Event emitted when `caller` claimed `amount` tokens for `to` address
 
 
 
+### `ClaimedTokensToAll(address caller, uint256 beneficiariesNb, uint256 tokensUnlockNb)`
 
-
-### `DistributedTokensToAll(address be, uint256 beneficiariesNb, uint256 tokensUnlockNb)`
-
-
+Event emitted when `caller` claimed the tokens for all beneficiary address
 
 
 
