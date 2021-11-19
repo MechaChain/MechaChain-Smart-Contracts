@@ -111,7 +111,7 @@ abstract contract MechaniumVesting is AccessControl, IMechaniumVesting {
     }
 
     /**
-     * @notice Allocate 'amount' token 'to' address
+     * @notice Allocate `amount` token `to` address
      * @param to Address of the beneficiary
      * @param amount Total token to be allocated
      */
@@ -166,8 +166,8 @@ abstract contract MechaniumVesting is AccessControl, IMechaniumVesting {
      */
 
     /**
-     * @notice Send 'amount' token 'to' address
-     * @dev 'amount' must imperatively be less or equal to the number of allocated tokens, throw an assert (loss of transaction fees)
+     * @notice Send `amount` token `to` address
+     * @dev `amount` must imperatively be less or equal to the number of allocated tokens, throw an assert (loss of transaction fees)
      * @param to Address of the beneficiary
      * @param amount Total token to send
      */
@@ -188,7 +188,7 @@ abstract contract MechaniumVesting is AccessControl, IMechaniumVesting {
      */
 
     /**
-     * @return the number of tokens that can be unlock since startTime
+     * @dev Return the number of tokens that can be unlock since startTime
      */
     function _unlockTokensCalc(uint256 startTime, uint256 allocation)
         internal
@@ -209,7 +209,7 @@ abstract contract MechaniumVesting is AccessControl, IMechaniumVesting {
     }
 
     /**
-     * @return the number of tokens that can be unlock in real time since startTime
+     * @dev Return the number of tokens that can be unlock in real time since startTime
      */
     function _pendingTokensCalc(uint256 startTime, uint256 allocation)
         internal
@@ -233,14 +233,14 @@ abstract contract MechaniumVesting is AccessControl, IMechaniumVesting {
     }
 
     /**
-     * @return the amount of tokens locked for `account`
+     * @dev Return the amount of tokens locked for `account`
      */
     function balanceOf(address account) public view override returns (uint256) {
         return allocatedTokensOf(account).sub(releasedTokensOf(account));
     }
 
     /**
-     * @return the amount of allocated tokens for `account` from the beginning
+     * @dev Return the amount of allocated tokens for `account` from the beginning
      */
     function allocatedTokensOf(address account)
         public
@@ -250,7 +250,7 @@ abstract contract MechaniumVesting is AccessControl, IMechaniumVesting {
         returns (uint256);
 
     /**
-     * @return the amount of tokens that the `account` can unlock in real time
+     * @dev Return the amount of tokens that the `account` can unlock in real time
      */
     function pendingTokensOf(address account)
         public
@@ -260,7 +260,7 @@ abstract contract MechaniumVesting is AccessControl, IMechaniumVesting {
         returns (uint256);
 
     /**
-     * @return the amount of tokens that the `account` can unlock per month
+     * @dev Return the amount of tokens that the `account` can unlock per month
      */
     function unlockableTokens(address account)
         public
@@ -282,42 +282,42 @@ abstract contract MechaniumVesting is AccessControl, IMechaniumVesting {
     }
 
     /**
-     * @return the token IERC20
+     * @dev Return the token IERC20
      */
     function token() public view override returns (address) {
         return address(_token);
     }
 
     /**
-     * @return the total token hold by the contract
+     * @dev Return the total token hold by the contract
      */
     function tokenBalance() public view override returns (uint256) {
         return _token.balanceOf(address(this));
     }
 
     /**
-     * @return the total supply of tokens
+     * @dev Return the total supply of tokens
      */
     function totalSupply() public view override returns (uint256) {
         return tokenBalance().add(_totalReleasedTokens);
     }
 
     /**
-     * @return the total token unallocated by the contract
+     * @dev Return the total token unallocated by the contract
      */
     function totalUnallocatedTokens() public view override returns (uint256) {
         return totalSupply().sub(_totalAllocatedTokens);
     }
 
     /**
-     * @return the total allocated tokens for all the addresses
+     * @dev Return the total allocated tokens for all the addresses
      */
     function totalAllocatedTokens() public view override returns (uint256) {
         return _totalAllocatedTokens;
     }
 
     /**
-     * @return the total tokens that have been transferred among all the addresses
+     * @dev Return the total tokens that have been transferred among all the addresses
      */
     function totalReleasedTokens() public view override returns (uint256) {
         return _totalReleasedTokens;

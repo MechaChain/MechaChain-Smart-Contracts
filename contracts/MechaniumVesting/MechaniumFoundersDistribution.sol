@@ -100,7 +100,7 @@ contract MechaniumFoundersDistribution is MechaniumTeamDistribution {
      */
 
     /**
-     * @return true if withdraw is permanently locked
+     * @dev Return true if withdraw is permanently locked
      */
     function isWithdrawLocked() external view returns (bool) {
         return _lockWithdraw;

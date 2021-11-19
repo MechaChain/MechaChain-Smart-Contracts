@@ -33,7 +33,7 @@ Get balance of allocated tokens of an address
 
 
 
-
+Return the amount of allocated tokens for `account` from the beginning
 
 ### `pendingTokensOf(address account) → uint256` (external)
 
@@ -57,13 +57,13 @@ Get released tokens of an address
 
 
 
-
+Return the token IERC20
 
 ### `tokenBalance() → uint256` (external)
 
 
 
-
+Return the total token hold by the contract
 
 ### `totalSupply() → uint256` (external)
 
@@ -81,13 +81,13 @@ Get total unallocated tokens
 
 
 
-
+Return the total allocated tokens for all the addresses
 
 ### `totalReleasedTokens() → uint256` (external)
 
 
 
-
+Return the total tokens that have been transferred among all the addresses
 
 
 

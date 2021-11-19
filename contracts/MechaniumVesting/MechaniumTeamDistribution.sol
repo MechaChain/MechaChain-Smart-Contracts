@@ -65,7 +65,7 @@ contract MechaniumTeamDistribution is MechaniumVesting {
     }
 
     /**
-     * @notice Allocate 'amount' token 'to' address
+     * @notice Allocate `amount` token `to` address
      * @param to Address of the beneficiary
      * @param amount Total token to be allocated
      */
@@ -106,7 +106,7 @@ contract MechaniumTeamDistribution is MechaniumVesting {
      */
 
     /**
-     * @return the amount of allocated tokens for `account` from the beginning
+     * @dev Return the amount of allocated tokens for `account` from the beginning
      */
     function allocatedTokensOf(address account)
         public
@@ -125,7 +125,7 @@ contract MechaniumTeamDistribution is MechaniumVesting {
     }
 
     /**
-     * @return the amount of tokens that the `account` can unlock in real time
+     * @dev Return the amount of tokens that the `account` can unlock in real time
      */
     function pendingTokensOf(address account)
         public
@@ -149,7 +149,7 @@ contract MechaniumTeamDistribution is MechaniumVesting {
     }
 
     /**
-     * @return the amount of tokens that the `account` can unlock per month
+     * @dev Return the amount of tokens that the `account` can unlock per month
      */
     function unlockableTokens(address account)
         public
@@ -173,14 +173,14 @@ contract MechaniumTeamDistribution is MechaniumVesting {
     }
 
     /**
-     * @return the amount of tokens of the allocation
+     * @dev Return the amount of tokens of the allocation
      */
     function allocationCount() public view returns (uint256) {
         return _allocationIdCounter.current();
     }
 
     /**
-     * @return the amount of tokens of the allocation
+     * @dev Return the amount of tokens of the allocation
      */
     function allocationTokens(uint256 allocationId)
         public
@@ -195,7 +195,7 @@ contract MechaniumTeamDistribution is MechaniumVesting {
     }
 
     /**
-     * @return the address of the allocation owner
+     * @dev Return the address of the allocation owner
      */
     function allocationOwner(uint256 allocationId)
         public
@@ -210,7 +210,7 @@ contract MechaniumTeamDistribution is MechaniumVesting {
     }
 
     /**
-     * @return the starting time of the allocation
+     * @dev Return the starting time of the allocation
      */
     function allocationStartingTime(uint256 allocationId)
         public
@@ -225,7 +225,7 @@ contract MechaniumTeamDistribution is MechaniumVesting {
     }
 
     /**
-     * @return the array of allocationId owned by 'wallet'
+     * @dev Return the array of allocationId owned by `wallet`
      */
     function allocationsOf(address wallet)
         public

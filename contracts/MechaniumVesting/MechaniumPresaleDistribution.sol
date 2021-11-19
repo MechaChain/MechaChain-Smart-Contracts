@@ -94,7 +94,7 @@ contract MechaniumPresaleDistribution is MechaniumVesting {
     }
 
     /**
-     * @notice Allocate 'amount' token 'to' address
+     * @notice Allocate `amount` token `to` address
      * @param to Address of the beneficiary
      * @param amount Total token to be allocated
      */
@@ -238,7 +238,7 @@ contract MechaniumPresaleDistribution is MechaniumVesting {
      */
 
     /**
-     * @return the amount of allocated tokens for `account` from the beginning
+     * @dev Return the amount of allocated tokens for `account` from the beginning
      */
     function allocatedTokensOf(address account)
         public
@@ -250,7 +250,7 @@ contract MechaniumPresaleDistribution is MechaniumVesting {
     }
 
     /**
-     * @return the amount of tokens that the `account` can unlock in real time
+     * @dev Return the amount of tokens that the `account` can unlock in real time
      */
     function pendingTokensOf(address account)
         public
@@ -264,7 +264,7 @@ contract MechaniumPresaleDistribution is MechaniumVesting {
     }
 
     /**
-     * @return the amount of tokens that the `account` can unlock per month
+     * @dev Return the amount of tokens that the `account` can unlock per month
      */
     function unlockableTokens(address account)
         public
@@ -278,21 +278,21 @@ contract MechaniumPresaleDistribution is MechaniumVesting {
     }
 
     /**
-     * @return true if the vesting schedule has started
+     * @dev Return true if the vesting schedule has started
      */
     function hasVestingStarted() public view returns (bool) {
         return block.timestamp >= _vestingStartingTime;
     }
 
     /**
-     * @return the starting time of the vesting schedule
+     * @dev Return the starting time of the vesting schedule
      */
     function vestingStartingTime() external view returns (uint256) {
         return _vestingStartingTime;
     }
 
     /**
-     * @return the unchangeable maximum vesting starting time
+     * @dev Return the unchangeable maximum vesting starting time
      */
     function maxVestingStartingTime() external view returns (uint256) {
         return _maxVestingStartingTime;

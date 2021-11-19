@@ -28,14 +28,10 @@ Withdraw all tokens if the code fails the audit
 
 
 
-
+Return true if withdraw is permanently locked
 
 
 ### `Withdraw(address to, uint256 amount)`
-
-========================
-         Events
-========================
 
 
 

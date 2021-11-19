@@ -26,7 +26,7 @@ Contract constructor
 
 ### `allocateTokens(address to, uint256 amount) → bool` (public)
 
-Allocate 'amount' token 'to' address
+Allocate `amount` token `to` address
 
 
 
@@ -74,44 +74,41 @@ Transfer tokens balance ( allocated but not claimed ) to the staking pool
 
 
 
-
+Return the amount of allocated tokens for `account` from the beginning
 
 ### `pendingTokensOf(address account) → uint256` (public)
 
 
 
-
+Return the amount of tokens that the `account` can unlock in real time
 
 ### `unlockableTokens(address account) → uint256` (public)
 
 
 
-
+Return the amount of tokens that the `account` can unlock per month
 
 ### `hasVestingStarted() → bool` (public)
 
 
 
-
+Return true if the vesting schedule has started
 
 ### `vestingStartingTime() → uint256` (external)
 
 
 
-
+Return the starting time of the vesting schedule
 
 ### `maxVestingStartingTime() → uint256` (external)
 
 
 
-
+Return the unchangeable maximum vesting starting time
 
 
 ### `VestingStartingTimeChanged(uint256 vestingStartingTime)`
 
-========================
-         Events
-========================
 
 
 

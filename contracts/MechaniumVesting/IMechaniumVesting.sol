@@ -26,7 +26,7 @@ interface IMechaniumVesting {
     function balanceOf(address account) external view returns (uint256);
 
     /**
-     * @return the amount of allocated tokens for `account` from the beginning
+     * @dev Return the amount of allocated tokens for `account` from the beginning
      */
     function allocatedTokensOf(address account) external view returns (uint256);
 
@@ -46,12 +46,12 @@ interface IMechaniumVesting {
     function releasedTokensOf(address account) external view returns (uint256);
 
     /**
-     * @return the token IERC20
+     * @dev Return the token IERC20
      */
     function token() external view returns (address);
 
     /**
-     * @return the total token hold by the contract
+     * @dev Return the total token hold by the contract
      */
     function tokenBalance() external view returns (uint256);
 
@@ -66,12 +66,12 @@ interface IMechaniumVesting {
     function totalUnallocatedTokens() external view returns (uint256);
 
     /**
-     * @return the total allocated tokens for all the addresses
+     * @dev Return the total allocated tokens for all the addresses
      */
     function totalAllocatedTokens() external view returns (uint256);
 
     /**
-     * @return the total tokens that have been transferred among all the addresses
+     * @dev Return the total tokens that have been transferred among all the addresses
      */
     function totalReleasedTokens() external view returns (uint256);
 }
