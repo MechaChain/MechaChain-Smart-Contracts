@@ -154,7 +154,7 @@ contract MechaniumPresaleDistribution is MechaniumVesting {
             startTime >= block.timestamp,
             "Vesting start time cannot be in the past"
         );
-        
+
         vestingStartingTime = startTime;
 
         emit VestingStartingTimeChanged(vestingStartingTime);

@@ -12,7 +12,7 @@ import "./MechaniumTeamDistribution.sol";
 contract MechaniumFoundersDistribution is MechaniumTeamDistribution {
     using SafeERC20 for IERC20;
     using Counters for Counters.Counter;
-    
+
     /**
      * ========================
      *          Events
@@ -44,13 +44,17 @@ contract MechaniumFoundersDistribution is MechaniumTeamDistribution {
     {
         _lockWithdraw = false;
     }
-    
+
     /**
-     * @notice Lock permanently the withdraw function 
+     * @notice Lock permanently the withdraw function
      */
-    function lockWithdraw() external onlyRole(DEFAULT_ADMIN_ROLE) returns (bool) {
+    function lockWithdraw()
+        external
+        onlyRole(DEFAULT_ADMIN_ROLE)
+        returns (bool)
+    {
         require(_lockWithdraw, "Whitdraw already locked");
-        
+
         _lockWithdraw = true;
 
         emit WithdrawLocked(msg.sender);
@@ -94,7 +98,7 @@ contract MechaniumFoundersDistribution is MechaniumTeamDistribution {
      *          Views
      * ========================
      */
-     
+
     /**
      * @return true if withdraw is permanently locked
      */
