@@ -150,6 +150,11 @@ contract MechaniumPresaleDistribution is MechaniumVesting {
             startTime <= _maxVestingStartingTime,
             "Vesting start time must not be more than 6 months"
         );
+        require(
+            startTime >= block.timestamp,
+            "Vesting start time cannot be in the past"
+        );
+        
         vestingStartingTime = startTime;
 
         emit VestingStartingTimeChanged(vestingStartingTime);
