@@ -203,7 +203,7 @@ abstract contract MechaniumVesting is AccessControl, IMechaniumVesting {
         view
         returns (uint256)
     {
-        if (startTime >= block.timestamp) {
+        if (startTime > block.timestamp) {
             return 0;
         }
         uint256 diff = block.timestamp.sub(startTime); // number of seconds since vesting has started
@@ -224,7 +224,7 @@ abstract contract MechaniumVesting is AccessControl, IMechaniumVesting {
         view
         returns (uint256)
     {
-        if (startTime >= block.timestamp) {
+        if (startTime > block.timestamp) {
             return 0;
         }
         uint256 decimals = 12; // decimals to add to the percentage calc

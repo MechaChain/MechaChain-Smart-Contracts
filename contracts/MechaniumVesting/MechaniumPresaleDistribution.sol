@@ -56,11 +56,11 @@ contract MechaniumPresaleDistribution is MechaniumVesting {
     uint256 private _vestingStartingTime;
 
     /// Play to earn pool address
-    address private _ptePoolAddress;
+    address internal _ptePoolAddress;
 
     /// Staking pool address & interface
-    address private _stakingPoolAddress;
-    IStakingPool private _stakingPool;
+    address internal _stakingPoolAddress;
+    IStakingPool internal _stakingPool;
 
     /**
      * ========================
@@ -299,14 +299,14 @@ contract MechaniumPresaleDistribution is MechaniumVesting {
     /**
      * @dev Return the starting time of the vesting schedule
      */
-    function vestingStartingTime() external view returns (uint256) {
+    function vestingStartingTime() public view returns (uint256) {
         return _vestingStartingTime;
     }
 
     /**
      * @dev Return the unchangeable maximum vesting starting time
      */
-    function maxVestingStartingTime() external view returns (uint256) {
+    function maxVestingStartingTime() public view returns (uint256) {
         return _maxVestingStartingTime;
     }
 }

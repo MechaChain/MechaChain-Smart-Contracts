@@ -12,14 +12,14 @@ import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 // Although it may fail compilation in 'Solidity Compiler' plugin
 // But it will work fine in 'Solidity Unit Testing' plugin
 import "remix_accounts.sol";
-import "../contracts/Mechanium.sol";
-import "../contracts/MechaniumDistribution/MechaniumDistribution.sol";
+import "../../contracts/Mechanium.sol";
+import "../../contracts/MechaniumVesting/MechaniumPresaleDistribution.sol";
 
 // File name has to end with '_test.sol', this file can contain more than one testSuite contracts
-contract myTestSuite is MechaniumDistribution {
+contract MechaniumPresaleDistributionTest is MechaniumPresaleDistribution {
     using SafeMath for uint256;
 
-    constructor() MechaniumDistribution(new Mechanium(address(this))) {}
+    constructor() MechaniumPresaleDistribution(new Mechanium(address(this))) {}
 
     address ownerAcc;
     address allocatorAcc;
@@ -156,7 +156,7 @@ contract myTestSuite is MechaniumDistribution {
         bool hasStarted = hasVestingStarted();
         Assert.equal(hasStarted, false, "Vesting should not be started");
 
-        Assert.equal(vestingStartingTime, time, "Vesting start time not valid");
+        Assert.equal(vestingStartingTime(), time, "Vesting start time not valid");
     }
 
     /**
@@ -270,7 +270,7 @@ contract myTestSuite is MechaniumDistribution {
      */
     function checkTransferToPTEPool() public {
         uint256 unallocated = totalUnallocatedTokens();
-        transfertToPTEPool();
+        transferUnsoldToPTEPool();
         uint256 ptePoolBalance = _token.balanceOf(_ptePoolAddress);
         Assert.equal(
             ptePoolBalance,
