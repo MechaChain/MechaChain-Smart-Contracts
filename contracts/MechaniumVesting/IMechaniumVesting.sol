@@ -74,4 +74,14 @@ interface IMechaniumVesting {
      * @dev Return the total tokens that have been transferred among all the addresses
      */
     function totalReleasedTokens() external view returns (uint256);
+
+    /**
+     * @dev Return the percentage of unlocked tokens per `vestingClockTime()` once the vesting schedule has started
+     */
+    function vestingPerClock() external view returns (uint256);
+
+    /**
+     * @dev Return the number of seconds between two `vestingPerClock()`
+     */
+    function vestingClockTime() external view returns (uint256);
 }

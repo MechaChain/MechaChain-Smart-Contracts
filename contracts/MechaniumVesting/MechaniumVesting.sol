@@ -105,18 +105,18 @@ abstract contract MechaniumVesting is AccessControl, IMechaniumVesting {
     /**
      * @dev Contract constructor sets the configuration of the vesting schedule
      * @param token_ Address of the ERC20 token contract, this address cannot be changed later
-     * @param vestingPerClock Percentage of unlocked tokens per _vestingClockTime once the vesting schedule has started
-     * @param vestingClockTime Number of seconds between two _vestingPerClock
+     * @param vestingPerClock_ Percentage of unlocked tokens per _vestingClockTime once the vesting schedule has started
+     * @param vestingClockTime_ Number of seconds between two _vestingPerClock
      */
     constructor(
         IERC20 token_,
-        uint256 vestingPerClock,
-        uint256 vestingClockTime
+        uint256 vestingPerClock_,
+        uint256 vestingClockTime_
     ) {
-        require(vestingPerClock <= 100, "Vesting can be greater than 100%");
+        require(vestingPerClock_ <= 100, "Vesting can be greater than 100%");
         _token = token_;
-        _vestingPerClock = vestingPerClock;
-        _vestingClockTime = vestingClockTime;
+        _vestingPerClock = vestingPerClock_;
+        _vestingClockTime = vestingClockTime_;
 
         _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _setupRole(ALLOCATOR_ROLE, msg.sender);
@@ -329,5 +329,19 @@ abstract contract MechaniumVesting is AccessControl, IMechaniumVesting {
      */
     function totalReleasedTokens() public view override returns (uint256) {
         return _totalReleasedTokens;
+    }
+
+    /**
+     * @dev Return the percentage of unlocked tokens per `vestingClockTime()` once the vesting schedule has started
+     */
+    function vestingPerClock() public view override returns (uint256) {
+        return _vestingPerClock;
+    }
+
+    /**
+     * @dev Return the number of seconds between two `vestingPerClock()`
+     */
+    function vestingClockTime() public view override returns (uint256) {
+        return _vestingClockTime;
     }
 }

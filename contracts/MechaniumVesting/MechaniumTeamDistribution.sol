@@ -51,17 +51,17 @@ contract MechaniumTeamDistribution is MechaniumVesting {
     /**
      * @dev Contract constructor sets the configuration of the vesting schedule
      * @param token_ Address of the ERC20 token contract, this address cannot be changed later
-     * @param timeBeforeStarting Number of seconds to wait between allocation and the start of the schedule
-     * @param vestingPerClock Percentage of unlocked tokens per _vestingClockTime once the vesting schedule has started
-     * @param vestingClockTime Number of seconds between two _vestingPerClock
+     * @param timeBeforeStarting_ Number of seconds to wait between allocation and the start of the schedule
+     * @param vestingPerClock_ Percentage of unlocked tokens per _vestingClockTime once the vesting schedule has started
+     * @param vestingClockTime_ Number of seconds between two _vestingPerClock
      */
     constructor(
         IERC20 token_,
-        uint256 timeBeforeStarting,
-        uint256 vestingPerClock,
-        uint256 vestingClockTime
-    ) MechaniumVesting(token_, vestingPerClock, vestingClockTime) {
-        _timeBeforeStarting = timeBeforeStarting;
+        uint256 timeBeforeStarting_,
+        uint256 vestingPerClock_,
+        uint256 vestingClockTime_
+    ) MechaniumVesting(token_, vestingPerClock_, vestingClockTime_) {
+        _timeBeforeStarting = timeBeforeStarting_;
     }
 
     /**
@@ -233,5 +233,12 @@ contract MechaniumTeamDistribution is MechaniumVesting {
         returns (uint256[] memory)
     {
         return _ownedAllocation[wallet];
+    }
+
+    /**
+     * @dev Return the number of seconds to wait between allocation and the start of the schedule
+     */
+    function timeBeforeStarting() public view returns (uint256) {
+        return _timeBeforeStarting;
     }
 }
