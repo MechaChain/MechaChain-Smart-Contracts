@@ -64,7 +64,7 @@ A simple ERC20 inheritance of lib from [OpenZeppelin](https://docs.openzeppelin.
 
 Testnets
   - Goerli : [0x1Be3C27E55867d9Ccc55765BbA14F350F9323539](https://goerli.etherscan.io/address/0x1be3c27e55867d9ccc55765bba14f350f9323539)
-  - Mumbal : ...
+  - Mumbai : [0x3dc6451e45dde42D3e376863F1ae4b24AFec5256](https://mumbai.polygonscan.com/address/0x3dc6451e45dde42D3e376863F1ae4b24AFec5256)
 
 Mainnets
   - Polygon : ...
