@@ -4,5 +4,6 @@ contracts/artifacts
 contracts/MechaniumVesting/artifacts
 contracts/MechaniumVestingWallet/artifacts
 contracts/MechaniumStaking/artifacts
+build/*
 node_modules
 package-lock.json
