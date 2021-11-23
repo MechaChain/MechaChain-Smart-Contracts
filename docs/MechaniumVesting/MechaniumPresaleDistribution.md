@@ -106,6 +106,18 @@ Return the starting time of the vesting schedule
 
 Return the unchangeable maximum vesting starting time
 
+### `getPTEPoolAddress() → address` (public)
+
+
+
+Return the pte pool address
+
+### `getStakingPoolAddress() → address` (public)
+
+
+
+Return the staking pool address
+
 
 ### `VestingStartingTimeChanged(uint256 vestingStartingTime)`
 
