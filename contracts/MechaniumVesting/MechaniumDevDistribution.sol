@@ -7,8 +7,11 @@ import "./MechaniumTeamDistribution.sol";
 
 /**
  * @title MechaniumDevDistribution - Vesting and distribution smart contract for the mechachain development team
+ * @author EthernalHorizons - <https://mechachain.io/>
+ * @custom:security-contact hello@mechachain.io
  */
 contract MechaniumDevDistribution is MechaniumTeamDistribution {
+    
     /**
      * @dev Contract constructor sets the configuration of the vesting schedule
      * @param token_ Address of the ERC20 token contract, this address cannot be changed later

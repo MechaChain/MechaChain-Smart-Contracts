@@ -7,8 +7,11 @@ import "./MechaniumTeamDistribution.sol";
 
 /**
  * @title MechaniumAdvisorsDistribution - Vesting and distribution smart contract for the mechachain advisor
+ * @author EthernalHorizons - <https://mechachain.io/>
+ * @custom:security-contact hello@mechachain.io
  */
 contract MechaniumAdvisorsDistribution is MechaniumTeamDistribution {
+    
     /**
      * @dev Contract constructor sets the configuration of the vesting schedule
      * @param token_ Address of the ERC20 token contract, this address cannot be changed later
@@ -18,7 +21,7 @@ contract MechaniumAdvisorsDistribution is MechaniumTeamDistribution {
             token_,
             180 days, // after 6 months (included)
             20, // unlock 20%
-            180 days // every 6 month
+            180 days // and repeat every 6 month
         )
     {}
 }

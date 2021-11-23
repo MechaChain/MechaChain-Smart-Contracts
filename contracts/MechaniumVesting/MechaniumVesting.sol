@@ -8,6 +8,8 @@ import "./IMechaniumVesting.sol";
 
 /**
  * @title MechaniumVesting - Abstract class for vesting and distribution smart contract
+ * @author EthernalHorizons - <https://mechachain.io/>
+ * @custom:security-contact hello@mechachain.io
  */
 abstract contract MechaniumVesting is AccessControl, IMechaniumVesting {
     using SafeMath for uint256;
@@ -197,7 +199,7 @@ abstract contract MechaniumVesting is AccessControl, IMechaniumVesting {
         _releasedTokens[to] = releasedTokensOf(to).add(amount);
         _totalReleasedTokens = _totalReleasedTokens.add(amount);
 
-        if(tokenBalance() == 0){
+        if (tokenBalance() == 0) {
             emit ReleasedLastTokens(totalReleasedTokens());
         }
     }

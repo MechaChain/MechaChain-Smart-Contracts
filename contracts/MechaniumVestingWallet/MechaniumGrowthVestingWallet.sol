@@ -5,8 +5,11 @@ import "./MechaniumVestingWallet.sol";
 
 /**
  * @title MechaniumGrowthVestingWallet - $MECHA allocated to the growth and marketing operations with a vesting schedule
+ * @author EthernalHorizons - <https://mechachain.io/>
+ * @custom:security-contact hello@mechachain.io
  */
 contract MechaniumGrowthVestingWallet is MechaniumVestingWallet {
+    
     /**
      * @dev Contract constructor sets the configuration of the vesting schedule
      * @param token_ Address of the ERC20 token contract, this address cannot be changed later

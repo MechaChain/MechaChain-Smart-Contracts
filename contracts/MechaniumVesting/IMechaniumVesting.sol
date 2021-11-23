@@ -3,8 +3,11 @@ pragma solidity ^0.8.2;
 
 /**
  * @dev Mechanim distribution smart contract interface
+ * @author EthernalHorizons - <https://mechachain.io/>
+ * @custom:security-contact hello@mechachain.io
  */
 interface IMechaniumVesting {
+    
     /**
      * @dev Allocate an amount of tokens to an address ( only allocator role )
      */
@@ -88,5 +91,5 @@ interface IMechaniumVesting {
     /**
      * @dev Return true if all tokens have been allocated
      */
-    function isSoldOut() external view  returns (bool);
+    function isSoldOut() external view returns (bool);
 }

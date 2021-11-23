@@ -5,6 +5,7 @@
 Mechanim vesting wallet smart contract interface
 
 
+
 ### `transfer(address to, uint256 amount) → bool` (external)
 
 Transfer `amount` unlocked tokens `to` address

@@ -8,6 +8,8 @@ import "../MechaniumStaking/IStakingPool.sol";
 
 /**
  * @title MechaniumPresaleDistribution - Pre-sale distribution smart contract
+ * @author EthernalHorizons - <https://mechachain.io/>
+ * @custom:security-contact hello@mechachain.io
  */
 contract MechaniumPresaleDistribution is MechaniumVesting {
     using SafeMath for uint256;

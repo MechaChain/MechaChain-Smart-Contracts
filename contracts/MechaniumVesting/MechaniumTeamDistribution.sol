@@ -8,6 +8,8 @@ import "./MechaniumVesting.sol";
 /**
  * @title MechaniumTeamDistribution - Vesting and distribution smart contract for the mechachain team
  * @notice Can manage multiple allocations with a specific schedule to each
+ * @author EthernalHorizons - <https://mechachain.io/>
+ * @custom:security-contact hello@mechachain.io
  */
 contract MechaniumTeamDistribution is MechaniumVesting {
     using SafeMath for uint256;

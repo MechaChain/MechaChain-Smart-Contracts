@@ -5,6 +5,7 @@
 Mechanim distribution smart contract interface
 
 
+
 ### `allocateTokens(address to, uint256 amount) → bool` (external)
 
 

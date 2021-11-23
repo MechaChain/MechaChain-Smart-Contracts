@@ -5,6 +5,7 @@
 Staking pool smart contract interface
 
 
+
 ### `stakeTokensFromDistribution(address to, uint256 amount) → bool` (external)
 
 

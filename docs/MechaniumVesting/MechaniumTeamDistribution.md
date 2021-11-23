@@ -5,6 +5,7 @@ Can manage multiple allocations with a specific schedule to each
 
 
 
+
 ### `constructor(contract IERC20 token_, uint256 timeBeforeStarting_, uint256 vestingPerClock_, uint256 vestingClockTime_)` (public)
 
 

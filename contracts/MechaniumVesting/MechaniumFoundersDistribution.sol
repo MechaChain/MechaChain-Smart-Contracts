@@ -8,6 +8,8 @@ import "./MechaniumTeamDistribution.sol";
 /**
  * @title MechaniumFoundersDistribution - Vesting and distribution smart contract for the mechachain founders
  * @notice Administrators have the right to whitdraw all tokens from the contract if the code fails the audit. If the contract is shifted secure, the whitdraw function is permanently blocked.
+ * @author EthernalHorizons - <https://mechachain.io/>
+ * @custom:security-contact hello@mechachain.io
  */
 contract MechaniumFoundersDistribution is MechaniumTeamDistribution {
     using SafeERC20 for IERC20;

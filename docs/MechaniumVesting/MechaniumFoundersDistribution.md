@@ -5,6 +5,7 @@ Administrators have the right to whitdraw all tokens from the contract if the co
 
 
 
+
 ### `constructor(contract IERC20 token_)` (public)
 
 

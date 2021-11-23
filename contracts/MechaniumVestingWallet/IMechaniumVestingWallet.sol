@@ -3,8 +3,11 @@ pragma solidity ^0.8.2;
 
 /**
  * @dev Mechanim vesting wallet smart contract interface
+ * @author EthernalHorizons - <https://mechachain.io/>
+ * @custom:security-contact hello@mechachain.io
  */
 interface IMechaniumVestingWallet {
+    
     /**
      * @notice Transfer `amount` unlocked tokens `to` address
      */

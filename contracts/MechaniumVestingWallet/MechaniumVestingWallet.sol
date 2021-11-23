@@ -8,6 +8,8 @@ import "./IMechaniumVestingWallet.sol";
 
 /**
  * @title MechaniumVestingWallet - $MECHA allocated for different operations with a vesting schedule
+ * @author EthernalHorizons - <https://mechachain.io/>
+ * @custom:security-contact hello@mechachain.io
  */
 contract MechaniumVestingWallet is IMechaniumVestingWallet, AccessControl {
     using SafeMath for uint256;
@@ -115,7 +117,7 @@ contract MechaniumVestingWallet is IMechaniumVestingWallet, AccessControl {
         _totalReleasedTokens = _totalReleasedTokens.add(amount);
 
         emit TransferredTokens(msg.sender, to, amount);
-        if(tokenBalance() == 0){
+        if (tokenBalance() == 0) {
             emit SoldOut(totalReleasedTokens());
         }
         return true;
