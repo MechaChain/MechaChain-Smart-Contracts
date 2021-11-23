@@ -18,6 +18,7 @@ All smart contracts for the play to earn [Mechachain project](https://mechachain
   - [Guidelines](#guidelines)
   - [HOW TO USE AND DEPLOY](#how-to-use-and-deploy)
     - [Use with Remix](#use-with-remix)
+    - [Launch unit tests](#launch-unit-tests)
     - [Use on Testnets](#use-on-testnets)
     - [Generate doc](#generate-doc)
   - [SMART CONTRACTS](#smart-contracts)
@@ -37,6 +38,17 @@ All smart contracts for the play to earn [Mechachain project](https://mechachain
 
 _For more informations : https://remix-ide.readthedocs.io/en/latest/remixd.html_
 
+### Launch unit tests
+
+For testing contract with [Truffle](https://www.trufflesuite.com/docs/truffle/testing/writing-tests-in-javascript): 
+  1. Install dependencies: `npm install -g truffle`
+```
+npm install -g truffle
+npm install -g ganache-cli
+npm install
+```
+  2. Run Ganache Ethereum simulator: `ganache-cli`
+  3. Run test: `truffle test` or `truffle test ./test/<test_file_name>.js`
 ### Use on Testnets
 
 Here are the different private keys of developer accounts on testnet
