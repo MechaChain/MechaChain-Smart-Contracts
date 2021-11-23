@@ -361,7 +361,7 @@ abstract contract MechaniumVesting is AccessControl, IMechaniumVesting {
     /**
      * @dev Return true if all tokens have been allocated
      */
-    function isSoldOut() public view returns (bool) {
+    function isSoldOut() public view override returns (bool) {
         return totalSupply() == totalAllocatedTokens();
     }
 }
