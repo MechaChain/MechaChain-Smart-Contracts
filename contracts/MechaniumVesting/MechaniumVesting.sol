@@ -240,7 +240,7 @@ abstract contract MechaniumVesting is AccessControl, IMechaniumVesting {
         if (startTime > block.timestamp) {
             return 0;
         }
-        uint256 decimals = 12; // decimals to add to the percentage calc
+        uint256 decimals = 18; // decimals to add to the percentage calc
         uint256 diff = block.timestamp.sub(startTime).mul(10**decimals); // number of seconds since vesting has started ** decimals
         uint256 clockNumber = diff.div(_vestingClockTime); // number of clock since vesting has started ** decimals
         uint256 percentage = clockNumber.mul(_vestingPerClock).add(
