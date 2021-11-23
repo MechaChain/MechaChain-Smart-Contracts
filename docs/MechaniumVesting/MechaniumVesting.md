@@ -12,7 +12,7 @@ Check if the contract has the amount of tokens to allocate
 
 
 
-### `constructor(contract IERC20 token_, uint256 vestingPerClock, uint256 vestingClockTime)` (internal)
+### `constructor(contract IERC20 token_, uint256 vestingPerClock_, uint256 vestingClockTime_)` (internal)
 
 
 
@@ -125,6 +125,24 @@ Return the total allocated tokens for all the addresses
 
 Return the total tokens that have been transferred among all the addresses
 
+### `vestingPerClock() → uint256` (public)
+
+
+
+Return the percentage of unlocked tokens per `vestingClockTime()` once the vesting schedule has started
+
+### `vestingClockTime() → uint256` (public)
+
+
+
+Return the number of seconds between two `vestingPerClock()`
+
+### `isSoldOut() → bool` (public)
+
+
+
+Return true if all tokens have been allocated
+
 
 ### `Allocated(address to, uint256 amount)`
 
@@ -141,6 +159,18 @@ Event emitted when `caller` claimed `amount` tokens for `to` address
 ### `ClaimedTokensToAll(address caller, uint256 beneficiariesNb, uint256 tokensUnlockNb)`
 
 Event emitted when `caller` claimed the tokens for all beneficiary address
+
+
+
+### `SoldOut(uint256 totalAllocated)`
+
+Event emitted when all tokens have been allocated
+
+
+
+### `ReleasedLastTokens(uint256 totalReleased)`
+
+Event emitted when the last tokens have been claimed
 
 
 

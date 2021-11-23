@@ -94,13 +94,13 @@ Return the amount of tokens that the `account` can unlock per month
 
 Return true if the vesting schedule has started
 
-### `vestingStartingTime() → uint256` (external)
+### `vestingStartingTime() → uint256` (public)
 
 
 
 Return the starting time of the vesting schedule
 
-### `maxVestingStartingTime() → uint256` (external)
+### `maxVestingStartingTime() → uint256` (public)
 
 
 

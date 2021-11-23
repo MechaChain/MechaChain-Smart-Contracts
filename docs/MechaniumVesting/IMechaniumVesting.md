@@ -89,6 +89,24 @@ Return the total allocated tokens for all the addresses
 
 Return the total tokens that have been transferred among all the addresses
 
+### `vestingPerClock() → uint256` (external)
+
+
+
+Return the percentage of unlocked tokens per `vestingClockTime()` once the vesting schedule has started
+
+### `vestingClockTime() → uint256` (external)
+
+
+
+Return the number of seconds between two `vestingPerClock()`
+
+### `isSoldOut() → bool` (external)
+
+
+
+Return true if all tokens have been allocated
+
 
 
 

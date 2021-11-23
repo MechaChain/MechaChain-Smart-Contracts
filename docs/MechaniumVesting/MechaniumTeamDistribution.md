@@ -5,7 +5,7 @@ Can manage multiple allocations with a specific schedule to each
 
 
 
-### `constructor(contract IERC20 token_, uint256 timeBeforeStarting, uint256 vestingPerClock, uint256 vestingClockTime)` (public)
+### `constructor(contract IERC20 token_, uint256 timeBeforeStarting_, uint256 vestingPerClock_, uint256 vestingClockTime_)` (public)
 
 
 
@@ -66,6 +66,12 @@ Return the starting time of the allocation
 
 
 Return the array of allocationId owned by `wallet`
+
+### `timeBeforeStarting() → uint256` (public)
+
+
+
+Return the number of seconds to wait between allocation and the start of the schedule
 
 
 

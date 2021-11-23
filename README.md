@@ -19,6 +19,7 @@ All smart contracts for the play to earn [Mechachain project](https://mechachain
   - [HOW TO USE AND DEPLOY](#how-to-use-and-deploy)
     - [Use with Remix](#use-with-remix)
     - [Use on Testnets](#use-on-testnets)
+    - [Generate doc](#generate-doc)
   - [SMART CONTRACTS](#smart-contracts)
     - [Mechanium.sol](#mechaniumsol)
 
@@ -54,6 +55,20 @@ For get more eth on Goerli, use this link : https://app.mycrypto.com/faucet
 **Faucets tokens for Mumbai or Goerli**
 
 For get more tokens on Mumbai or Goerli, use this link : https://faucet.polygon.technology/
+
+### Generate doc
+
+To generate the markdown documentation, first install [solidity-docgen](https://github.com/OpenZeppelin/solidity-docgen) for solidity v0.8.2.
+
+```
+npm install -G solc-0.8@npm:solc@^0.8.2
+```
+Then, run : 
+
+```
+npx solidity-docgen --solc-module solc-0.8
+```
+
 ## SMART CONTRACTS
 
 ### Mechanium.sol
