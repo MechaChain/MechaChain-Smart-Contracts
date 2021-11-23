@@ -84,4 +84,9 @@ interface IMechaniumVesting {
      * @dev Return the number of seconds between two `vestingPerClock()`
      */
     function vestingClockTime() external view returns (uint256);
+
+    /**
+     * @dev Return true if all tokens have been allocated
+     */
+    function isSoldOut() external view  returns (bool);
 }

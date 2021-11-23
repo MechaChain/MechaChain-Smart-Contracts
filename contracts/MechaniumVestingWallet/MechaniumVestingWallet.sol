@@ -29,6 +29,11 @@ contract MechaniumVestingWallet is IMechaniumVestingWallet, AccessControl {
     );
 
     /**
+     * @notice Event emitted when all tokens have been transferred
+     */
+    event SoldOut(uint256 totalAllocated);
+
+    /**
      * ========================
      *  Constants & Immutables
      * ========================
@@ -110,6 +115,9 @@ contract MechaniumVestingWallet is IMechaniumVestingWallet, AccessControl {
         _totalReleasedTokens = _totalReleasedTokens.add(amount);
 
         emit TransferredTokens(msg.sender, to, amount);
+        if(tokenBalance() == 0){
+            emit SoldOut(totalReleasedTokens());
+        }
         return true;
     }
 

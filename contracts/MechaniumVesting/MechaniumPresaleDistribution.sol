@@ -130,6 +130,9 @@ contract MechaniumPresaleDistribution is MechaniumVesting {
         _totalAllocatedTokens = _totalAllocatedTokens.add(amount);
 
         emit Allocated(to, amount);
+        if (isSoldOut()) {
+            emit SoldOut(totalAllocatedTokens());
+        }
         return true;
     }
 

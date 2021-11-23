@@ -43,6 +43,16 @@ abstract contract MechaniumVesting is AccessControl, IMechaniumVesting {
     );
 
     /**
+     * @notice Event emitted when all tokens have been allocated
+     */
+    event SoldOut(uint256 totalAllocated);
+
+    /**
+     * @notice Event emitted when the last tokens have been claimed
+     */
+    event ReleasedLastTokens(uint256 totalReleased);
+
+    /**
      * ========================
      *  Constants & Immutables
      * ========================
@@ -184,9 +194,12 @@ abstract contract MechaniumVesting is AccessControl, IMechaniumVesting {
 
         _token.safeTransfer(to, amount);
 
-        // if transfer succeeded
         _releasedTokens[to] = releasedTokensOf(to).add(amount);
         _totalReleasedTokens = _totalReleasedTokens.add(amount);
+
+        if(tokenBalance() == 0){
+            emit ReleasedLastTokens(totalReleasedTokens());
+        }
     }
 
     /**
@@ -343,5 +356,12 @@ abstract contract MechaniumVesting is AccessControl, IMechaniumVesting {
      */
     function vestingClockTime() public view override returns (uint256) {
         return _vestingClockTime;
+    }
+
+    /**
+     * @dev Return true if all tokens have been allocated
+     */
+    function isSoldOut() public view returns (bool) {
+        return totalSupply() == totalAllocatedTokens();
     }
 }
