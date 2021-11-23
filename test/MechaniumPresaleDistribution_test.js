@@ -58,6 +58,16 @@ contract('MechaniumPresaleDistribution', (accounts) => {
     assert.equal(hasStarted, false, "Vesting should not be started");
   });
 
+  it('Allocator should be able to allocate tokens to multiple users', async () => {
+    const amount = getAmount(100);
+    for (let i = 4; i < 10; i++) {
+      const _user = accounts[i];
+      await instance.allocateTokens(_user, amount, { from: allocator });
+      const userBalance = await instance.balanceOf(_user);
+      assert.equal(userBalance.cmp(amount), 0, "Allocated amout not valid");
+    }
+  });
+
   it('Allocator should be able to allocate tokens to user', async () => {
     const amount = getAmount(100);
     await instance.allocateTokens(user, amount, { from: allocator });
@@ -147,6 +157,27 @@ contract('MechaniumPresaleDistribution', (accounts) => {
     );
   });
 
+  it('Pending tokens must be calculated per seconds', async () => {
+    const diff = time.duration.days(2);
+    await time.increase(diff);
+    const vct = await instance.vestingClockTime();
+    const vpc = await instance.vestingPerClock();
+
+    const balance = await instance.allocatedTokensOf(user);
+    const divPerClock = getBN(100).div(vpc);
+    const releasePerClock = balance.div(divPerClock);
+    const releasePerSecond = releasePerClock.div(vct);
+    let toRelease = releasePerSecond.mul(diff);
+    const unlockableTokens = await instance.unlockableTokens(user);
+    toRelease = toRelease.add(unlockableTokens);
+    toRelease = toRelease.div(getBN(10 ** 12));
+
+    let pendingTokens = await instance.pendingTokensOf(user);
+    pendingTokens = pendingTokens.div(getBN(10 ** 12));
+
+    assert.equal(toRelease.toString(), pendingTokens.toString(), 'Pending tokens not valid');
+  });
+
   it('Admin should claim user\'s unlockable tokens ( 20% )', async () => {
     const oldUserBalance = await instance.balanceOf(user);
     const expectedClaimedAmount = oldUserBalance.div(getBN(5));
@@ -169,6 +200,13 @@ contract('MechaniumPresaleDistribution', (accounts) => {
       0,
       "Rest user balance must be 80% of the total allocated tokes"
     );
+  });
+
+  it('Admin should not be able to claim user\'s tokens in same period', async () => {
+    await expectRevert(
+      instance.claimTokens(user),
+      `No token can be unlocked for this account -- Reason given: No token can be unlocked for this account.`,
+    )
   });
 
   it('Admin should set pte pool address', async () => {
@@ -205,7 +243,7 @@ contract('MechaniumPresaleDistribution', (accounts) => {
     )
   });
 
-  it('Unlockable amount must be 60% of total user balance ( after three month )', async () => {
+  it('Unlockable amount must be 60% of total allocated tokens ( after three month )', async () => {
     await time.increase(time.duration.days(63));
 
     let userBalance = await instance.balanceOf(user);
@@ -249,7 +287,7 @@ contract('MechaniumPresaleDistribution', (accounts) => {
     );
   });
 
-  it('Unlockable amount must be 100% of total user balance ( after 6 months )', async () => {
+  it('Unlockable amount must be 100% of total user balance ( after 5 months )', async () => {
     await time.increase(time.duration.days(90));
 
     let userBalance = await instance.balanceOf(user);
@@ -290,6 +328,32 @@ contract('MechaniumPresaleDistribution', (accounts) => {
       newUserBalance.cmp(restUserBalance),
       0,
       "Rest user balance must be 0% of the total allocated tokes"
+    );
+  });
+
+  it('Admin should not be able to claim user\'s tokens after they where all claimed', async () => {
+    await expectRevert(
+      instance.claimTokens(user),
+      `No token can be unlocked for this account -- Reason given: No token can be unlocked for this account.`,
+    )
+  });
+
+  it('Admin should claim all users tokens', async () => {
+    await instance.claimTokensForAll();
+
+    for (let i = 4; i < 10; i++) {
+      const _user = accounts[i];
+      await expectRevert(
+        instance.claimTokens(_user),
+        'No token can be unlocked for this account'
+      );
+    }
+  });
+
+  it('Admin should not be able to claim all users tokens once they are already claimed', async () => {
+    await expectRevert(
+      instance.claimTokensForAll(),
+      'No token can be unlocked'
     );
   });
 });
