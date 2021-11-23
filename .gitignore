@@ -6,3 +6,6 @@ contracts/MechaniumVestingWallet/artifacts
 contracts/MechaniumStaking/artifacts
 node_modules
 package-lock.json
+.VSCodeCounter
+contracts/MechaniumVesting/artifacts
+contracts/MechaniumVestingWallet/artifacts
