@@ -4,18 +4,21 @@ const { time, expectRevert } = require('@openzeppelin/test-helpers');
 // Load artifacts
 const Mechanium = artifacts.require('Mechanium');
 const MechaniumPresaleDistribution = artifacts.require('MechaniumPresaleDistribution');
+const StakingPool = artifacts.require('StakingPool');
 
 // Load utils
 const { getAmount, getBN } = require('../utils');
 
 contract('MechaniumPresaleDistribution', (accounts) => {
   const [owner, allocator, user, ptePoolAddr] = accounts;
-  let instance, token, ALLOCATOR_ROLE, DEFAULT_ADMIN_ROLE;
+  let instance, token, stakingPool, ALLOCATOR_ROLE, DEFAULT_ADMIN_ROLE;
 
   it('Smart contract should be deployed', async () => {
     instance = await MechaniumPresaleDistribution.deployed();
-    token = await Mechanium.deployed();
     assert(instance.address !== '');
+    token = await Mechanium.deployed();
+    stakingPool = await StakingPool.deployed();
+    DEFAULT_ADMIN_ROLE = await instance.DEFAULT_ADMIN_ROLE();
   });
 
   it('Allocator account should not have ALLOCATOR_ROLE', async () => {
@@ -217,8 +220,45 @@ contract('MechaniumPresaleDistribution', (accounts) => {
     assert.equal(ptePoolAddr, _ptePoolAddress, "PTE pool address not set");
   });
 
-  it('User should not have access to set pte pool address', async () => {
-    DEFAULT_ADMIN_ROLE = await instance.DEFAULT_ADMIN_ROLE();
+  it('User shoud not be able to transfer to staking pool if the staking pool is not set', async () => {
+    const _user = accounts[9];
+
+    await expectRevert(
+      instance.transferToStakingPool({ from: _user }),
+      'Staking pool address is not set',
+    );
+  });
+
+  it('Admin shoud be able to set staking pool address', async () => {
+    await instance.setStakingPool(stakingPool.address);
+
+    const stakingPoolAddress = await instance.getStakingPoolAddress();
+
+    assert.equal(stakingPool.address, stakingPoolAddress, 'Staking pool address not valid');
+  });
+
+  it('User shoud not be able to set staking pool address', async () => {
+    await expectRevert(
+      instance.setStakingPool(stakingPool.address, { from: user }),
+      `AccessControl: account ${user.toLowerCase()} is missing role ${DEFAULT_ADMIN_ROLE.toLowerCase()} -- Reason given: AccessControl: account ${user.toLowerCase()} is missing role ${DEFAULT_ADMIN_ROLE.toLowerCase()}.`,
+    );
+  });
+
+  it('User shoud be able to transfer all unclaimed tokens to staking pool', async () => {
+    const _user = accounts[9];
+    const userBalance = await instance.balanceOf(_user);
+
+    await instance.transferToStakingPool({ from: _user });
+
+    const stakedBalance = await stakingPool.balanceOf(_user);
+
+    const contractTokens = await token.balanceOf(stakingPool.address);
+
+    assert.equal(contractTokens.cmp(stakedBalance), 0, 'Staking Contract balance not valid');
+    assert.equal(userBalance.cmp(stakedBalance), 0, 'User staking balance not valid');
+  });
+
+  it('User should not set pte pool address', async () => {
     await expectRevert(
       instance.setPTEPool(ptePoolAddr, { from: user }),
       `AccessControl: account ${user.toLowerCase()} is missing role ${DEFAULT_ADMIN_ROLE.toLowerCase()} -- Reason given: AccessControl: account ${user.toLowerCase()} is missing role ${DEFAULT_ADMIN_ROLE.toLowerCase()}.`,

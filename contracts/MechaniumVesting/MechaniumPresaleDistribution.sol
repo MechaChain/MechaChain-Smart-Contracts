@@ -316,4 +316,11 @@ contract MechaniumPresaleDistribution is MechaniumVesting {
     function getPTEPoolAddress() public view returns (address) {
         return _ptePoolAddress;
     }
+
+    /**
+     * @dev Return the staking pool address
+     */
+    function getStakingPoolAddress() public view returns (address) {
+        return _stakingPoolAddress;
+    }
 }

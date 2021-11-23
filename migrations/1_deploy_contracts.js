@@ -1,5 +1,6 @@
 const Mechanium = artifacts.require("Mechanium");
 const MechaniumPresaleDistribution = artifacts.require("MechaniumPresaleDistribution");
+const StakingPool = artifacts.require("StakingPool");
 
 // Load utils
 const { getAmount } = require('../utils');
@@ -11,4 +12,5 @@ module.exports = async function(deployer, network, accounts) {
   await deployer.deploy(MechaniumPresaleDistribution, mechaniumInstance.address);
   const presaleInstance = await MechaniumPresaleDistribution.deployed();
   await mechaniumInstance.transfer(presaleInstance.address, getAmount(10000000));
+  await deployer.deploy(StakingPool, mechaniumInstance.address);
 };
