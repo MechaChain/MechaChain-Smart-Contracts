@@ -167,7 +167,7 @@ contract('MechaniumPresaleDistribution', (accounts) => {
     assert.equal(
       newUserBalance.cmp(restUserBalance),
       0,
-      "Rest user balance must be 80% of the old balance"
+      "Rest user balance must be 80% of the total allocated tokes"
     );
   });
 
@@ -203,5 +203,93 @@ contract('MechaniumPresaleDistribution', (accounts) => {
       instance.transferUnsoldToPTEPool({ from: user }),
       `AccessControl: account ${user.toLowerCase()} is missing role ${DEFAULT_ADMIN_ROLE.toLowerCase()} -- Reason given: AccessControl: account ${user.toLowerCase()} is missing role ${DEFAULT_ADMIN_ROLE.toLowerCase()}.`,
     )
+  });
+
+  it('Unlockable amount must be 60% of total user balance ( after three month )', async () => {
+    await time.increase(time.duration.days(63));
+
+    let userBalance = await instance.balanceOf(user);
+    const releaseUserTokens = await instance.releasedTokensOf(user);
+    const unlockableAmount = await instance.unlockableTokens(user);
+    userBalance = userBalance.add(releaseUserTokens);
+
+    const expectedUnlockableAmount = userBalance.div(getBN(5)).mul(getBN(2));
+
+    assert.equal(
+      unlockableAmount.cmp(expectedUnlockableAmount),
+      0,
+      "Amount must be 60% of the balance"
+    );
+  });
+
+  it('Admin should claim user\'s unlockable tokens ( 60% )', async () => {
+    const oldUserBalance = await instance.balanceOf(user);
+    const releaseUserTokens = await instance.releasedTokensOf(user);
+    const totalUserBalance = await instance.allocatedTokensOf(user);
+    const expectedClaimedAmount = totalUserBalance.div(getBN(5)).mul(getBN(2));
+
+    const restUserBalance = oldUserBalance.sub(expectedClaimedAmount);
+
+    await instance.claimTokens(user);
+
+    const userTokenBalance = await token.balanceOf(user);
+
+    assert.equal(
+      userTokenBalance.cmp(expectedClaimedAmount.add(releaseUserTokens)),
+      0,
+      "Claimend amount must be 60% of the balance"
+    );
+
+    const newUserBalance = await instance.balanceOf(user);
+
+    assert.equal(
+      newUserBalance.cmp(restUserBalance),
+      0,
+      "Rest user balance must be 40% of the total allocated tokes"
+    );
+  });
+
+  it('Unlockable amount must be 100% of total user balance ( after 6 months )', async () => {
+    await time.increase(time.duration.days(90));
+
+    let userBalance = await instance.balanceOf(user);
+    const releaseUserTokens = await instance.releasedTokensOf(user);
+    const unlockableAmount = await instance.unlockableTokens(user);
+    userBalance = userBalance.add(releaseUserTokens);
+
+    const expectedUnlockableAmount = userBalance.div(getBN(5)).mul(getBN(2));
+
+    assert.equal(
+      unlockableAmount.cmp(expectedUnlockableAmount),
+      0,
+      "Amount must be 100% of the balance"
+    );
+  });
+
+  it('Admin should claim user\'s unlockable tokens ( 100% )', async () => {
+    const oldUserBalance = await instance.balanceOf(user);
+    const releaseUserTokens = await instance.releasedTokensOf(user);
+    const totalUserBalance = await instance.allocatedTokensOf(user);
+    const expectedClaimedAmount = totalUserBalance.div(getBN(5)).mul(getBN(2));
+
+    const restUserBalance = oldUserBalance.sub(expectedClaimedAmount);
+
+    await instance.claimTokens(user);
+
+    const userTokenBalance = await token.balanceOf(user);
+
+    assert.equal(
+      userTokenBalance.cmp(expectedClaimedAmount.add(releaseUserTokens)),
+      0,
+      "Claimend amount must be 100% of the balance"
+    );
+
+    const newUserBalance = await instance.balanceOf(user);
+
+    assert.equal(
+      newUserBalance.cmp(restUserBalance),
+      0,
+      "Rest user balance must be 0% of the total allocated tokes"
+    );
   });
 });
