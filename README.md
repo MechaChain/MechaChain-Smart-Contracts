@@ -50,6 +50,10 @@ Administrator of all smart contracts and keeps tokens
 **Faucets for Goerli**
 
 For get more eth on Goerli, use this link : https://app.mycrypto.com/faucet
+
+**Faucets tokens for Mumbai or Goerli**
+
+For get more tokens on Mumbai or Goerli, use this link : https://faucet.polygon.technology/
 ## SMART CONTRACTS
 
 ### Mechanium.sol
