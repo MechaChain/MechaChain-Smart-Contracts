@@ -312,4 +312,18 @@ contract MechaniumPresaleDistribution is MechaniumVesting {
     function maxVestingStartingTime() public view returns (uint256) {
         return _maxVestingStartingTime;
     }
+
+    /**
+     * @dev Return the pte pool address
+     */
+    function getPTEPoolAddress() public view returns (address) {
+        return _ptePoolAddress;
+    }
+
+    /**
+     * @dev Return the staking pool address
+     */
+    function getStakingPoolAddress() public view returns (address) {
+        return _stakingPoolAddress;
+    }
 }

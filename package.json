@@ -4,6 +4,7 @@
     "solc-0.8": "npm:solc@^0.8.10"
   },
   "dependencies": {
-    "@openzeppelin/contracts": "^4.3.3"
+    "@openzeppelin/contracts": "^4.3.3",
+    "@openzeppelin/test-helpers": "^0.5.15"
   }
 }
