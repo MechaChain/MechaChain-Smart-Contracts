@@ -49,63 +49,35 @@ contract('MechaniumFoundersDistribution', (accounts) => {
     assert.equal(newBalance.cmp(oldBalance.add(amount)), 0, 'Withdraw must be locked');
   });
 
-  it('Total unlockable tokens must be 20% of the first allocation', async () => {
-    const timeBeforeStarting = await instance.timeBeforeStarting();
-    await time.increase(timeBeforeStarting.sub(getBN(30)));
-    const vpc = await instance.vestingPerClock();
-    const vct = await instance.vestingClockTime();
-
-    const currentTime = await time.latest();
-    const allocIndexes = await instance.allocationsOf(user);
+  it('Total unlockable tokens must be 20% of the first allocation (1 year after the first allocation)', async () => {
+    await time.increase(time.duration.days(360 - 30));
     const totalUnlockableTokens = await instance.unlockableTokens(user);
-
-    let exptectedTotalTokens = getBN(0);
-
-    for (let i in allocIndexes) {
-      const allocTime = await instance.allocationStartingTime(i);
-      const allocTokens = await instance.allocationTokens(i);
-      let allocTokensForPeriod = allocTokens.div(getBN(100).div(vpc));
-      const diff = currentTime.sub(allocTime);
-      if (diff.lt(getBN(0))) {
-        allocTokensForPeriod = getBN(0);
-      }
-      const passedPeriod = diff.div(vct).add(getBN(1));
-      const expectedTokens = allocTokensForPeriod.mul(passedPeriod);
-      exptectedTotalTokens = exptectedTotalTokens.add(expectedTokens);
-    }
-
-    assert.equal(totalUnlockableTokens.cmp(exptectedTotalTokens), 0, 'Unlockable tokens not valid');
+    let exptectedTotalTokens = getAmount(1000 * 0.2);
+    assert.equal(totalUnlockableTokens.toString(), exptectedTotalTokens.toString(), 'Unlockable tokens not valid');
   });
 
-  it('Total unlockable tokens must be 40% of the first allocation', async () => {
-    const timeBeforeStarting = await instance.timeBeforeStarting();
-    await time.increase(timeBeforeStarting.add(getBN(150)));
-    const vpc = await instance.vestingPerClock();
-    const vct = await instance.vestingClockTime();
-
-    const currentTime = await time.latest();
-    const allocIndexes = await instance.allocationsOf(user);
+  it('Total unlockable tokens must be 20% of the two allocations (1 year after the seconds allocation)', async () => {
+    await time.increase(time.duration.days(30));
     const totalUnlockableTokens = await instance.unlockableTokens(user);
-
-    let exptectedTotalTokens = getBN(0);
-
-    for (let i in allocIndexes) {
-      const allocTime = await instance.allocationStartingTime(i);
-      const allocTokens = await instance.allocationTokens(i);
-      let allocTokensForPeriod = allocTokens.div(getBN(100).div(vpc));
-      const diff = currentTime.sub(allocTime);
-      if (diff.lt(getBN(0))) {
-        allocTokensForPeriod = getBN(0);
-      }
-      const passedPeriod = diff.div(vct).add(getBN(1));
-      const expectedTokens = allocTokensForPeriod.mul(passedPeriod);
-      exptectedTotalTokens = exptectedTotalTokens.add(expectedTokens);
-    }
-
-    assert.equal(totalUnlockableTokens.cmp(exptectedTotalTokens), 0, 'Unlockable tokens not valid');
+    let exptectedTotalTokens = getAmount((1000 + 1000) * 0.2);
+    assert.equal(totalUnlockableTokens.toString(), exptectedTotalTokens.toString(), 'Unlockable tokens not valid');
   });
 
-  it('Total unlockable tokens must be 100% of the first allocation', async () => {
+  it('Total unlockable tokens must be 40% of the first allocation + 20% of the seconds (1 year + 6 month)', async () => {
+    await time.increase(time.duration.days(180 - 30));
+    const totalUnlockableTokens = await instance.unlockableTokens(user);
+    let exptectedTotalTokens = getAmount(1000 * 0.2 + 1000 * 0.4);
+    assert.equal(totalUnlockableTokens.toString(), exptectedTotalTokens.toString(), 'Unlockable tokens not valid');
+  });
+
+  it('Total unlockable tokens must be 100% of all allocation', async () => {
+    await time.increase(time.duration.days(30 + 180 * 3));
+    const totalUnlockableTokens = await instance.unlockableTokens(user);
+    let exptectedTotalTokens = getAmount(2000);
+    assert.equal(totalUnlockableTokens.toString(), exptectedTotalTokens.toString(), 'Unlockable tokens not valid');
+  });
+
+  /*it('Total unlockable tokens must be 100% of the first allocation', async () => {
     const timeBeforeStarting = await instance.timeBeforeStarting();
     await time.increase(timeBeforeStarting.add(getBN(1000)));
     const vpc = await instance.vestingPerClock();
@@ -131,7 +103,7 @@ contract('MechaniumFoundersDistribution', (accounts) => {
     }
 
     assert.equal(totalUnlockableTokens.cmp(exptectedTotalTokens), 0, 'Unlockable tokens not valid');
-  });
+  });*/
 
   it('User should be able to claim unlockable tokens', async () => {
     const totalUnlockableTokens = await instance.unlockableTokens(user);
@@ -141,6 +113,23 @@ contract('MechaniumFoundersDistribution', (accounts) => {
     const tokensBalance = await token.balanceOf(user);
 
     assert.equal(tokensBalance.cmp(totalUnlockableTokens), 0, 'Unlockable tokens not claimed');
+  });
+  
+  it('Allocator should allocate new tokens to user', async () => {
+    const amount = getAmount(1000);
+
+    await instance.allocateTokens(user, amount);
+
+    const balance = await instance.balanceOf(user);
+
+    assert.equal(balance.cmp(amount), 0, 'Withdraw must be locked');
+  });
+
+  it('Total unlockable tokens must be 20% of the new allocation (1 year after the new allocation)', async () => {
+    await time.increase(time.duration.days(360));
+    const totalUnlockableTokens = await instance.unlockableTokens(user);
+    let exptectedTotalTokens = getAmount(1000 * 0.2);
+    assert.equal(totalUnlockableTokens.toString(), exptectedTotalTokens.toString(), 'Unlockable tokens not valid');
   });
 
   it('Admin should withdraw', async () => {
@@ -155,12 +144,10 @@ contract('MechaniumFoundersDistribution', (accounts) => {
     assert.equal(oldBalance.cmp(newAdminBalance.sub(oldAdminBalance)), 0, 'Admin balance not valid');
   });
 
-  it('Admin should lock withdraw', async () => {
-    await instance.lockWithdraw();
-
-    const isLocked = await instance.isWithdrawLocked();
-
-    assert.equal(isLocked, true, 'Withdraw must be locked');
+  it('User should not have unlockable tokens anymore', async () => {
+    const totalUnlockableTokens = await instance.unlockableTokens(user);
+    let exptectedTotalTokens = getAmount(0);
+    assert.equal(totalUnlockableTokens.toString(), exptectedTotalTokens.toString(), 'Unlockable tokens not valid');
   });
 
   it('User should not be able to lock withdraw', async () => {
@@ -168,6 +155,14 @@ contract('MechaniumFoundersDistribution', (accounts) => {
       instance.lockWithdraw({ from: user }),
       `AccessControl: account ${user.toLowerCase()} is missing role ${DEFAULT_ADMIN_ROLE.toLowerCase()} -- Reason given: AccessControl: account ${user.toLowerCase()} is missing role ${DEFAULT_ADMIN_ROLE.toLowerCase()}.`,
     );
+  });
+
+  it('Admin should lock withdraw', async () => {
+    await instance.lockWithdraw();
+
+    const isLocked = await instance.isWithdrawLocked();
+
+    assert.equal(isLocked, true, 'Withdraw must be locked');
   });
 
   it('Admin should not be able to relock withdraw', async () => {
