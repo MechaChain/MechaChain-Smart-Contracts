@@ -1,6 +1,7 @@
 const Mechanium = artifacts.require("Mechanium");
 const MechaniumPresaleDistribution = artifacts.require("MechaniumPresaleDistribution");
 const MechaniumGrowthVestingWallet = artifacts.require("MechaniumGrowthVestingWallet");
+const MechaniumFoundersDistribution = artifacts.require("MechaniumFoundersDistribution");
 const StakingPool = artifacts.require("StakingPool");
 
 // Load utils
@@ -25,4 +26,9 @@ module.exports = async function(deployer, network, accounts) {
   await deployer.deploy(MechaniumGrowthVestingWallet, mechaniumInstance.address);
   const growthWalletInstance = await MechaniumGrowthVestingWallet.deployed();
   await mechaniumInstance.transfer(growthWalletInstance.address, getAmount(8000000)); // 8 000 000 $MECHA
+
+  // MechaniumFoundersDistribution
+  await deployer.deploy(MechaniumFoundersDistribution, mechaniumInstance.address);
+  const mechaniumFoundersInstance = await MechaniumFoundersDistribution.deployed();
+  await mechaniumInstance.transfer(mechaniumFoundersInstance.address, getAmount(10000000)); // 10 000 000 $MECHA
 };
