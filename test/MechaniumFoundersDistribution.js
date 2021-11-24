@@ -105,6 +105,34 @@ contract('MechaniumFoundersDistribution', (accounts) => {
     assert.equal(totalUnlockableTokens.cmp(exptectedTotalTokens), 0, 'Unlockable tokens not valid');
   });
 
+  it('Total unlockable tokens must be 100% of the first allocation', async () => {
+    const timeBeforeStarting = await instance.timeBeforeStarting();
+    await time.increase(timeBeforeStarting.add(getBN(1000)));
+    const vpc = await instance.vestingPerClock();
+    const vct = await instance.vestingClockTime();
+
+    const currentTime = await time.latest();
+    const allocIndexes = await instance.allocationsOf(user);
+    const totalUnlockableTokens = await instance.unlockableTokens(user);
+
+    let exptectedTotalTokens = getBN(0);
+
+    for (let i in allocIndexes) {
+      const allocTime = await instance.allocationStartingTime(i);
+      const allocTokens = await instance.allocationTokens(i);
+      let allocTokensForPeriod = allocTokens.div(getBN(100).div(vpc));
+      const diff = currentTime.sub(allocTime);
+      if (diff.lt(getBN(0))) {
+        allocTokensForPeriod = getBN(0);
+      }
+      const passedPeriod = diff.div(vct).add(getBN(1));
+      const expectedTokens = allocTokensForPeriod.mul(passedPeriod);
+      exptectedTotalTokens = exptectedTotalTokens.add(expectedTokens);
+    }
+
+    assert.equal(totalUnlockableTokens.cmp(exptectedTotalTokens), 0, 'Unlockable tokens not valid');
+  });
+
   it('User should be able to claim unlockable tokens', async () => {
     const totalUnlockableTokens = await instance.unlockableTokens(user);
 
@@ -116,11 +144,15 @@ contract('MechaniumFoundersDistribution', (accounts) => {
   });
 
   it('Admin should withdraw', async () => {
+    const oldBalance = await token.balanceOf(instance.address);
+    const oldAdminBalance = await token.balanceOf(owner);
     await instance.withdraw();
 
-    const balance = await token.balanceOf(instance.address);
+    const newBalance = await token.balanceOf(instance.address);
+    const newAdminBalance = await token.balanceOf(owner);
 
-    assert.equal(balance.cmp(getBN(0)), 0, 'Withdraw not valid');
+    assert.equal(newBalance.cmp(getBN(0)), 0, 'Withdraw not valid');
+    assert.equal(oldBalance.cmp(newAdminBalance.sub(oldAdminBalance)), 0, 'Admin balance not valid');
   });
 
   it('Admin should lock withdraw', async () => {
