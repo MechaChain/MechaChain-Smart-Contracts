@@ -63,7 +63,7 @@ contract MechaniumFoundersDistribution is MechaniumTeamDistribution {
         onlyRole(DEFAULT_ADMIN_ROLE)
         returns (bool)
     {
-        require(_lockWithdraw, "Whitdraw already locked");
+        require(!_lockWithdraw, "Whitdraw already locked");
 
         _lockWithdraw = true;
 
