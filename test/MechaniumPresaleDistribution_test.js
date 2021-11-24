@@ -173,10 +173,10 @@ contract('MechaniumPresaleDistribution', (accounts) => {
     let toRelease = releasePerSecond.mul(diff);
     const unlockableTokens = await instance.unlockableTokens(user);
     toRelease = toRelease.add(unlockableTokens);
-    toRelease = toRelease.div(getBN(10 ** 12));
+    toRelease = toRelease.div(getBN(10 ** 15));
 
     let pendingTokens = await instance.pendingTokensOf(user);
-    pendingTokens = pendingTokens.div(getBN(10 ** 12));
+    pendingTokens = pendingTokens.div(getBN(10 ** 15));
 
     assert.equal(toRelease.toString(), pendingTokens.toString(), 'Pending tokens not valid');
   });
