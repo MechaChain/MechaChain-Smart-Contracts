@@ -122,6 +122,7 @@ Distribute the tokens according to the lock & vesting schedule:
 >- then 20% every month _(30 days)_
 
 _Inherit from [MechaniumVesting.sol](#MechaniumVesting)_
+
 [MechaniumPresaleDistribution.sol documentation](.\docs\MechaniumVesting\MechaniumPresaleDistribution.md)
 
 **Smart contract address**
@@ -137,6 +138,7 @@ Mainnets
 Set `timeBeforeStarting`.
 
 _Inherit from [MechaniumVesting.sol](#MechaniumVesting)_
+
 [MechaniumTeamDistribution.sol documentation](.\docs\MechaniumVesting\MechaniumTeamDistribution.md)
 
 ### MechaniumFoundersDistribution.sol
@@ -148,6 +150,7 @@ Distribute the tokens according to the lock & vesting schedule:
 >- and repeat every 6 months _(180 days)_
 
 _Inherit from [MechaniumTeamDistribution.sol](#MechaniumTeamDistribution)_
+
 [MechaniumFoundersDistribution.sol documentation](.\docs\MechaniumVesting\MechaniumFoundersDistribution.md)
 
 **Smart contract address**
@@ -166,6 +169,7 @@ Distribute the tokens according to the lock & vesting schedule:
 >- and repeat every 6 months _(180 days)_
 
 _Inherit from [MechaniumTeamDistribution.sol](#MechaniumTeamDistribution)_
+
 [MechaniumAdvisorsDistribution.sol documentation](.\docs\MechaniumVesting\MechaniumAdvisorsDistribution.md)
 
 **Smart contract address**
@@ -185,6 +189,7 @@ Distribute the tokens according to the lock & vesting schedule:
 >- and repeat every 3 months _(90 days)_
 
 _Inherit from [MechaniumTeamDistribution.sol](#MechaniumTeamDistribution)_
+
 [MechaniumDevDistribution.sol documentation](.\docs\MechaniumVesting\MechaniumDevDistribution.md)
 
 **Smart contract address**
@@ -208,6 +213,7 @@ Set `initialVesting`, `vestingPerClock` and `vestingClockTime`
 >- then unlock 20% every 6 months _(180 days)_
 
 _Inherit from [MechaniumVestingWallet.sol](#mechaniumvestingwalletsol)_
+
 [MechaniumGrowthVestingWallet.sol documentation](.\docs\MechaniumVestingWallet\MechaniumGrowthVestingWallet.md)
 
 **Smart contract address**
