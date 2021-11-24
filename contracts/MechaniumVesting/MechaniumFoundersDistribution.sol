@@ -50,7 +50,12 @@ contract MechaniumFoundersDistribution is MechaniumTeamDistribution {
      * @param token_ Address of the ERC20 token contract, this address cannot be changed later
      */
     constructor(IERC20 token_)
-        MechaniumTeamDistribution(token_, 360 days, 20, 180 days)
+        MechaniumTeamDistribution(
+            token_,
+            360 days, // 1 year after allocation
+            20, // unlock 20%
+            180 days // and repeat every 6 months
+        )
     {
         _lockWithdraw = false;
     }

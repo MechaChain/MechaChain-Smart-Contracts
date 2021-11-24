@@ -102,7 +102,13 @@ contract MechaniumPresaleDistribution is MechaniumVesting {
      * @dev Contract constructor
      * @param token_ address of the ERC20 token contract, this address cannot be changed later
      */
-    constructor(IERC20 token_) MechaniumVesting(token_, 20, 30 days) {
+    constructor(IERC20 token_)
+        MechaniumVesting(
+            token_,
+            20, // once the schedule has started, unlock 20%
+            30 days // and repeat every month
+        )
+    {
         _vestingStartingTime = block.timestamp.add(180 days);
         _maxVestingStartingTime = block.timestamp.add(180 days);
     }

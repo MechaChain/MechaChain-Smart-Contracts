@@ -21,7 +21,7 @@ contract MechaniumDevDistribution is MechaniumTeamDistribution {
             token_,
             0, // at the allocation
             20, // unlock 20%
-            90 days // and repeat every 3 month
+            90 days // and repeat every 3 months
         )
     {}
 }

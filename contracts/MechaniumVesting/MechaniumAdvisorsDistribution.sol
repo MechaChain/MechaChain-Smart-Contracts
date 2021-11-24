@@ -19,9 +19,9 @@ contract MechaniumAdvisorsDistribution is MechaniumTeamDistribution {
     constructor(IERC20 token_)
         MechaniumTeamDistribution(
             token_,
-            180 days, // after 6 months (included)
+            180 days, // 6 months after allocation
             20, // unlock 20%
-            180 days // and repeat every 6 month
+            180 days // and repeat every 6 months
         )
     {}
 }
