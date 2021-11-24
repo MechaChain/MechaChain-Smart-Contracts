@@ -4,9 +4,10 @@ pragma solidity ^0.8.2;
 import "./MechaniumVestingWallet.sol";
 
 /**
- * @title MechaniumGrowthVestingWallet - $MECHA allocated to the growth and marketing operations with a vesting schedule
- * @author EthernalHorizons - <https://mechachain.io/>
- * @custom:security-contact hello@mechachain.io
+ * @title MechaniumGrowthVestingWallet - Hold $MECHA allocated to the growth and marketing operations with a vesting schedule
+ * @author EthernalHorizons - <https://ethernalhorizons.com/>
+ * @custom:project-website  https://mechachain.io/
+ * @custom:security-contact contracts@ethernalhorizons.com
  */
 contract MechaniumGrowthVestingWallet is MechaniumVestingWallet {
     

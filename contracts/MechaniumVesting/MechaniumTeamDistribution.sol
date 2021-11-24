@@ -6,10 +6,11 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 import "./MechaniumVesting.sol";
 
 /**
- * @title MechaniumTeamDistribution - Vesting and distribution smart contract for the mechachain team
+ * @title MechaniumTeamDistribution - Vesting and distribution smart contract for the MechaChain team
  * @notice Can manage multiple allocations with a specific schedule to each
- * @author EthernalHorizons - <https://mechachain.io/>
- * @custom:security-contact hello@mechachain.io
+ * @author EthernalHorizons - <https://ethernalhorizons.com/>
+ * @custom:project-website  https://mechachain.io/
+ * @custom:security-contact contracts@ethernalhorizons.com
  */
 contract MechaniumTeamDistribution is MechaniumVesting {
     using SafeMath for uint256;

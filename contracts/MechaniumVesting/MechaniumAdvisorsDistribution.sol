@@ -6,9 +6,10 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 import "./MechaniumTeamDistribution.sol";
 
 /**
- * @title MechaniumAdvisorsDistribution - Vesting and distribution smart contract for the mechachain advisor
- * @author EthernalHorizons - <https://mechachain.io/>
- * @custom:security-contact hello@mechachain.io
+ * @title MechaniumAdvisorsDistribution - Vesting and distribution smart contract for the MechaChain advisors
+ * @author EthernalHorizons - <https://ethernalhorizons.com/>
+ * @custom:project-website  https://mechachain.io/
+ * @custom:security-contact contracts@ethernalhorizons.com
  */
 contract MechaniumAdvisorsDistribution is MechaniumTeamDistribution {
     
