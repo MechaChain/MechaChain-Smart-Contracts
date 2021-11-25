@@ -8,8 +8,9 @@ import "../MechaniumStaking/IStakingPool.sol";
 
 /**
  * @title MechaniumPresaleDistribution - Pre-sale distribution smart contract
- * @author EthernalHorizons - <https://mechachain.io/>
- * @custom:security-contact hello@mechachain.io
+ * @author EthernalHorizons - <https://ethernalhorizons.com/>
+ * @custom:project-website  https://mechachain.io/
+ * @custom:security-contact contracts@ethernalhorizons.com
  */
 contract MechaniumPresaleDistribution is MechaniumVesting {
     using SafeMath for uint256;
@@ -102,7 +103,13 @@ contract MechaniumPresaleDistribution is MechaniumVesting {
      * @dev Contract constructor
      * @param token_ address of the ERC20 token contract, this address cannot be changed later
      */
-    constructor(IERC20 token_) MechaniumVesting(token_, 20, 30 days) {
+    constructor(IERC20 token_)
+        MechaniumVesting(
+            token_,
+            20, // once the schedule has started, unlock 20%
+            30 days // and repeat every month
+        )
+    {
         _vestingStartingTime = block.timestamp.add(180 days);
         _maxVestingStartingTime = block.timestamp.add(180 days);
     }

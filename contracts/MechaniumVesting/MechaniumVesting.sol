@@ -8,8 +8,9 @@ import "./IMechaniumVesting.sol";
 
 /**
  * @title MechaniumVesting - Abstract class for vesting and distribution smart contract
- * @author EthernalHorizons - <https://mechachain.io/>
- * @custom:security-contact hello@mechachain.io
+ * @author EthernalHorizons - <https://ethernalhorizons.com/>
+ * @custom:project-website  https://mechachain.io/
+ * @custom:security-contact contracts@ethernalhorizons.com
  */
 abstract contract MechaniumVesting is AccessControl, IMechaniumVesting {
     using SafeMath for uint256;

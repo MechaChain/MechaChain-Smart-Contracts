@@ -6,9 +6,10 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 import "./MechaniumTeamDistribution.sol";
 
 /**
- * @title MechaniumAdvisorsDistribution - Vesting and distribution smart contract for the mechachain advisor
- * @author EthernalHorizons - <https://mechachain.io/>
- * @custom:security-contact hello@mechachain.io
+ * @title MechaniumAdvisorsDistribution - Vesting and distribution smart contract for the MechaChain advisors
+ * @author EthernalHorizons - <https://ethernalhorizons.com/>
+ * @custom:project-website  https://mechachain.io/
+ * @custom:security-contact contracts@ethernalhorizons.com
  */
 contract MechaniumAdvisorsDistribution is MechaniumTeamDistribution {
     
@@ -19,9 +20,9 @@ contract MechaniumAdvisorsDistribution is MechaniumTeamDistribution {
     constructor(IERC20 token_)
         MechaniumTeamDistribution(
             token_,
-            180 days, // after 6 months (included)
+            180 days, // 6 months after allocation
             20, // unlock 20%
-            180 days // and repeat every 6 month
+            180 days // and repeat every 6 months
         )
     {}
 }

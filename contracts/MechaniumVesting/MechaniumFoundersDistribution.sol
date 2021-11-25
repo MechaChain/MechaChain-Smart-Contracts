@@ -6,10 +6,11 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 import "./MechaniumTeamDistribution.sol";
 
 /**
- * @title MechaniumFoundersDistribution - Vesting and distribution smart contract for the mechachain founders
+ * @title MechaniumFoundersDistribution - Vesting and distribution smart contract for the MechaChain founders
  * @notice Administrators have the right to whitdraw all tokens from the contract if the code fails the audit. If the contract is shifted secure, the whitdraw function is permanently blocked.
- * @author EthernalHorizons - <https://mechachain.io/>
- * @custom:security-contact hello@mechachain.io
+ * @author EthernalHorizons - <https://ethernalhorizons.com/>
+ * @custom:project-website  https://mechachain.io/
+ * @custom:security-contact contracts@ethernalhorizons.com
  */
 contract MechaniumFoundersDistribution is MechaniumTeamDistribution {
     using SafeERC20 for IERC20;
@@ -50,7 +51,12 @@ contract MechaniumFoundersDistribution is MechaniumTeamDistribution {
      * @param token_ Address of the ERC20 token contract, this address cannot be changed later
      */
     constructor(IERC20 token_)
-        MechaniumTeamDistribution(token_, 360 days, 20, 180 days)
+        MechaniumTeamDistribution(
+            token_,
+            360 days, // 1 year after allocation
+            20, // unlock 20%
+            180 days // and repeat every 6 months
+        )
     {
         _lockWithdraw = false;
     }
@@ -63,7 +69,7 @@ contract MechaniumFoundersDistribution is MechaniumTeamDistribution {
         onlyRole(DEFAULT_ADMIN_ROLE)
         returns (bool)
     {
-        require(_lockWithdraw, "Whitdraw already locked");
+        require(!_lockWithdraw, "Whitdraw already locked");
 
         _lockWithdraw = true;
 

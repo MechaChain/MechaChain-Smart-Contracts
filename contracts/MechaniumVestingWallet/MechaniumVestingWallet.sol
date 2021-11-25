@@ -7,9 +7,10 @@ import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "./IMechaniumVestingWallet.sol";
 
 /**
- * @title MechaniumVestingWallet - $MECHA allocated for different operations with a vesting schedule
- * @author EthernalHorizons - <https://mechachain.io/>
- * @custom:security-contact hello@mechachain.io
+ * @title MechaniumVestingWallet - Hold $MECHA allocated for different operations with a vesting schedule
+ * @author EthernalHorizons - <https://ethernalhorizons.com/>
+ * @custom:project-website  https://mechachain.io/
+ * @custom:security-contact contracts@ethernalhorizons.com
  */
 contract MechaniumVestingWallet is IMechaniumVestingWallet, AccessControl {
     using SafeMath for uint256;

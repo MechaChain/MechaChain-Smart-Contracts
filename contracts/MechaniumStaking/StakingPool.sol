@@ -9,8 +9,9 @@ import "../Mechanium.sol";
 
 /**
  * @title StakingPool - A dummy staking pool smart contract for tests
- * @author EthernalHorizons - <https://mechachain.io/>
- * @custom:security-contact hello@mechachain.io
+ * @author EthernalHorizons - <https://ethernalhorizons.com/>
+ * @custom:project-website  https://mechachain.io/
+ * @custom:security-contact contracts@ethernalhorizons.com
  */
 contract StakingPool is IStakingPool {
     using SafeMath for uint256;
