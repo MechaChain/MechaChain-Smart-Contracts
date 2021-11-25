@@ -57,6 +57,10 @@ npm install
 ```
   2. Run Ganache Ethereum simulator: `ganache-cli`
   3. Run test: `truffle test` or `truffle test ./test/<test_file_name>.js`
+
+For testing scaling on contract with [Truffle](https://www.trufflesuite.com/docs/truffle/testing/writing-tests-in-javascript): 
+  1. Run Ganache Ethereum simulator: `ganache-cli --accounts=502 -l 90000000000000`
+  2. Run test: `truffle test ./scalingTest/<test_file_name>.js`
 ### Use on Testnets
 
 Here are the different private keys of developer accounts on testnet

@@ -7,6 +7,7 @@
   "dependencies": {
     "@maticnetwork/pos-portal": "^1.5.2",
     "@openzeppelin/contracts": "^4.3.3",
-    "@openzeppelin/test-helpers": "^0.5.15"
+    "@openzeppelin/test-helpers": "^0.5.15",
+    "web3-utils": "^1.6.1"
   }
 }
