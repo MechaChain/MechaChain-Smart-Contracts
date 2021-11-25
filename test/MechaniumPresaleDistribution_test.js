@@ -109,7 +109,7 @@ contract('MechaniumPresaleDistribution', (accounts) => {
     assert.equal(vestingStartingTime.cmp(timeToSet), 0, "Vesting start time not valid");
   });
 
-  it('Admin should be able to set vesting start time after max start time', async () => {
+  it('Admin should not be able to set vesting start time after max start time', async () => {
     let timeToSet = await time.latest();
     timeToSet = timeToSet.add(time.duration.days(200));
 
@@ -283,7 +283,7 @@ contract('MechaniumPresaleDistribution', (accounts) => {
     )
   });
 
-  it('Unlockable amount must be 60% of total allocated tokens ( after three month )', async () => {
+  it('Unlockable amount must be 60% of total allocated tokens ( after 60 days )', async () => {
     await time.increase(time.duration.days(63));
 
     let userBalance = await instance.balanceOf(user);
