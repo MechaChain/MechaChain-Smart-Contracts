@@ -50,7 +50,7 @@ contract('MechaniumPresaleDistribution', (accounts) => {
     }
   });
 
-  it('ClaimAll gas usage must be lower for claim one', async () => {
+  it('ClaimAll gas usage must be lower than claim one', async () => {
     console.log(`Gas used for one claim : ${gasUsedForOneTransaction}`);
     console.log(`${accounts.length - 2} x Gas used For one claim : ${getBN(gasUsedForOneTransaction).mul(getBN(accounts.length - 2))}`);
     console.log(`Gas used for claimAll function: ${gasUsedForMultipleTransactions}`);
