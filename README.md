@@ -67,10 +67,7 @@ Here are the different private keys of developer accounts on testnet
 
 **Admin account**
 
-Administrator of all smart contracts and keeps tokens
-```
-3851a32ae0f58665fcadb30cb9f66d96349b455554b8cd3a422c016888ae3e60
-```
+Administrator of all smart contracts and keeps tokens - stored in internal tool
 
 **Faucets for Goerli**
 
