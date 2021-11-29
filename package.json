@@ -8,6 +8,7 @@
     "@maticnetwork/pos-portal": "^1.5.2",
     "@openzeppelin/contracts": "^4.3.3",
     "@openzeppelin/test-helpers": "^0.5.15",
+    "dotenv": "^10.0.0",
     "web3-utils": "^1.6.1"
   }
 }

@@ -21,6 +21,7 @@ All smart contracts for the play to earn [MechaChain project](https://mechachain
     - [Launch unit tests](#launch-unit-tests)
     - [Use on Testnets](#use-on-testnets)
     - [Generate doc](#generate-doc)
+    - [Verify contract](#verify-contract)
   - [SMART CONTRACTS](#smart-contracts)
     - [Mechanium.sol](#mechaniumsol)
     - [MechaniumVesting.sol](#mechaniumvestingsol)
@@ -89,6 +90,23 @@ Then, run :
 ```
 npx solidity-docgen --solc-module solc-0.8
 ```
+
+
+### Verify contract
+
+To verify contracts use either [Remix Etherscan Plugin](https://remix-etherscan-plugin.readthedocs.io/en/latest/) for Ethereum mainnet or [Truffle plugin verify](https://github.com/rkalis/truffle-plugin-verify) for other networks.
+
+
+**Verify contract on polygonscan with Truffle**
+
+  1. Configure `.env` with a `POLYGONSCAN_API_KEYS` which can be found here [found here](https://polygonscan.com/apis).
+  2. Check that the compilers config used for the deployment is the same as registered in `truffle-config.js`
+  3. Encode constructors arguments with a [ABI Encoding Service](https://abi.hashex.org/) if necessary
+  4. Run the command
+```
+truffle run verify <contractName>@<contractAddress> --forceConstructorArgs string:<contractEncodedArguments > --network matic
+```
+
 
 ## SMART CONTRACTS
 

@@ -10,3 +10,4 @@ package-lock.json
 .VSCodeCounter
 contracts/MechaniumVesting/artifacts
 contracts/MechaniumVestingWallet/artifacts
+.env

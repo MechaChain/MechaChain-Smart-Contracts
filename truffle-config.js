@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 module.exports = {
   networks: {
     development: {
@@ -11,15 +13,17 @@ module.exports = {
   },
   compilers: {
     solc: {
-      version: "^0.8.0",
-      optimizer: {
-        enabled: true,
-        runs: 200
-      }
+      version: "0.8.7",
+      settings: {
+        optimizer: {
+          enabled: true,
+          runs: 200,
+        },
+      },
     },
   },
   plugins: ["truffle-plugin-verify"],
   api_keys: {
-    polygonscan: "FMH5P5I1PNDR1W39T2THIBZ3TZVQM398A4",
+    polygonscan: process.env.POLYGONSCAN_API_KEYS,
   },
 };
