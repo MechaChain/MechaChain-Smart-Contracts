@@ -78,6 +78,14 @@ contract('MechaniumPresaleDistribution', (accounts) => {
     assert.equal(userBalance.cmp(amount), 0, "Allocated amout not valid");
   });
 
+  it('Allocator should not be able to allocate tokens to smart contract address', async () => {
+    const amount = getAmount(100);
+    await expectRevert(
+      instance.allocateTokens(instance.address, amount, { from: allocator }),
+      'Address must not be contract address -- Reason given: Address must not be contract address.'
+    );
+  });
+
   it('User balance should increase after allocation', async () => {
     const oldUserBalance = await instance.balanceOf(user);
     const amount = getAmount(100);
