@@ -81,6 +81,7 @@ contract MechaniumTeamDistribution is MechaniumVesting {
     {
         require(amount > 0, "Amount must be superior to 0");
         require(to != address(0), "Address must not be address(0)");
+        require(to != address(this), "Address must not be contract address");
 
         if (_ownedAllocation[to].length == 0) {
             /// first allocation

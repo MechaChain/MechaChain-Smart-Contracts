@@ -38,6 +38,14 @@ contract("MechaniumFoundersDistribution", (accounts) => {
     assert.equal(balance.cmp(amount), 0, "Withdraw must be locked");
   });
 
+  it('Allocator should not be able to allocate tokens to smart contract address', async () => {
+    const amount = getAmount(100);
+    await expectRevert(
+      instance.allocateTokens(instance.address, amount, { from: allocator }),
+      'Address must not be contract address -- Reason given: Address must not be contract address.'
+    );
+  });
+
   it("User balance should encrease when allocated tokens", async () => {
     await time.increase(time.duration.days(30));
     const oldBalance = await instance.balanceOf(user);
