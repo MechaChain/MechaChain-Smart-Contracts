@@ -5,6 +5,7 @@ import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "./IMechaniumVestingWallet.sol";
+import "../MechaniumUtils/MechaniumCanReleaseUnintented.sol";
 
 /**
  * @title MechaniumVestingWallet - Hold $MECHA allocated for different operations with a vesting schedule
@@ -12,7 +13,11 @@ import "./IMechaniumVestingWallet.sol";
  * @custom:project-website  https://mechachain.io/
  * @custom:security-contact contracts@ethernalhorizons.com
  */
-contract MechaniumVestingWallet is IMechaniumVestingWallet, AccessControl {
+contract MechaniumVestingWallet is
+    IMechaniumVestingWallet,
+    AccessControl,
+    MechaniumCanReleaseUnintented
+{
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
 
@@ -96,6 +101,8 @@ contract MechaniumVestingWallet is IMechaniumVestingWallet, AccessControl {
 
         _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _setupRole(TRANSFER_ROLE, msg.sender);
+
+        _addLockedToken(address(token_));
     }
 
     /**

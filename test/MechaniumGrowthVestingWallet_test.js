@@ -3,6 +3,7 @@ const { time, expectRevert } = require("@openzeppelin/test-helpers");
 
 // Load artifacts
 const Mechanium = artifacts.require("Mechanium");
+const MechaniumBis = artifacts.require("MechaniumBis");
 const MechaniumGrowthVestingWallet = artifacts.require(
   "MechaniumGrowthVestingWallet"
 );
@@ -12,11 +13,12 @@ const { getAmount, getBN } = require("../utils");
 
 contract("MechaniumGrowthVestingWallet", (accounts) => {
   const [owner, dao, user, user2] = accounts;
-  let instance, token, TRANSFER_ROLE, DEFAULT_ADMIN_ROLE;
+  let instance, token, tokenBis, TRANSFER_ROLE, DEFAULT_ADMIN_ROLE;
 
   it("Smart contract should be deployed", async () => {
     instance = await MechaniumGrowthVestingWallet.deployed();
     token = await Mechanium.deployed();
+    tokenBis = await MechaniumBis.deployed();
     assert(instance.address !== "");
   });
 
@@ -38,6 +40,50 @@ contract("MechaniumGrowthVestingWallet", (accounts) => {
       instance.grantRole(TRANSFER_ROLE, user2, { from: user }),
       `AccessControl: account ${user.toLowerCase()} is missing role ${DEFAULT_ADMIN_ROLE.toLowerCase()}.`
     );
+  });
+
+  it("Admin should not be able to release unintented $MECHA", async () => {
+    const amount = getAmount(100);
+
+    await expectRevert(
+      instance.releaseUnintented(token.address, user, amount),
+      "Token can't be released -- Reason given: Token can't be released."
+    );
+  });
+
+  it("Admin should be able to release unintented $MECHABIS", async () => {
+    const amount = getAmount(100);
+
+    await instance.releaseUnintented(tokenBis.address, user, amount);
+
+    const userBalance = await tokenBis.balanceOf(user);
+
+    assert.equal(
+      userBalance.cmp(amount),
+      0,
+      "Wrong balance");
+  });
+
+  it("Admin should be able to release unintented ETH", async () => {
+    const amount = getAmount(10);
+
+    await instance.send(amount, { from: owner });
+
+    const oldBalance = await web3.eth.getBalance(instance.address);
+
+    assert.equal(
+      oldBalance,
+      10000000000000000000,
+      "Error sending ETH");
+
+    await instance.releaseUnintented("0x0000000000000000000000000000000000000000", owner, amount);
+
+    const newBalance = await web3.eth.getBalance(instance.address);
+
+    assert.equal(
+      newBalance,
+      0,
+      "Error releasing unintented ETH");
   });
 
   it("DAO account should not be able to set TRANSFER_ROLE", async () => {
@@ -95,7 +141,7 @@ contract("MechaniumGrowthVestingWallet", (accounts) => {
 
     assert.ok(
       startTime.lte(expectedStartTime.add(time.duration.hours(1))) &&
-        startTime.gte(expectedStartTime.sub(time.duration.hours(1))),
+      startTime.gte(expectedStartTime.sub(time.duration.hours(1))),
       "initialVesting not valid"
     );
   });
