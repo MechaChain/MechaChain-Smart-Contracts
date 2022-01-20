@@ -1,0 +1,36 @@
+{
+  "etherium": {
+    "Mechanium": {
+      "address": "0xc5bcc8ba3f33ab0d64f3473e861bdc0685b19ef5",
+      "date": "24/11/2021, 14:34:43"
+    }
+  },
+  "polygon": {
+    "Mechanium": {
+      "address": "0xacd4e2d936be9b16c01848a3742a34b3d5a5bdfa",
+      "date": "24/11/2021, 18:39:18"
+    }
+  },
+  "goerli-fork": {
+    "Mechanium": {
+      "address": "0x1Be3C27E55867d9Ccc55765BbA14F350F9323539",
+      "date": "21/11/2021, 13:02:53"
+    },
+    "MechaniumPresaleDistribution": {
+      "address": "0x6554eFF5405BDB45b82dA39995b6959001f4BB23",
+      "date": "20/01/2022, 19:08:18"
+    }
+  },
+  "goerli": {
+    "Mechanium": {
+      "address": "0x1Be3C27E55867d9Ccc55765BbA14F350F9323539",
+      "date": "21/11/2021, 13:02:53"
+    }
+  },
+  "ropsten": {
+    "Mechanium": {
+      "address": "0xE22A901E5D0d1D21aa54144b1E7E41639c4bd435",
+      "date": "20/01/2022, 20:38:21"
+    }
+  }
+}

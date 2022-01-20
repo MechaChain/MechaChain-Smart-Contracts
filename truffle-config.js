@@ -1,5 +1,7 @@
 require("dotenv").config();
 
+const HDWalletProvider = require("truffle-hdwallet-provider");
+
 module.exports = {
   networks: {
     development: {
@@ -9,6 +11,32 @@ module.exports = {
     },
     matic: {
       network_id: 137,
+    },
+    goerli: {
+      network_id: 5,
+      provider: () =>
+        new HDWalletProvider(
+          process.env.DEV_WALLET_PRIVATE_KEY,
+          "https://goerli.infura.io/v3/" + process.env.INFURA_PROJECT_ID
+        ),
+      gas: 7500000,
+      gasPrice: 5000000000,
+    },
+    ropsten: {
+      provider: () =>
+        new HDWalletProvider(
+          process.env.DEV_WALLET_PRIVATE_KEY,
+          "https://ropsten.infura.io/v3/" + process.env.INFURA_PROJECT_ID
+        ),
+      network_id: 3,
+    },
+    rinkeby: {
+      provider: () =>
+        new HDWalletProvider(
+          process.env.DEV_WALLET_PRIVATE_KEY,
+          "https://rinkeby.infura.io/v3/" + process.env.INFURA_PROJECT_ID
+        ),
+      network_id: 4,
     },
   },
   compilers: {
@@ -24,6 +52,6 @@ module.exports = {
   },
   plugins: ["truffle-plugin-verify"],
   api_keys: {
-    polygonscan: process.env.POLYGONSCAN_API_KEYS,
+    polygonscan: process.env.POLYGONSCAN_API_KEY,
   },
 };

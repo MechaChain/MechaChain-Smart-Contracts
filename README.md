@@ -18,6 +18,7 @@ All smart contracts for the play to earn [MechaChain project](https://mechachain
   - [Guidelines](#guidelines)
   - [HOW TO USE AND DEPLOY](#how-to-use-and-deploy)
     - [Use with Remix](#use-with-remix)
+    - [Deploy with Truffle](#deploy-with-truffle)
     - [Launch unit tests](#launch-unit-tests)
     - [Use on Testnets](#use-on-testnets)
     - [Generate doc](#generate-doc)
@@ -46,6 +47,15 @@ All smart contracts for the play to earn [MechaChain project](https://mechachain
   3. Go to [Remix](https://remix.ethereum.org/) and select `localhost` Workspace
 
 _For more informations : https://remix-ide.readthedocs.io/en/latest/remixd.html_
+
+### Deploy with Truffle
+First, please fill the `.env` file with `INFURA_PROJECT_ID` and, for testnets, `DEV_WALLET_PRIVATE_KEY`.
+```
+truffle migrate --f <contractIndex> --to <contractIndex> --network <networkName>
+```
+- `--f <contractIndex>` is the frist index of the migration file to run
+- `--to <contractIndex>` is the last index of the migration file to run (can be the same as the previous one)
+- `<networkName>` can be `development` _(local network)_, `matic`, `goerli`, `ropsten` or `rinkeby`.
 
 ### Launch unit tests
 
