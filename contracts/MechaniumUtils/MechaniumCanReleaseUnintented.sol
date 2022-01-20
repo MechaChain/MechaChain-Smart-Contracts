@@ -36,16 +36,19 @@ abstract contract MechaniumCanReleaseUnintented is
     receive() external payable {}
 
     /**
-    * @notice Add a locked `token_` ( can't be released )
-    */    
+     * @notice Add a locked `token_` ( can't be released )
+     */
     function _addLockedToken(address token_) internal {
         _lockedTokens[token_] = true;
     }
 
     /**
-    * @notice Release an `amount` of `token` to an `account`
-    * This function is used to prevent unintented tokens that got sent to be stuck on the contract
-    */ 
+     * @notice Release an `amount` of `token` to an `account`
+     * This function is used to prevent unintented tokens that got sent to be stuck on the contract
+     * @param token The address of the token contract (zero address for claiming native coins).
+     * @param account The address of the tokens/coins receiver.
+     * @param amount Amount to claim.
+     */
     function releaseUnintented(
         address token,
         address account,

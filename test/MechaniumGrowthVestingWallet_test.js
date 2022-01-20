@@ -58,10 +58,20 @@ contract("MechaniumGrowthVestingWallet", (accounts) => {
 
     const userBalance = await tokenBis.balanceOf(user);
 
-    assert.equal(
-      userBalance.cmp(amount),
-      0,
-      "Wrong balance");
+    assert.equal(userBalance.cmp(amount), 0, "Wrong balance");
+  });
+
+  it("Admin should not be able to release unintented ETH (Reason: insufficient balance)", async () => {
+    const amount = getAmount(100);
+
+    await expectRevert(
+      instance.releaseUnintented(
+        "0x0000000000000000000000000000000000000000",
+        owner,
+        amount
+      ),
+      "Address: insufficient balance"
+    );
   });
 
   it("Admin should be able to release unintented ETH", async () => {
@@ -71,19 +81,17 @@ contract("MechaniumGrowthVestingWallet", (accounts) => {
 
     const oldBalance = await web3.eth.getBalance(instance.address);
 
-    assert.equal(
-      oldBalance,
-      10000000000000000000,
-      "Error sending ETH");
+    assert.equal(oldBalance, 10000000000000000000, "Error sending ETH");
 
-    await instance.releaseUnintented("0x0000000000000000000000000000000000000000", owner, amount);
+    await instance.releaseUnintented(
+      "0x0000000000000000000000000000000000000000",
+      owner,
+      amount
+    );
 
     const newBalance = await web3.eth.getBalance(instance.address);
 
-    assert.equal(
-      newBalance,
-      0,
-      "Error releasing unintented ETH");
+    assert.equal(newBalance, 0, "Error releasing unintented ETH");
   });
 
   it("DAO account should not be able to set TRANSFER_ROLE", async () => {
@@ -141,7 +149,7 @@ contract("MechaniumGrowthVestingWallet", (accounts) => {
 
     assert.ok(
       startTime.lte(expectedStartTime.add(time.duration.hours(1))) &&
-      startTime.gte(expectedStartTime.sub(time.duration.hours(1))),
+        startTime.gte(expectedStartTime.sub(time.duration.hours(1))),
       "initialVesting not valid"
     );
   });
