@@ -5,6 +5,7 @@ import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "./IMechaniumVesting.sol";
+import "../MechaniumUtils/MechaniumCanReleaseUnintented.sol";
 
 /**
  * @title MechaniumVesting - Abstract class for vesting and distribution smart contract
@@ -12,7 +13,11 @@ import "./IMechaniumVesting.sol";
  * @custom:project-website  https://mechachain.io/
  * @custom:security-contact contracts@ethernalhorizons.com
  */
-abstract contract MechaniumVesting is AccessControl, IMechaniumVesting {
+abstract contract MechaniumVesting is
+    AccessControl,
+    IMechaniumVesting,
+    MechaniumCanReleaseUnintented
+{
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
 
@@ -133,6 +138,8 @@ abstract contract MechaniumVesting is AccessControl, IMechaniumVesting {
 
         _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _setupRole(ALLOCATOR_ROLE, msg.sender);
+
+        _addLockedToken(address(token_));
     }
 
     /**
