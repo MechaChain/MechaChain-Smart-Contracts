@@ -8,8 +8,8 @@
     "@maticnetwork/pos-portal": "^1.5.2",
     "@openzeppelin/contracts": "^4.3.3",
     "@openzeppelin/test-helpers": "^0.5.15",
-    "@umaprotocol/truffle-ledger-provider": "^1.0.5",
     "dotenv": "^10.0.0",
+    "truffle-hdwallet-provider": "^1.0.17",
     "web3-utils": "^1.6.1"
   }
 }
