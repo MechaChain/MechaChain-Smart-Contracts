@@ -98,7 +98,7 @@ npm install -G solc-0.8@npm:solc@^0.8.2
 Then, run : 
 
 ```
-npx solidity-docgen --solc-module solc-0.8
+npx solidity-docgen --solc-module solc-0.8 -t ./docs-templates
 ```
 
 
