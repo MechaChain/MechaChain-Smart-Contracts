@@ -14,4 +14,18 @@ interface IStakingPool {
     function stakeTokensFromDistribution(address to, uint256 amount)
         external
         returns (bool);
+
+    function getAllocatedTokens() external view returns (uint256);
+
+    function getInitBlock() external view returns (uint256);
+
+    function getMinStakingTime() external view returns (uint256);
+
+    function getMaxStakingTime() external view returns (uint256);
+
+    function getMinWeightMultiplier() external view returns (uint256);
+
+    function getMaxWeightMultiplier() external view returns (uint256);
+
+    function getMinRewardsPerBlock() external view returns (uint256);
 }
