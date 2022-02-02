@@ -63,8 +63,8 @@ contract MechaniumStakingPoolFactory is IMechaniumStakingPoolFactory, Ownable {
      */
 
     /// List of registred staking pools
-    mapping(address => bool) private _registredPools;
-    address[] private _registredPoolsList;
+    mapping(address => bool) public registredPools;
+    address[] public registredPoolsList;
 
     /**
      * ========================
@@ -116,8 +116,8 @@ contract MechaniumStakingPoolFactory is IMechaniumStakingPoolFactory, Ownable {
 
         address stakingPoolAddr = address(stakingPool);
 
-        _registredPools[stakingPoolAddr] = true;
-        _registredPoolsList.push(stakingPoolAddr);
+        registredPools[stakingPoolAddr] = true;
+        registredPoolsList.push(stakingPoolAddr);
 
         addAllocatedTokens(stakingPoolAddr, allocatedTokens);
 
@@ -147,7 +147,7 @@ contract MechaniumStakingPoolFactory is IMechaniumStakingPoolFactory, Ownable {
         onlyOwner
         returns (bool)
     {
-        require(_registredPools[poolAddr], "Staking pool not registred");
+        require(registredPools[poolAddr], "Staking pool not registred");
 
         _transferTokens(poolAddr, amount);
 
@@ -210,13 +210,6 @@ contract MechaniumStakingPoolFactory is IMechaniumStakingPoolFactory, Ownable {
     }
 
     /**
-     * @notice Get registred pools list
-     */
-    function registredPoolsList() public view returns (address[] memory) {
-        return _registredPoolsList;
-    }
-
-    /**
      * @notice Get staking pool data
      * @param poolAddr The pool address
      */
@@ -226,7 +219,7 @@ contract MechaniumStakingPoolFactory is IMechaniumStakingPoolFactory, Ownable {
         override
         returns (PoolData memory)
     {
-        require(_registredPools[poolAddr], "Pool not registred");
+        require(registredPools[poolAddr], "Pool not registred");
 
         IStakingPool pool = IStakingPool(poolAddr);
 

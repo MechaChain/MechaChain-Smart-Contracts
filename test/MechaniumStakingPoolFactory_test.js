@@ -31,8 +31,7 @@ contract('MechaniumStakingPoolFactory', (accounts) => {
   it('Owner should be able to create staking pool instance', async () => {
     await instance.createPool(...Object.values(mainStakingPoolData));
 
-    const poolsList = await instance.registredPoolsList();
-    mainPoolAddr = poolsList[poolsList.length - 1];
+    mainPoolAddr = await instance.registredPoolsList.call(0);
 
     assert(mainPoolAddr);
 
