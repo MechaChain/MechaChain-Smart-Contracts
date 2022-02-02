@@ -147,15 +147,9 @@ contract MechaniumStakingPoolFactory is IMechaniumStakingPoolFactory, Ownable {
         onlyOwner
         returns (bool)
     {
-        require(poolAddr != address(0), "Pool address must not be 0");
         require(_registredPools[poolAddr], "Staking pool not registred");
-        require(amount > 0, "Amount must be superior to zero");
 
-        uint256 factoryBalance = _token.balanceOf(address(this));
-
-        require(factoryBalance >= amount, "Not enough tokens in factory");
-
-        _token.safeTransfer(poolAddr, amount);
+        _transferTokens(poolAddr, amount);
 
         emit AddAllocatedTokens(poolAddr, amount);
 
@@ -173,7 +167,24 @@ contract MechaniumStakingPoolFactory is IMechaniumStakingPoolFactory, Ownable {
         onlyOwner
         returns (bool)
     {
-        require(account != address(0), "Account address must not be 0");
+        _transferTokens(account, amount);
+
+        emit WithdrawUnallocated(account, amount);
+
+        return true;
+    }
+
+    /**
+     * ========================
+     *    Private functions
+     * ========================
+     */
+
+    function _transferTokens(address account, uint256 amount)
+        private
+        returns (bool)
+    {
+        require(account != address(0), "Address must not be 0");
         require(amount > 0, "Amount must be superior to zero");
 
         uint256 factoryBalance = _token.balanceOf(address(this));
@@ -181,8 +192,6 @@ contract MechaniumStakingPoolFactory is IMechaniumStakingPoolFactory, Ownable {
         require(factoryBalance >= amount, "Not enough tokens in factory");
 
         _token.safeTransfer(account, amount);
-
-        emit WithdrawUnallocated(account, amount);
 
         return true;
     }
@@ -213,8 +222,8 @@ contract MechaniumStakingPoolFactory is IMechaniumStakingPoolFactory, Ownable {
      */
     function getPoolData(address poolAddr)
         public
-        override
         view
+        override
         returns (PoolData memory)
     {
         require(_registredPools[poolAddr], "Pool not registred");

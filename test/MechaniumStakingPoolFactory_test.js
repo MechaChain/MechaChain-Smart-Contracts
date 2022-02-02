@@ -54,13 +54,6 @@ contract('MechaniumStakingPoolFactory', (accounts) => {
 
   });
 
-  it('Owner should not be able to allocate to address(0)', async () => {
-    await expectRevert(
-      instance.addAllocatedTokens("0x0000000000000000000000000000000000000000", getAmount(10000)),
-      "Pool address must not be 0"
-    );
-  });
-
   it('Owner should not be able to allocate to a non registred pool', async () => {
     await expectRevert(
       instance.addAllocatedTokens(fakePool, getAmount(10000)),
@@ -85,7 +78,7 @@ contract('MechaniumStakingPoolFactory', (accounts) => {
   it('Owner should not be able to withdraw to address(0)', async () => {
     await expectRevert(
       instance.withdrawUnallocated("0x0000000000000000000000000000000000000000", getAmount(1000)),
-      "Account address must not be 0"
+      "Address must not be 0"
     );
   });
 
