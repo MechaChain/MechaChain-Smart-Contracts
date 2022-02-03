@@ -34,13 +34,34 @@ contract MechaniumStakingPoolFactory is IMechaniumStakingPoolFactory, Ownable {
         uint256 maxStakingTime,
         uint256 minWeightMultiplier,
         uint256 maxWeightMultiplier,
-        uint256 minRewardsPerBlock
+        uint256 rewardsLockingPeriod,
+        uint256 rewardsPerBlock
+    );
+
+    /**
+     * @notice Event emitted when a staking flash pool is created
+     */
+    event CreateFlashPool(
+        address indexed poolAddress,
+        uint256 allocatedTokens,
+        uint256 initBlock,
+        uint256 minStakingTime,
+        uint256 maxStakingTime,
+        uint256 minWeightMultiplier,
+        uint256 maxWeightMultiplier,
+        uint256 rewardsLockingPeriod,
+        uint256 rewardsPerBlock
     );
 
     /**
      * @notice Event emitted when an `amount` of tokens is added to `poolAddress` token allocation
      */
     event AddAllocatedTokens(address indexed poolAddress, uint256 amount);
+
+    /**
+     * @notice Event emitted when an `amount` of tokens is added to `poolAddress` token allocation
+     */
+    event AddAllocatedTokens(address indexed poolAddress, uint256 amount, uint256 rewardsPerBlock);
 
     /**
      * @notice Event emitted when `amount` of unallocated tokens is withdrawn to an `account`
@@ -54,7 +75,7 @@ contract MechaniumStakingPoolFactory is IMechaniumStakingPoolFactory, Ownable {
      */
 
     /// Main staking ERC20 token
-    IERC20 immutable _token;
+    IERC20 private immutable _token;
 
     /**
      * ========================
@@ -86,7 +107,8 @@ contract MechaniumStakingPoolFactory is IMechaniumStakingPoolFactory, Ownable {
      * @param maxStakingTime The maximum time allowed for staking
      * @param minWeightMultiplier The minimum weight multiplier
      * @param maxWeightMultiplier The maximum weight multiplier
-     * @param minRewardsPerBlock The minimum reward per block
+     * @param rewardsLockingPeriod The rewards locking period
+     * @param rewardsPerBlock The rewards per block
      */
     function createPool(
         uint256 allocatedTokens,
@@ -95,7 +117,8 @@ contract MechaniumStakingPoolFactory is IMechaniumStakingPoolFactory, Ownable {
         uint256 maxStakingTime,
         uint256 minWeightMultiplier,
         uint256 maxWeightMultiplier,
-        uint256 minRewardsPerBlock
+        uint256 rewardsLockingPeriod,
+        uint256 rewardsPerBlock
     ) public override onlyOwner returns (bool) {
         uint256 factoryBalance = _token.balanceOf(address(this));
 
@@ -111,7 +134,8 @@ contract MechaniumStakingPoolFactory is IMechaniumStakingPoolFactory, Ownable {
             maxStakingTime,
             minWeightMultiplier,
             maxWeightMultiplier,
-            minRewardsPerBlock
+            rewardsLockingPeriod,
+            rewardsPerBlock
         );
 
         address stakingPoolAddr = address(stakingPool);
@@ -129,7 +153,69 @@ contract MechaniumStakingPoolFactory is IMechaniumStakingPoolFactory, Ownable {
             maxStakingTime,
             minWeightMultiplier,
             maxWeightMultiplier,
-            minRewardsPerBlock
+            rewardsLockingPeriod,
+            rewardsPerBlock
+        );
+
+        return true;
+    }
+
+    /**
+     * @notice Create new staking flash pool
+     * @dev Deploy an instance of the StakingPool smart contract and transfer the tokens to it
+     * @param allocatedTokens The number of tokens allocated for the pool
+     * @param initBlock The initial block of the pool to start
+     * @param minStakingTime The minimum time allowed for staking
+     * @param maxStakingTime The maximum time allowed for staking
+     * @param minWeightMultiplier The minimum weight multiplier
+     * @param maxWeightMultiplier The maximum weight multiplier
+     * @param rewardsPerBlock The rewards per block
+     */
+    function createFlashPool(
+        IERC20 stakedToken,
+        uint256 allocatedTokens,
+        uint256 initBlock,
+        uint256 minStakingTime,
+        uint256 maxStakingTime,
+        uint256 minWeightMultiplier,
+        uint256 maxWeightMultiplier,
+        uint256 rewardsPerBlock
+    ) public override onlyOwner returns (bool) {
+        uint256 factoryBalance = _token.balanceOf(address(this));
+
+        require(
+            factoryBalance >= allocatedTokens,
+            "Not enough tokens in factory"
+        );
+
+        IStakingPool stakingPool = new StakingPool(
+            stakedToken,
+            initBlock,
+            minStakingTime,
+            maxStakingTime,
+            minWeightMultiplier,
+            maxWeightMultiplier,
+            0,
+            rewardsPerBlock
+        );
+
+        address stakingPoolAddr = address(stakingPool);
+
+        registredPools[stakingPoolAddr] = true;
+        registredPoolsList.push(stakingPoolAddr);
+
+        addAllocatedTokens(stakingPoolAddr, allocatedTokens);
+
+        emit CreateFlashPool(
+            stakingPoolAddr,
+            allocatedTokens,
+            initBlock,
+            minStakingTime,
+            maxStakingTime,
+            minWeightMultiplier,
+            maxWeightMultiplier,
+            0,
+            rewardsPerBlock
         );
 
         return true;
@@ -152,6 +238,31 @@ contract MechaniumStakingPoolFactory is IMechaniumStakingPoolFactory, Ownable {
         _transferTokens(poolAddr, amount);
 
         emit AddAllocatedTokens(poolAddr, amount);
+
+        return true;
+    }
+
+    /**
+     * @notice Allocate more tokens to a staking pool and change the rewards per block
+     * @dev Safe transfer the tokens to the pool
+     * @param poolAddr The pool address
+     * @param amount The amount of tokens to allocate
+     * @param rewardsPerBlock The new rewards per block
+     */
+    function addAllocatedTokens(
+        address poolAddr,
+        uint256 amount,
+        uint256 rewardsPerBlock
+    ) public override onlyOwner returns (bool) {
+        require(registredPools[poolAddr], "Staking pool not registred");
+
+        _transferTokens(poolAddr, amount);
+
+        IStakingPool pool = StakingPool(poolAddr);
+
+        pool.setRewardsPerBlock(rewardsPerBlock);
+
+        emit AddAllocatedTokens(poolAddr, amount, rewardsPerBlock);
 
         return true;
     }
@@ -221,16 +332,17 @@ contract MechaniumStakingPoolFactory is IMechaniumStakingPoolFactory, Ownable {
     {
         require(registredPools[poolAddr], "Pool not registred");
 
-        IStakingPool pool = IStakingPool(poolAddr);
+        StakingPool pool = StakingPool(poolAddr);
 
         PoolData memory poolData = PoolData(
             pool.getAllocatedTokens(),
-            pool.getInitBlock(),
-            pool.getMinStakingTime(),
-            pool.getMaxStakingTime(),
-            pool.getMinWeightMultiplier(),
-            pool.getMaxWeightMultiplier(),
-            pool.getMinRewardsPerBlock()
+            pool.initBlock(),
+            pool.minStakingTime(),
+            pool.maxStakingTime(),
+            pool.minWeightMultiplier(),
+            pool.maxWeightMultiplier(),
+            pool.rewardsLockingPeriod(),
+            pool.rewardsPerBlock()
         );
 
         return poolData;

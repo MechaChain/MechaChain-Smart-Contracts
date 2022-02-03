@@ -30,7 +30,8 @@ contract StakingPool is IStakingPool {
     uint256 public maxStakingTime;
     uint256 public minWeightMultiplier;
     uint256 public maxWeightMultiplier;
-    uint256 public minRewardsPerBlock;
+    uint256 public rewardsLockingPeriod;
+    uint256 public rewardsPerBlock;
 
     /**
      * @dev Contract constructor sets the configuration of the vesting schedule
@@ -43,7 +44,8 @@ contract StakingPool is IStakingPool {
         uint256 maxStakingTime_,
         uint256 minWeightMultiplier_,
         uint256 maxWeightMultiplier_,
-        uint256 minRewardsPerBlock_
+        uint256 rewardsLockingPeriod_,
+        uint256 rewardsPerBlock_
     ) {
         _token = token_;
         initBlock = initBlock_;
@@ -51,7 +53,8 @@ contract StakingPool is IStakingPool {
         maxStakingTime = maxStakingTime_;
         minWeightMultiplier = minWeightMultiplier_;
         maxWeightMultiplier = maxWeightMultiplier_;
-        minRewardsPerBlock = minRewardsPerBlock_;
+        rewardsLockingPeriod = rewardsLockingPeriod_;
+        rewardsPerBlock = rewardsPerBlock_;
     }
 
     function stakeTokensFromDistribution(address account, uint256 amount)
@@ -87,27 +90,8 @@ contract StakingPool is IStakingPool {
         return _token.balanceOf(address(this));
     }
 
-    function getInitBlock() public override view returns (uint256) {
-        return initBlock;
-    }
-
-    function getMinStakingTime() public override view returns (uint256) {
-        return minStakingTime;
-    }
-
-    function getMaxStakingTime() public override view returns (uint256) {
-        return maxStakingTime;
-    }
-
-    function getMinWeightMultiplier() public override view returns (uint256) {
-        return minWeightMultiplier;
-    }
-
-    function getMaxWeightMultiplier() public override view returns (uint256) {
-        return maxWeightMultiplier;
-    }
-
-    function getMinRewardsPerBlock() public override view returns (uint256) {
-        return minRewardsPerBlock;
+    function setRewardsPerBlock(uint256 rewardsPerBlock_) public override returns (bool) {
+        rewardsPerBlock = rewardsPerBlock_;
+        return true;
     }
 }

@@ -19,7 +19,8 @@ contract('MechaniumStakingPoolFactory', (accounts) => {
     maxStakingTime: time.duration.days(360),
     minWeightMultiplier: 1,
     maxWeightMultiplier: 2,
-    minRewardsPerBlock: getAmount(1)
+    rewardsLockingPeriod: time.duration.days(90),
+    rewardsPerBlock: getAmount(1)
   };
 
   it('Smart contract should be deployed', async () => {
@@ -35,9 +36,28 @@ contract('MechaniumStakingPoolFactory', (accounts) => {
 
     assert(mainPoolAddr);
 
-    const boolBalance = await token.balanceOf(mainPoolAddr);
+    const poolBalance = await token.balanceOf(mainPoolAddr);
 
-    assert.equal(boolBalance.cmp(mainStakingPoolData.allocatedTokens), 0, "Wrong pool balance");
+    assert.equal(poolBalance.cmp(mainStakingPoolData.allocatedTokens), 0, "Wrong pool balance");
+  });
+
+  it('Owner should be able to create flash staking pool instance', async () => {
+    const flashPoolData = {
+      stakedToken: token.address,
+      ...mainStakingPoolData,
+    };
+
+    delete flashPoolData.rewardsLockingPeriod;
+
+    await instance.createFlashPool(...Object.values(flashPoolData));
+
+    const flashPoolAddr = await instance.registredPoolsList.call(1);
+
+    assert(flashPoolAddr);
+
+    const poolBalance = await token.balanceOf(flashPoolAddr);
+
+    assert.equal(poolBalance.cmp(flashPoolData.allocatedTokens), 0, "Wrong pool balance");
   });
 
   it('Owner should be able to add allocated tokens to pool', async () => {
@@ -45,12 +65,31 @@ contract('MechaniumStakingPoolFactory', (accounts) => {
 
     await instance.addAllocatedTokens(mainPoolAddr, amount);
 
-    const boolBalance = await token.balanceOf(mainPoolAddr);
+    const poolBalance = await token.balanceOf(mainPoolAddr);
 
     mainStakingPoolData.allocatedTokens = mainStakingPoolData.allocatedTokens.add(amount);
 
-    assert.equal(boolBalance.cmp(mainStakingPoolData.allocatedTokens), 0, "Wrong pool balance");
+    assert.equal(poolBalance.cmp(mainStakingPoolData.allocatedTokens), 0, "Wrong pool balance");
 
+  });
+
+  it('Owner should be able to add allocated tokens to pool and change the rewards per block', async () => {
+    const amount = getAmount(10000);
+    const newRewardsPerBlock = getAmount(10);
+
+    await instance.addAllocatedTokens(mainPoolAddr, amount, newRewardsPerBlock);
+
+    const poolBalance = await token.balanceOf(mainPoolAddr);
+
+    mainStakingPoolData.allocatedTokens = mainStakingPoolData.allocatedTokens.add(amount);
+
+    assert.equal(poolBalance.cmp(mainStakingPoolData.allocatedTokens), 0, "Wrong pool balance");
+
+    const { rewardsPerBlock } = await instance.getPoolData(mainPoolAddr);
+
+    mainStakingPoolData.rewardsPerBlock = newRewardsPerBlock;
+
+    assert(rewardsPerBlock === mainStakingPoolData.rewardsPerBlock.toString(), "Wrong rewards per block");
   });
 
   it('Owner should not be able to allocate to a non registred pool', async () => {
@@ -119,7 +158,9 @@ contract('MechaniumStakingPoolFactory', (accounts) => {
     Object.keys(mainStakingPoolData).forEach(key => {
       const initialValue = mainStakingPoolData[key];
       const poolValue = poolData[key];
-      assert(initialValue.toString() === poolValue, `Wrong ${key} value`);
+      if (typeof poolValue !== 'undefined') {
+        assert(initialValue.toString() === poolValue, `Wrong ${key} value`);
+      }
     });
   });
 });

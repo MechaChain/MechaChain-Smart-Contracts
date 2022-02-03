@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.2;
 
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+
 /**
  * @title Staking pool factory smart contract interface
  * @author EthernalHorizons - <https://ethernalhorizons.com/>
@@ -16,7 +18,8 @@ interface IMechaniumStakingPoolFactory {
         uint256 maxStakingTime;
         uint256 minWeightMultiplier;
         uint256 maxWeightMultiplier;
-        uint256 minRewardsPerBlock;
+        uint256 rewardsLockingPeriod;
+        uint256 rewardsPerBlock;
     }
 
     /**
@@ -29,13 +32,35 @@ interface IMechaniumStakingPoolFactory {
         uint256 maxStakingTime,
         uint256 minWeightMultiplier,
         uint256 maxWeightMultiplier,
-        uint256 minRewardsPerBlock
+        uint256 rewardsLockingPeriod,
+        uint256 rewardsPerBlock
+    ) external returns (bool);
+
+    /**
+     * @notice Function used to create a new staking flash pool
+     */
+    function createFlashPool(
+        IERC20 stakedToken,
+        uint256 allocatedTokens,
+        uint256 initBlock,
+        uint256 minStakingTime,
+        uint256 maxStakingTime,
+        uint256 minWeightMultiplier,
+        uint256 maxWeightMultiplier,
+        uint256 rewardsPerBlock
     ) external returns (bool);
 
     /**
      * @notice Function used to add more tokens to a staking pool
      */
     function addAllocatedTokens(address pool, uint256 amount)
+        external
+        returns (bool);
+
+    /**
+     * @notice Function used to add more tokens to a staking pool
+     */
+    function addAllocatedTokens(address pool, uint256 amount, uint256 rewardPerBlock)
         external
         returns (bool);
 
