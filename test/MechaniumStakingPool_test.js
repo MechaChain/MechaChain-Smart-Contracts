@@ -8,7 +8,7 @@ const MechaniumStakingPoolFactory = artifacts.require(
 );
 
 // Load utils
-const { getAmount, getBN } = require("../utils");
+const { getAmount, getBN, getBNRange } = require("../utils");
 
 contract("MechaniumStakingPool", (accounts) => {
   const [owner, fakePool, staker1, staker2, staker3] = accounts;
@@ -19,13 +19,15 @@ contract("MechaniumStakingPool", (accounts) => {
   let mainStakingPoolData = {
     allocatedTokens: getAmount(10000),
     initBlock: 0, // set in the first test = latestBlock + 100
-    minStakingTime: time.duration.days(30),
-    maxStakingTime: time.duration.days(360),
-    minWeightMultiplier: 1,
-    maxWeightMultiplier: 2,
+    minStakingTime: time.duration.days(0),
+    maxStakingTime: time.duration.days(100),
+    minWeightMultiplier: getBN(1),
+    maxWeightMultiplier: getBN(2),
     rewardsLockingPeriod: time.duration.days(90),
     rewardsPerBlock: getAmount(1),
   };
+
+  const WEIGHT_MULTIPLIER = getBN(1e6);
 
   /**
    * ========================
@@ -33,15 +35,25 @@ contract("MechaniumStakingPool", (accounts) => {
    * ========================
    */
 
+  const getWeightMultiplierRange = (stakingTime) => {
+    return getBNRange(
+      mainStakingPoolData.minStakingTime,
+      mainStakingPoolData.minWeightMultiplier.mul(WEIGHT_MULTIPLIER),
+      mainStakingPoolData.maxStakingTime,
+      mainStakingPoolData.maxWeightMultiplier.mul(WEIGHT_MULTIPLIER),
+      stakingTime
+    );
+  };
+
   /**
    * Stake `amount` for `staker` with balance, weight and lock times tests
    */
-  const stake = async (amount, staker) => {
+  const stake = async (amount, staker, stakingTime) => {
     const userOldBalance = token.balanceOf(staker);
     const userOldPoolBalance = mainPool.balanceOf(staker);
 
     token.approve(mainPool.address, amount, { from: staker });
-    await mainPool.stake(amount, mainStakingPoolData.maxStakingTime, {
+    await mainPool.stake(amount, stakingTime, {
       from: staker,
     });
 
@@ -58,7 +70,9 @@ contract("MechaniumStakingPool", (accounts) => {
           ? lastBlock
           : mainStakingPoolData.initBlock,
       amount: amount,
-      weight: amount.mul(mainStakingPoolData.maxWeightMultiplier),
+      weight: amount
+        .mul(getWeightMultiplierRange(stakingTime))
+        .div(WEIGHT_MULTIPLIER),
     };
     usersDeposits[staker].push(newDeposit);
 
@@ -103,7 +117,7 @@ contract("MechaniumStakingPool", (accounts) => {
     );
     assert.equal(
       lastDeposit.lockedUntil.toString(),
-      time.latest().add(mainStakingPoolData.maxStakingTime).toString(),
+      time.latest().add(stakingTime).toString(),
       "Incorrect deposit lockedUntil"
     );
   };
@@ -190,7 +204,7 @@ contract("MechaniumStakingPool", (accounts) => {
   });
 
   it("Owner of the pool should by the fatory", async () => {
-    assert.equal(await mainPool.owner(), factory.address, "Wrong pool balance");
+    assert.equal(await mainPool.owner(), factory.address, "Wrong pool owner");
   });
 
   it("User can’t stake if he did not approve tokens first", async () => {
@@ -239,7 +253,7 @@ contract("MechaniumStakingPool", (accounts) => {
     const amount = getAmount(100);
     const staker = staker1;
 
-    await stake(amount, staker);
+    await stake(amount, staker, mainStakingPoolData.maxStakingTime);
   });
 
   it("Staker2 can stake his tokens (3/4 of weight)", async () => {
@@ -248,7 +262,7 @@ contract("MechaniumStakingPool", (accounts) => {
     const amount = getAmount(300);
     const staker = staker2;
 
-    await stake(amount, staker);
+    await stake(amount, staker, mainStakingPoolData.maxStakingTime);
   });
 
   it("No rewards should be distributed before iniBlock", async () => {
@@ -306,6 +320,9 @@ contract("MechaniumStakingPool", (accounts) => {
     await time.advanceBlock();
     await time.advanceBlock();
     await time.advanceBlock();
+    await time.advanceBlock();
+    await time.advanceBlock();
+    await time.advanceBlock();
 
     const blockPassed = (await time.latestBlock()).sub(
       mainStakingPoolData.initBlock
@@ -319,5 +336,12 @@ contract("MechaniumStakingPool", (accounts) => {
       remainingAllocatedTokens.toString(),
       "Incorrect remainingAllocatedTokens"
     );
+  });
+
+  it("Staker3 can stake his tokens", async () => {
+    const amount = getAmount(600);
+    const staker = staker3;
+
+    await stake(amount, staker, mainStakingPoolData.minStakingTime);
   });
 });
