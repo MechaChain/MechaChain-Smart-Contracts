@@ -1,5 +1,8 @@
 const Mechanium = artifacts.require("Mechanium");
 const MechaniumBis = artifacts.require("MechaniumBis");
+
+const { time } = require('@openzeppelin/test-helpers');
+
 const MechaniumPresaleDistribution = artifacts.require(
   "MechaniumPresaleDistribution"
 );
@@ -16,7 +19,7 @@ module.exports = async function (deployer, network, accounts) {
   if (network === "development") {
     const mechaniumInstance = await Mechanium.deployed();
 
-    await deployer.deploy(StakingPool, mechaniumInstance.address);
+    await deployer.deploy(StakingPool, mechaniumInstance.address, time.duration.days(360));
 
     return;
   }

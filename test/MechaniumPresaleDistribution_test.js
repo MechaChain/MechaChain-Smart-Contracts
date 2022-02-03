@@ -230,9 +230,11 @@ contract('MechaniumPresaleDistribution', (accounts) => {
 
   it('User shoud not be able to transfer to staking pool if the staking pool is not set', async () => {
     const _user = accounts[9];
+    const amount = getAmount(100);
+    const duration = time.duration.days(30);
 
     await expectRevert(
-      instance.transferToStakingPool({ from: _user }),
+      instance.transferToStakingPool(amount, duration, { from: _user }),
       'Staking pool address is not set',
     );
   });
@@ -245,6 +247,50 @@ contract('MechaniumPresaleDistribution', (accounts) => {
     assert.equal(stakingPool.address, stakingPoolAddress, 'Staking pool address not valid');
   });
 
+  it('User shoud not be able to transfer if staking time lower than minimum staking time', async () => {
+    const _user = accounts[9];
+    const amount = getAmount(100);
+    const duration = time.duration.days(30);
+
+    await expectRevert(
+      instance.transferToStakingPool(amount, duration, { from: _user }),
+      'Staking time must be superior to minimum staking time',
+    );
+  });
+
+  it('User shoud not be able to transfer if staking time greater than maximum staking time', async () => {
+    const _user = accounts[9];
+    const amount = getAmount(100);
+    const duration = time.duration.days(500);
+
+    await expectRevert(
+      instance.transferToStakingPool(amount, duration, { from: _user }),
+      'Staking time must be lower to maximum staking time',
+    );
+  });
+
+  it('User shoud not be able to transfer an amount of 0', async () => {
+    const _user = accounts[9];
+    const amount = getAmount(0);
+    const duration = time.duration.days(200);
+
+    await expectRevert(
+      instance.transferToStakingPool(amount, duration, { from: _user }),
+      'Amount must be superior to zero',
+    );
+  });
+
+  it('User shoud not be able to transfer an amount superior to his allocated tokens', async () => {
+    const _user = accounts[9];
+    const amount = getAmount(10000);
+    const duration = time.duration.days(200);
+
+    await expectRevert(
+      instance.transferToStakingPool(amount, duration, { from: _user }),
+      'Insufficient balance.',
+    );
+  });
+
   it('User shoud not be able to set staking pool address', async () => {
     await expectRevert(
       instance.setStakingPool(stakingPool.address, { from: user }),
@@ -252,11 +298,14 @@ contract('MechaniumPresaleDistribution', (accounts) => {
     );
   });
 
-  it('User shoud be able to transfer all unclaimed tokens to staking pool', async () => {
+  it('User shoud be able to transfer an amount of unlocked tokens to staking pool', async () => {
     const _user = accounts[9];
+    const amount = getAmount(100);
+    const duration = time.duration.days(200);
+
     const userBalance = await instance.balanceOf(_user);
 
-    await instance.transferToStakingPool({ from: _user });
+    await instance.transferToStakingPool(amount, duration, { from: _user });
 
     const stakedBalance = await stakingPool.balanceOf(_user);
 
