@@ -9,9 +9,9 @@ pragma solidity ^0.8.2;
  */
 interface IStakingPool {
     /**
-     * @dev Stake tokens ( only from distribution contract )
+     * @dev Stake tokens
      */
-    function stakeTokensFromDistribution(address to, uint256 amount)
+    function depositFor(address account, uint256 amount, uint256 stakingTime)
         external
         returns (bool);
 

@@ -35,7 +35,11 @@ contract MechaniumPresaleDistribution is MechaniumVesting {
     /**
      * @notice Event emitted when `account` has transferred `amount` tokens to the staking pool
      */
-    event TransferToStakingPool(address indexed account, uint256 amount);
+    event TransferToStakingPool(
+        address indexed account,
+        uint256 amount,
+        uint256 stakingTime
+    );
 
     /**
      * ========================
@@ -64,6 +68,12 @@ contract MechaniumPresaleDistribution is MechaniumVesting {
     /// Staking pool address & interface
     address internal _stakingPoolAddress;
     IStakingPool internal _stakingPool;
+
+    /// Time to transfer tokens to staking pool
+    uint256 private _stakingTransferTimeLimit;
+
+    /// Minimum staking time
+    uint256 private _minimumStakingTime;
 
     /**
      * ========================
@@ -112,6 +122,8 @@ contract MechaniumPresaleDistribution is MechaniumVesting {
     {
         _vestingStartingTime = block.timestamp.add(180 days);
         _maxVestingStartingTime = block.timestamp.add(180 days);
+        _stakingTransferTimeLimit = 90 days;
+        _minimumStakingTime = 180 days;
     }
 
     /**
@@ -237,22 +249,65 @@ contract MechaniumPresaleDistribution is MechaniumVesting {
     }
 
     /**
+     * @notice Set staking transfer time limit
+     * @param stakingTransferTimeLimit The staking transfer time limit
+     */
+    function setStakingTransferTimeLimit(uint256 stakingTransferTimeLimit)
+        public
+        onlyRole(DEFAULT_ADMIN_ROLE)
+        returns (bool)
+    {
+        _stakingTransferTimeLimit = stakingTransferTimeLimit;
+        return true;
+    }
+
+    /**
+     * @notice Set minimum staking time
+     * @param minimumStakingTime The minimum staking time
+     */
+    function setMinimumStakingTime(uint256 minimumStakingTime)
+        public
+        onlyRole(DEFAULT_ADMIN_ROLE)
+        returns (bool)
+    {
+        _minimumStakingTime = minimumStakingTime;
+        return true;
+    }
+
+    /**
      * @notice Transfer tokens balance ( allocated but not claimed ) to the staking pool
      */
-    function transferToStakingPool() public returns (bool) {
+    function transferToStakingPool(uint256 amount, uint256 stakingTime)
+        public
+        returns (bool)
+    {
         require(
             _stakingPoolAddress != address(0),
             "Staking pool address is not set"
         );
+
+        require(
+            block.timestamp <=
+                _vestingStartingTime.add(_stakingTransferTimeLimit),
+            "Staking is not possible after staking time limit passed"
+        );
+
+        require(
+            stakingTime >= _minimumStakingTime,
+            "Staking time must be superior to minimum staking time"
+        );
+
+        require(amount > 0, "Amount must be superior to zero");
+
         address account = msg.sender;
-        uint256 amount = balanceOf(account);
-        require(amount > 0);
+        uint256 userBalance = balanceOf(account);
+        require(amount <= userBalance, "Insufficient balance");
 
-        _token.safeTransfer(_stakingPoolAddress, amount);
-        _stakingPool.stakeTokensFromDistribution(account, amount);
-        _releasedTokens[account] = releasedTokensOf(account).add(amount);
+        _token.safeIncreaseAllowance(_stakingPoolAddress, amount);
+        _stakingPool.depositFor(account, amount, stakingTime);
+        _allocatedTokens[account] = allocatedTokensOf(account).sub(amount);
 
-        emit TransferToStakingPool(account, amount);
+        emit TransferToStakingPool(account, amount, stakingTime);
         return true;
     }
 
@@ -335,5 +390,19 @@ contract MechaniumPresaleDistribution is MechaniumVesting {
      */
     function getStakingPoolAddress() public view returns (address) {
         return _stakingPoolAddress;
+    }
+
+    /**
+     * @dev Return the staking transfer time limit
+     */
+    function getStrakingTransferTimeLimit() public view returns (uint256) {
+        return _stakingTransferTimeLimit;
+    }
+
+    /**
+     * @dev Return the minimum staking time
+     */
+    function getMinimumStakingTime() public view returns (uint256) {
+        return _minimumStakingTime;
     }
 }
