@@ -66,7 +66,7 @@ npm install -g truffle
 npm install -g ganache-cli
 npm install
 ```
-  2. Run Ganache Ethereum simulator: `ganache-cli`
+  2. Run Ganache Ethereum simulator: `ganache-cli --accounts=20`
   3. Run test: `truffle test` or `truffle test ./test/<test_file_name>.js`
 
 For testing scaling on contract with [Truffle](https://www.trufflesuite.com/docs/truffle/testing/writing-tests-in-javascript): 
