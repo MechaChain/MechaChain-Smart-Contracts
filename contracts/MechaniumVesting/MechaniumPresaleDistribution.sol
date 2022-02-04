@@ -136,7 +136,6 @@ contract MechaniumPresaleDistribution is MechaniumVesting {
         override
         onlyRole(ALLOCATOR_ROLE)
         tokensAvailable(amount)
-        vestingNotStarted
         returns (bool)
     {
         require(amount > 0, "Amount must be superior to 0");
