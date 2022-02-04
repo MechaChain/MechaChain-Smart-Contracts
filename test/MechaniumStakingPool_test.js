@@ -254,6 +254,12 @@ contract("MechaniumStakingPool", (accounts) => {
     const staker = staker1;
 
     await stake(amount, staker, mainStakingPoolData.maxStakingTime);
+    const userWeight = await mainPool.users(staker).totalWeight;
+    assert.equal(
+      userWeight.toString(),
+      amount.mul(mainStakingPoolData.maxWeightMultiplier).toString(), // 100 * 2 = 200
+      "Incorrect weight"
+    );
   });
 
   it("Staker2 can stake his tokens (3/4 of weight)", async () => {
@@ -263,6 +269,18 @@ contract("MechaniumStakingPool", (accounts) => {
     const staker = staker2;
 
     await stake(amount, staker, mainStakingPoolData.maxStakingTime);
+
+    const expectedWeight = await mainPool
+      .totalUserWeight()
+      .div(getBN(4))
+      .mul(getBN(3));
+    const userWeight = await mainPool.users(staker).totalWeight; // 300 * 2 = 600
+
+    assert.equal(
+      expectedWeight.toString(),
+      userWeight.toString(),
+      "Incorrect weight"
+    );
   });
 
   it("No rewards should be distributed before iniBlock", async () => {
@@ -338,10 +356,138 @@ contract("MechaniumStakingPool", (accounts) => {
     );
   });
 
-  it("Staker3 can stake his tokens", async () => {
-    const amount = getAmount(600);
+  it("Staker3 can stake his tokens (weight x1.25 => 1/5 of total weight)", async () => {
+    const amount = getAmount(160);
     const staker = staker3;
 
-    await stake(amount, staker, mainStakingPoolData.minStakingTime);
+    const quarterTime =
+      (mainStakingPoolData.maxStakingTime.toNumber() -
+        mainStakingPoolData.minStakingTime.toNumber()) /
+      4;
+
+    await stake(amount, staker, getBN(quarterTime));
+
+    const weightMultiplier =
+      (mainStakingPoolData.maxWeightMultiplier.toNumber() -
+        mainStakingPoolData.minWeightMultiplier.toNumber()) /
+      4;
+
+    const userWeight = await mainPool.users(staker).totalWeight;
+    assert.equal(
+      userWeight.toString(),
+      getAmount(160 * weightMultiplier).toString(), // 160 * 1.25 = 200
+      "Incorrect weight"
+    );
+  });
+
+  it("Weight verification for staker1 (1/5), staker2 (3/5) and staker3 (1/5)", async () => {
+    const staker1Weight = await mainPool.users(staker1).totalWeight;
+    const staker2Weight = await mainPool.users(staker2).totalWeight;
+    const staker3Weight = await mainPool.users(staker3).totalWeight;
+    const totalUserWeight = await mainPool.totalUserWeight();
+
+    assert.equal(
+      staker1Weight.toString(),
+      totalUserWeight.div(getBN(5)).toString(),
+      "Incorrect weight for staker1"
+    );
+
+    assert.equal(
+      staker2Weight.toString(),
+      totalUserWeight.div(getBN(5)).mul(getBN(3)).toString(),
+      "Incorrect weight for staker2"
+    );
+
+    assert.equal(
+      staker3Weight.toString(),
+      totalUserWeight.div(getBN(5)).toString(),
+      "Incorrect weight for staker3"
+    );
+  });
+
+  it("Pendings Rewards must take weight change in count", async () => {
+    const oldPendingRewardsStaker1 = await mainStakingPool.pendingRewards(
+      staker1
+    );
+    const oldPendingRewardsStaker2 = await mainStakingPool.pendingRewards(
+      staker2
+    );
+    const oldPendingRewardsStaker3 = await mainStakingPool.pendingRewards(
+      staker3
+    );
+
+    const blockPassed = (await time.latestBlock()).sub(
+      mainStakingPoolData.initBlock
+    );
+
+    assert.equal(
+      oldPendingRewardsStaker1.toString(),
+      mainStakingPoolData.rewardsPerBlock
+        .mul(blockPassed)
+        .div(getBN(4))
+        .toString(),
+      "Incorrect pendingRewards of staker1: must still have 1/4 of totalWeight"
+    );
+    assert.equal(
+      oldPendingRewardsStaker2.toString(),
+      mainStakingPoolData.rewardsPerBlock
+        .mul(blockPassed)
+        .div(4)
+        .mul(3)
+        .toString(),
+      "Incorrect pendingRewards of staker2: must still have 3/4 of totalWeight"
+    );
+
+    assert.equal(
+      oldPendingRewardsStaker3.toString(),
+      "0",
+      "Incorrect pendingRewards of staker3: must have 0"
+    );
+
+    // advance 4 blocks
+    await time.advanceBlock();
+    await time.advanceBlock();
+    await time.advanceBlock();
+    await time.advanceBlock();
+
+    const newPendingRewardsStaker1 = await mainStakingPool.pendingRewards(
+      staker1
+    );
+    const newPendingRewardsStaker2 = await mainStakingPool.pendingRewards(
+      staker2
+    );
+    const newPendingRewardsStaker3 = await mainStakingPool.pendingRewards(
+      staker3
+    );
+
+    // Pendings rewards must be increase by 4 * rewardsPerBlock / weight
+    assert.equal(
+      newPendingRewardsStaker1.toString(),
+      oldPendingRewardsStaker1
+        .add(mainStakingPoolData.rewardsPerBlock.mul(getBN(4)).div(getBN(5)))
+        .toString(),
+      "Incorrect pendingRewards of staker1"
+    );
+    assert.equal(
+      newPendingRewardsStaker2.toString(),
+      oldPendingRewardsStaker2
+        .add(
+          mainStakingPoolData.rewardsPerBlock
+            .mul(getBN(4))
+            .div(getBN(5))
+            .mul(getBN(3))
+        )
+        .toString(),
+      "Incorrect pendingRewards of staker2"
+    );
+
+    assert.equal(
+      newPendingRewardsStaker3.toString(),
+      mainStakingPoolData.rewardsPerBlock
+        .mul(getBN(4))
+        .div(getBN(5))
+        .toString(),
+      "Incorrect pendingRewards of staker3"
+    );
   });
 });
