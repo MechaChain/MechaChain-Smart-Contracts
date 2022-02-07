@@ -12,7 +12,7 @@ const StakingPool = artifacts.require("StakingPool");
 const { getAmount, getBN } = require("../utils");
 
 contract("MechaniumPresaleDistribution", (accounts) => {
-  const [owner, allocator, user, ptePoolAddr] = accounts;
+  const [owner, allocator, user] = accounts;
   let instance, token, stakingPool, ALLOCATOR_ROLE, DEFAULT_ADMIN_ROLE;
 
   it("Smart contract should be deployed", async () => {
@@ -134,13 +134,6 @@ contract("MechaniumPresaleDistribution", (accounts) => {
     );
   });
 
-  it("Admin should not be able to transfer unallocated tokens to PTE pool if the vesting has not started", async () => {
-    await expectRevert(
-      instance.transferUnsoldToPTEPool(),
-      `The vesting schedule has not started yet -- Reason given: The vesting schedule has not started yet.`
-    );
-  });
-
   it("Admin should not be able to claim user tokens if vesting has not started", async () => {
     await expectRevert(
       instance.claimTokens(user),
@@ -234,14 +227,6 @@ contract("MechaniumPresaleDistribution", (accounts) => {
       instance.claimTokens(user),
       `No token can be unlocked for this account -- Reason given: No token can be unlocked for this account.`
     );
-  });
-
-  it("Admin should set pte pool address", async () => {
-    await instance.setPTEPool(ptePoolAddr);
-
-    const _ptePoolAddress = await instance.getPTEPoolAddress();
-
-    assert.equal(ptePoolAddr, _ptePoolAddress, "PTE pool address not set");
   });
 
   it("User shoud not be able to transfer to staking pool if the staking pool is not set", async () => {
@@ -343,31 +328,6 @@ contract("MechaniumPresaleDistribution", (accounts) => {
     );
   });
 
-  it("User should not set pte pool address", async () => {
-    await expectRevert(
-      instance.setPTEPool(ptePoolAddr, { from: user }),
-      `AccessControl: account ${user.toLowerCase()} is missing role ${DEFAULT_ADMIN_ROLE.toLowerCase()} -- Reason given: AccessControl: account ${user.toLowerCase()} is missing role ${DEFAULT_ADMIN_ROLE.toLowerCase()}.`
-    );
-  });
-
-  it("User should not be able to transfer unallocated tokens to PTE pool", async () => {
-    await expectRevert(
-      instance.transferUnsoldToPTEPool({ from: user }),
-      `AccessControl: account ${user.toLowerCase()} is missing role ${DEFAULT_ADMIN_ROLE.toLowerCase()} -- Reason given: AccessControl: account ${user.toLowerCase()} is missing role ${DEFAULT_ADMIN_ROLE.toLowerCase()}.`
-    );
-  });
-
-  it("Admin should be able to transfer unallocated tokens to PTE pool once the vesting has started", async () => {
-    const unallocated = await instance.totalUnallocatedTokens();
-    await instance.transferUnsoldToPTEPool();
-    const ptePoolBalance = await token.balanceOf(ptePoolAddr);
-    assert.equal(
-      ptePoolBalance.cmp(unallocated),
-      0,
-      "PTE Pool balance not correct"
-    );
-  });
-
   it("Admin can refill the contract", async () => {
     const oldBalance = await token.balanceOf(instance.address);
 
@@ -399,7 +359,7 @@ contract("MechaniumPresaleDistribution", (accounts) => {
     const expectedClaimedAmount = getAmount(4);
     const restUserBalance = getAmount(6);
 
-    await instance.claimTokens(accounts[9]);
+    await instance.claimTokens({ from: accounts[9] });
 
     const userTokenBalance = await token.balanceOf(accounts[9]);
 
@@ -551,7 +511,7 @@ contract("MechaniumPresaleDistribution", (accounts) => {
   });
 
   it("Admin should claim all users tokens", async () => {
-    await instance.claimTokensForAll();
+    await instance.claimTokensForAll({ from: owner });
 
     for (let i = 4; i < 9; i++) {
       const _user = accounts[i];
@@ -564,7 +524,7 @@ contract("MechaniumPresaleDistribution", (accounts) => {
 
   it("Admin should not be able to claim all users tokens once they are already claimed", async () => {
     await expectRevert(
-      instance.claimTokensForAll(),
+      instance.claimTokensForAll({ from: owner }),
       "No token can be unlocked"
     );
   });

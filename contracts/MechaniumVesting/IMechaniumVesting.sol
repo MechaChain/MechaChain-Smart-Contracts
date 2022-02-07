@@ -8,7 +8,6 @@ pragma solidity ^0.8.2;
  * @custom:security-contact contracts@ethernalhorizons.com
  */
 interface IMechaniumVesting {
-    
     /**
      * @dev Allocate an amount of tokens to an address ( only allocator role )
      */
@@ -20,7 +19,12 @@ interface IMechaniumVesting {
     function claimTokens(address account) external returns (bool);
 
     /**
-     * @dev Transfers the all the allocated tokens to the respective addresses ( once the distribution has started )
+     * @dev Transfers the allocated tokens to the sender ( once the distribution has started )
+     */
+    function claimTokens() external returns (bool);
+
+    /**
+     * @dev Transfers the all the allocated tokens to the respective addresses ( once the distribution has started and only by DEFAULT_ADMIN_ROLE)
      */
     function claimTokensForAll() external returns (bool);
 

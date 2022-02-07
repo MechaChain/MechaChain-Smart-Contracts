@@ -168,9 +168,21 @@ abstract contract MechaniumVesting is
     }
 
     /**
-     * @notice Claim all the accounts tokens
+     * @notice Claim the account's token
      */
-    function claimTokensForAll() public override returns (bool) {
+    function claimTokens() public override returns (bool) {
+        return claimTokens(msg.sender);
+    }
+
+    /**
+     * @notice Claim all the accounts tokens (Only by DEFAULT_ADMIN_ROLE)
+     */
+    function claimTokensForAll()
+        public
+        override
+        onlyRole(DEFAULT_ADMIN_ROLE)
+        returns (bool)
+    {
         uint256 beneficiariesNb = 0;
         uint256 tokensUnlockNb = 0;
         for (uint256 i = 0; i < _beneficiaryList.length; i++) {

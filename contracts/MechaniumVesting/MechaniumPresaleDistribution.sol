@@ -62,9 +62,6 @@ contract MechaniumPresaleDistribution is MechaniumVesting {
     /// Starting time of the vesting schedule
     uint256 private _vestingStartingTime;
 
-    /// Play to earn pool address
-    address internal _ptePoolAddress;
-
     /// Staking pool address & interface
     address internal _stakingPoolAddress;
     IStakingPool internal _stakingPool;
@@ -194,42 +191,6 @@ contract MechaniumPresaleDistribution is MechaniumVesting {
         _vestingStartingTime = startTime;
 
         emit VestingStartingTimeChanged(_vestingStartingTime);
-        return true;
-    }
-
-    /**
-     * @notice Set the play to earn pool address
-     * @param ptePoolAddress PTE pool address
-     */
-    function setPTEPool(address ptePoolAddress)
-        public
-        onlyRole(DEFAULT_ADMIN_ROLE)
-        returns (bool)
-    {
-        _ptePoolAddress = ptePoolAddress;
-        return true;
-    }
-
-    /**
-     * @notice Transfer unclaimed tokens to PTE pool
-     */
-    function transferUnsoldToPTEPool()
-        public
-        onlyRole(DEFAULT_ADMIN_ROLE)
-        vestingStarted
-        returns (bool)
-    {
-        require(
-            _ptePoolAddress != address(0),
-            "Play to earn pool address is not set"
-        );
-        uint256 amount = totalUnallocatedTokens();
-        require(amount > 0);
-
-        _token.safeTransfer(_ptePoolAddress, amount);
-
-        emit TransferUnsoldToPTEPool(amount);
-
         return true;
     }
 
@@ -375,13 +336,6 @@ contract MechaniumPresaleDistribution is MechaniumVesting {
      */
     function maxVestingStartingTime() public view returns (uint256) {
         return _maxVestingStartingTime;
-    }
-
-    /**
-     * @dev Return the pte pool address
-     */
-    function getPTEPoolAddress() public view returns (address) {
-        return _ptePoolAddress;
     }
 
     /**
