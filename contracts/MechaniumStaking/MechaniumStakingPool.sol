@@ -204,22 +204,29 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
             "Staking time greater than maximum required"
         );
 
+        // TODO - Call processRewards only if has it (user.totalStaked > 0)
         processRewards();
+        // TODO - If no processRewards, updateRewardsPerWeight
 
         stakedToken.safeTransferFrom(account, address(this), amount);
 
         User storage user = users[account];
 
-        uint256 weight = _calculateUserWeight(amount, lockPeriod);
+        uint256 weight = calculateUserWeight(amount, lockPeriod);
 
         uint64 lockStart = uint64(block.timestamp);
         uint64 lockEnd = lockStart + lockPeriod;
 
+        // TODO - For a better understanding, can use an object instead of parameters on struct creation
+        // ex: Deposit({amount: amount, weight: weight, lockStart: lockStart, lockEnd: lockEnd})
+        // can avoid error on struct changement
         Deposit memory deposit = Deposit(amount, weight, lockStart, lockEnd);
         user.deposits.push(deposit);
 
         user.totalStaked = user.totalStaked.add(amount);
         user.totalWeight = user.totalWeight.add(weight);
+
+        // TODO - Nico, update user.missingRewards
 
         totalUsersWeight = totalUsersWeight.add(weight);
         totalTokensStaked = totalTokensStaked.add(amount);
@@ -257,12 +264,16 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
 
         Deposit storage deposit = user.deposits[depositId];
 
+        // TODO the lockPeriod should be greater than the previous one
+
         deposit.lockedFrom = uint64(block.timestamp);
         deposit.lockedUntil = deposit.lockedFrom + lockPeriod;
 
         uint256 oldWeight = deposit.weight;
-        uint256 newWeight = _calculateUserWeight(deposit.amount, lockPeriod);
+        uint256 newWeight = calculateUserWeight(deposit.amount, lockPeriod);
 
+        // FIXME as we are in storage, isn't it better to change the variable at once?
+        // ex : user.totalWeight = user.totalWeight.sub(oldWeight).add(newWeight);
         user.totalWeight = user.totalWeight.sub(oldWeight);
         totalUsersWeight = totalUsersWeight.sub(oldWeight);
 
@@ -279,6 +290,7 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
      * @dev TODO
      */
     function processRewards() public override returns (bool) {
+        // TODO Nico
         // User storage user = users[msg.sender];
 
         // user.releasedRewards = user.releasedRewards.add(1);
@@ -294,6 +306,8 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
      * @param depositId The deposit id that will be unstaked
      */
     function unstake(uint256 depositId) public override returns (bool) {
+        // TODO Nico
+
         emit Unstake(msg.sender, depositId);
         return true;
     }
@@ -302,6 +316,8 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
      * @notice Used to update the rewardsPerWeight
      */
     function updateRewardsPerWeight() public override returns (bool) {
+        // TODO - also update a new variable `totalRewards`
+        // TODO - rename if `updateRewards()`
         require(block.number >= initBlock, "initBlock is not reached");
 
         rewardsPerWeight = updatedRewardsPerWeight();
@@ -357,7 +373,14 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
         }
 
         uint256 blocksPassed = block.number.sub(initBlock);
+        // FIXME incorect calculation : rewardsPerBlock maybe changed after the initBlock and totalTokensStaked counts the rewards already processed
+        // token.balance - (totalTokensStaked + updatedTotalRewards() - totalProcessedRewards)
+        // 1. 12M - (2M + 0 - 0) = block 0, 10M de tokens alloués => remainingAllocatedTokens = 10M
+        // 2. 12M - (2M + 2M - 0) = block X, 2M de tokens rewards prévu mais aucun process rewards => remainingAllocatedTokens = 8M
+        // 3. 12M - (3M + 2M - 1M) = block X, 1M de tokens process (donc alloué)  => remainingAllocatedTokens = 8M
+        // 3. 11.5M - (2.5M + 2M - 1M) = block X, 0.5M unstake (donc enelvé de la balance et le totalTokensStaked) = 8M
 
+        // updatedTotalRewards() ~= rewardsPerBlock.mul(blocksPassed)
         return balance.sub(rewardsPerBlock.mul(blocksPassed));
     }
 
@@ -378,6 +401,8 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
         uint256 _pendingRewards = users[account].totalWeight.mul(
             rewardsPerWeight
         );
+
+        // TODO - Nico, remove missingRewards
 
         _pendingRewards = _pendingRewards.div(WEIGHT_MULTIPLIER);
 
@@ -438,6 +463,8 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
         return user;
     }
 
+    // TODO updatedTotalRewards() = like updatedRewardsPerWeight, but without the weight
+
     /**
      * @notice Get the updated rewards per weight
      * @dev Used to calculate the rewardsPerWeight without updating them
@@ -465,6 +492,8 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
 
         uint256 _rewardsPerWeight = cumulatedRewards.div(totalUsersWeight);
 
+        // FIXME does not take into account the old rewardsPerWeight ???
+
         return _rewardsPerWeight;
     }
 
@@ -473,7 +502,7 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
      * @param amount The staking amount
      * @param stakingTime The staking time
      */
-    function _calculateUserWeight(uint256 amount, uint64 stakingTime)
+    function calculateUserWeight(uint256 amount, uint64 stakingTime)
         public
         view
         returns (uint256)

@@ -60,7 +60,11 @@ contract MechaniumStakingPoolFactory is IMechaniumStakingPoolFactory, Ownable {
     /**
      * @notice Event emitted when an `amount` of tokens is added to `poolAddress` token allocation
      */
-    event AddAllocatedTokens(address indexed poolAddress, uint256 amount, uint256 rewardsPerBlock);
+    event AddAllocatedTokens(
+        address indexed poolAddress,
+        uint256 amount,
+        uint256 rewardsPerBlock
+    );
 
     /**
      * @notice Event emitted when `amount` of unallocated tokens is withdrawn to an `account`

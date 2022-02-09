@@ -45,15 +45,17 @@ interface IMechaniumStakingPool {
         external
         returns (bool);
 
-    function remainingAllocatedTokens()
-        external
-        returns (uint256);
+    function remainingAllocatedTokens() external returns (uint256);
 
     function pendingRewards(address account) external returns (uint256);
 
     function balanceOf(address account) external returns (uint256);
 
-    function getDeposit(address account, uint256 depositId) external returns (Deposit memory);
-    
+    function getDeposit(address account, uint256 depositId)
+        external
+        returns (Deposit memory);
+
     function getDepositsLength(address account) external returns (uint256);
+
+    // TODO : add calculateUserWeight
 }

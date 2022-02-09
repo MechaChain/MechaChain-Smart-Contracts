@@ -60,9 +60,11 @@ interface IMechaniumStakingPoolFactory {
     /**
      * @notice Function used to add more tokens to a staking pool
      */
-    function addAllocatedTokens(address pool, uint256 amount, uint256 rewardPerBlock)
-        external
-        returns (bool);
+    function addAllocatedTokens(
+        address pool,
+        uint256 amount,
+        uint256 rewardPerBlock
+    ) external returns (bool);
 
     /**
      * @notice Function used to withdraw unallocated tokens
