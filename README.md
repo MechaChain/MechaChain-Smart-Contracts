@@ -55,7 +55,7 @@ truffle migrate --f <contractIndex> --to <contractIndex> --network <networkName>
 ```
 - `--f <contractIndex>` is the frist index of the migration file to run
 - `--to <contractIndex>` is the last index of the migration file to run (can be the same as the previous one)
-- `<networkName>` can be `development` _(local network)_, `matic`, `goerli`, `ropsten` or `rinkeby`.
+- `<networkName>` can be `development` _(local network)_, `matic`, `goerli`, `ropsten`, `mumbai` or `rinkeby`.
 
 ### Launch unit tests
 
@@ -131,7 +131,7 @@ Build with a simple ERC20 inheritance from [OpenZeppelin ERC20 lib](https://docs
 
 Testnets
   - Goerli : [0x1Be3C27E55867d9Ccc55765BbA14F350F9323539](https://goerli.etherscan.io/address/0x1be3c27e55867d9ccc55765bba14f350f9323539)
-  - Mumbal : ...
+  - Mumbai : [0x3dc6451e45dde42D3e376863F1ae4b24AFec5256](https://mumbai.polygonscan.com/address/0x3dc6451e45dde42D3e376863F1ae4b24AFec5256)
 
 Mainnets
   - Polygon : [0xacd4e2d936be9b16c01848a3742a34b3d5a5bdfa](https://polygonscan.com/address/0xacd4e2d936be9b16c01848a3742a34b3d5a5bdfa)
@@ -157,7 +157,7 @@ _Inherit from [MechaniumVesting.sol](#MechaniumVesting)_
 **Smart contract address**
 
 Testnets
-  - Mumbal : ...
+  - Mumbai : ...
 
 Mainnets
   - Polygon : ...
@@ -185,7 +185,7 @@ _Inherit from [MechaniumTeamDistribution.sol](#MechaniumTeamDistribution)_
 **Smart contract address**
 
 Testnets
-  - Mumbal : ...
+  - Mumbai : ...
 
 Mainnets
   - Polygon : [0xc4e4154a56f8f7bf5fb783cde83d2d26f6b3cd87](https://polygonscan.com/address/0xc4e4154a56f8f7bf5fb783cde83d2d26f6b3cd87)
@@ -204,7 +204,7 @@ _Inherit from [MechaniumTeamDistribution.sol](#MechaniumTeamDistribution)_
 **Smart contract address**
 
 Testnets
-  - Mumbal : ...
+  - Mumbai : ...
 
 Mainnets
   - Polygon : ...
@@ -224,7 +224,7 @@ _Inherit from [MechaniumTeamDistribution.sol](#MechaniumTeamDistribution)_
 **Smart contract address**
 
 Testnets
-  - Mumbal : ...
+  - Mumbai : ...
 
 Mainnets
   - Polygon : ...
@@ -248,7 +248,7 @@ _Inherit from [MechaniumVestingWallet.sol](#mechaniumvestingwalletsol)_
 **Smart contract address**
 
 Testnets
-  - Mumbal : ...
+  - Mumbai : ...
 
 Mainnets
   - Polygon : ...

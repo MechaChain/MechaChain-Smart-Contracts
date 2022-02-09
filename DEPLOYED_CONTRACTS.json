@@ -27,6 +27,12 @@
       "date": "21/11/2021, 13:02:53"
     }
   },
+  "mumbai": {
+    "Mechanium": {
+      "address": "0x3dc6451e45dde42D3e376863F1ae4b24AFec5256",
+      "date": "17/11/2021, 13:48:33"
+    }
+  },
   "ropsten": {
     "Mechanium": {
       "address": "0xE22A901E5D0d1D21aa54144b1E7E41639c4bd435",

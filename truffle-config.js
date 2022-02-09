@@ -22,6 +22,14 @@ module.exports = {
       gas: 7500000,
       gasPrice: 5000000000,
     },
+    mumbai: {
+      provider: () =>
+        new HDWalletProvider(
+          process.env.DEV_WALLET_PRIVATE_KEY,
+          "https://polygon-mumbai.infura.io/v3/" + process.env.INFURA_PROJECT_ID
+        ),
+      network_id: 80001,
+    },
     ropsten: {
       provider: () =>
         new HDWalletProvider(
