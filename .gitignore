@@ -5,9 +5,11 @@ contracts/MechaniumVesting/artifacts
 contracts/MechaniumVestingWallet/artifacts
 contracts/MechaniumStaking/artifacts
 build/*
+types/*
 node_modules
 package-lock.json
 .VSCodeCounter
 contracts/MechaniumVesting/artifacts
 contracts/MechaniumVestingWallet/artifacts
 .env
+.DS_Store

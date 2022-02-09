@@ -1,4 +1,8 @@
 {
+  "scripts": {
+    "build": "npx truffle compile",
+    "generate-types": "typechain --target=ethers-v5 build/contracts/*.json"
+  },
   "devDependencies": {
     "hardhat": "^2.8.3",
     "solc-0.6": "npm:solc@^0.6.6",
@@ -9,8 +13,10 @@
     "@maticnetwork/pos-portal": "^1.5.2",
     "@openzeppelin/contracts": "^4.3.3",
     "@openzeppelin/test-helpers": "^0.5.15",
+    "@typechain/ethers-v5": "^9.0.0",
     "dotenv": "^10.0.0",
     "truffle-hdwallet-provider": "^1.0.17",
+    "typechain": "^7.0.0",
     "web3-utils": "^1.6.1"
   }
 }
