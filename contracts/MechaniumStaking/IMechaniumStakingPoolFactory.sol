@@ -27,12 +27,12 @@ interface IMechaniumStakingPoolFactory {
      */
     function createPool(
         uint256 allocatedTokens,
-        uint256 initBlock,
-        uint256 minStakingTime,
-        uint256 maxStakingTime,
-        uint256 minWeightMultiplier,
-        uint256 maxWeightMultiplier,
-        uint256 rewardsLockingPeriod,
+        uint32 initBlock,
+        uint64 minStakingTime,
+        uint64 maxStakingTime,
+        uint16 minWeightMultiplier,
+        uint16 maxWeightMultiplier,
+        uint64 rewardsLockingPeriod,
         uint256 rewardsPerBlock
     ) external returns (bool);
 
@@ -42,11 +42,11 @@ interface IMechaniumStakingPoolFactory {
     function createFlashPool(
         IERC20 stakedToken,
         uint256 allocatedTokens,
-        uint256 initBlock,
-        uint256 minStakingTime,
-        uint256 maxStakingTime,
-        uint256 minWeightMultiplier,
-        uint256 maxWeightMultiplier,
+        uint32 initBlock,
+        uint64 minStakingTime,
+        uint64 maxStakingTime,
+        uint16 minWeightMultiplier,
+        uint16 maxWeightMultiplier,
         uint256 rewardsPerBlock
     ) external returns (bool);
 

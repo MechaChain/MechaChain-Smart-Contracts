@@ -5,8 +5,8 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 import "./IMechaniumStakingPoolFactory.sol";
-import "./IStakingPool.sol";
-import "./StakingPool.sol";
+import "./IMechaniumStakingPool.sol";
+import "./MechaniumStakingPool.sol";
 
 /**
  * @title MechaniumStakingPoolFactory - Staking pool factory smart contract
@@ -49,7 +49,6 @@ contract MechaniumStakingPoolFactory is IMechaniumStakingPoolFactory, Ownable {
         uint256 maxStakingTime,
         uint256 minWeightMultiplier,
         uint256 maxWeightMultiplier,
-        uint256 rewardsLockingPeriod,
         uint256 rewardsPerBlock
     );
 
@@ -112,12 +111,12 @@ contract MechaniumStakingPoolFactory is IMechaniumStakingPoolFactory, Ownable {
      */
     function createPool(
         uint256 allocatedTokens,
-        uint256 initBlock,
-        uint256 minStakingTime,
-        uint256 maxStakingTime,
-        uint256 minWeightMultiplier,
-        uint256 maxWeightMultiplier,
-        uint256 rewardsLockingPeriod,
+        uint32 initBlock,
+        uint64 minStakingTime,
+        uint64 maxStakingTime,
+        uint16 minWeightMultiplier,
+        uint16 maxWeightMultiplier,
+        uint64 rewardsLockingPeriod,
         uint256 rewardsPerBlock
     ) public override onlyOwner returns (bool) {
         uint256 factoryBalance = _token.balanceOf(address(this));
@@ -127,7 +126,8 @@ contract MechaniumStakingPoolFactory is IMechaniumStakingPoolFactory, Ownable {
             "Not enough tokens in factory"
         );
 
-        IStakingPool stakingPool = new StakingPool(
+        IMechaniumStakingPool stakingPool = new MechaniumStakingPool(
+            _token,
             _token,
             initBlock,
             minStakingTime,
@@ -174,11 +174,11 @@ contract MechaniumStakingPoolFactory is IMechaniumStakingPoolFactory, Ownable {
     function createFlashPool(
         IERC20 stakedToken,
         uint256 allocatedTokens,
-        uint256 initBlock,
-        uint256 minStakingTime,
-        uint256 maxStakingTime,
-        uint256 minWeightMultiplier,
-        uint256 maxWeightMultiplier,
+        uint32 initBlock,
+        uint64 minStakingTime,
+        uint64 maxStakingTime,
+        uint16 minWeightMultiplier,
+        uint16 maxWeightMultiplier,
         uint256 rewardsPerBlock
     ) public override onlyOwner returns (bool) {
         uint256 factoryBalance = _token.balanceOf(address(this));
@@ -188,8 +188,9 @@ contract MechaniumStakingPoolFactory is IMechaniumStakingPoolFactory, Ownable {
             "Not enough tokens in factory"
         );
 
-        IStakingPool stakingPool = new StakingPool(
+        IMechaniumStakingPool stakingPool = new MechaniumStakingPool(
             stakedToken,
+            _token,
             initBlock,
             minStakingTime,
             maxStakingTime,
@@ -214,7 +215,6 @@ contract MechaniumStakingPoolFactory is IMechaniumStakingPoolFactory, Ownable {
             maxStakingTime,
             minWeightMultiplier,
             maxWeightMultiplier,
-            0,
             rewardsPerBlock
         );
 
@@ -258,7 +258,7 @@ contract MechaniumStakingPoolFactory is IMechaniumStakingPoolFactory, Ownable {
 
         _transferTokens(poolAddr, amount);
 
-        IStakingPool pool = StakingPool(poolAddr);
+        IMechaniumStakingPool pool = MechaniumStakingPool(poolAddr);
 
         pool.setRewardsPerBlock(rewardsPerBlock);
 
@@ -332,10 +332,10 @@ contract MechaniumStakingPoolFactory is IMechaniumStakingPoolFactory, Ownable {
     {
         require(registredPools[poolAddr], "Pool not registred");
 
-        StakingPool pool = StakingPool(poolAddr);
+        MechaniumStakingPool pool = MechaniumStakingPool(poolAddr);
 
         PoolData memory poolData = PoolData(
-            pool.getAllocatedTokens(),
+            pool.totalTokensStaked(),
             pool.initBlock(),
             pool.minStakingTime(),
             pool.maxStakingTime(),
