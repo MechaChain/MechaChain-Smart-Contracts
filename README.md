@@ -117,6 +117,9 @@ To verify contracts use either [Remix Etherscan Plugin](https://remix-etherscan-
 truffle run verify <contractName>@<contractAddress> --forceConstructorArgs string:<contractEncodedArguments > --network matic
 ```
 
+### Generate typescript types definition
+  1. `npm run build`
+  2. `npm run generate-types`
 
 ## SMART CONTRACTS
 
