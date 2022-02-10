@@ -240,8 +240,9 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
             lockedFrom: lockStart,
             lockedUntil: lockEnd
         });
-        user.deposits.push(deposit);
 
+        // update user profil
+        user.deposits.push(deposit);
         user.totalStaked = user.totalStaked.add(amount);
         user.totalWeight = user.totalWeight.add(weight);
 
@@ -290,6 +291,7 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
         User storage user = users[msg.sender];
 
         require(depositId < user.deposits.length, "Deposit does not exist");
+        // TODO : Need test for already deleted deposit ?
 
         Deposit storage deposit = user.deposits[depositId];
 
@@ -392,9 +394,9 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
                 lockedFrom: lockStart,
                 lockedUntil: lockEnd
             });
-            user.deposits.push(deposit);
 
             // update user profil
+            user.deposits.push(deposit);
             user.totalStaked = user.totalStaked.add(userPendingRewards);
             user.totalWeight = user.totalWeight.add(weight);
 
@@ -422,7 +424,40 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
      * @param depositId The deposit id that will be unstaked
      */
     function unstake(uint256 depositId) public override returns (bool) {
-        // TODO Nico
+        // Update rewards
+        if (canUpdateRewards()) {
+            updateRewards();
+        }
+
+        // Process rewards with no update to not do it twice
+        _processRewards(msg.sender, false);
+
+        User storage user = users[msg.sender];
+        require(depositId < user.deposits.length, "Deposit does not exist");
+        Deposit memory deposit = user.deposits[depositId];
+        // TODO : Need test for already deleted deposit ?
+        require(
+            deposit.lockedUntil >= uint64(block.timestamp),
+            "Staking for this deposit is not yet complete"
+        );
+
+        // Update user record
+        user.totalStaked = user.totalStaked.sub(deposit.amount);
+        user.totalWeight = user.totalWeight.sub(deposit.weight);
+        user.missingRewards = weightToReward(
+            user.totalWeight,
+            rewardsPerWeight
+        );
+
+        // Update total record
+        totalUsersWeight = totalUsersWeight.sub(deposit.weight);
+        totalTokensStaked = totalTokensStaked.sub(deposit.amount);
+
+        // Transfer tokens
+        rewardToken.safeTransfer(msg.sender, deposit.amount);
+
+        // Remove deposit
+        delete user.deposits[depositId];
 
         emit Unstake(msg.sender, depositId);
         return true;
