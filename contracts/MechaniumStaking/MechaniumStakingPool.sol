@@ -151,6 +151,16 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
                 rewardsLockingPeriod_ == 0,
             "Rewards locking period must be 0 for flash pools"
         );
+        require(
+            rewardsLockingPeriod_ == 0 ||
+                rewardsLockingPeriod_ >= minStakingTime_,
+            "Rewards locking period must be 0 or lower than minStakingTime"
+        );
+        require(
+            rewardsLockingPeriod_ == 0 ||
+                rewardsLockingPeriod_ <= maxStakingTime_,
+            "Rewards locking period must be 0 or greater than maxStakingTime"
+        );
 
         stakedToken = stakedToken_;
         rewardToken = rewardToken_;
@@ -204,9 +214,13 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
             "Staking time greater than maximum required"
         );
 
-        // TODO - Call processRewards only if has it (user.totalStaked > 0)
-        processRewards();
-        // TODO - If no processRewards, updateRewardsPerWeight
+        // Update rewards
+        if (canUpdateRewardsPerWeight()) {
+            updateRewardsPerWeight();
+        }
+
+        // Process rewards with no update to not do it twice
+        _processRewards(account, false);
 
         stakedToken.safeTransferFrom(account, address(this), amount);
 
@@ -226,7 +240,11 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
         user.totalStaked = user.totalStaked.add(amount);
         user.totalWeight = user.totalWeight.add(weight);
 
-        // TODO - Nico, update user.missingRewards
+        // Reset the missingRewards of the user
+        user.missingRewards = weightToReward(
+            user.totalWeight,
+            rewardsPerWeight
+        );
 
         totalUsersWeight = totalUsersWeight.add(weight);
         totalTokensStaked = totalTokensStaked.add(amount);
@@ -286,18 +304,100 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
     }
 
     /**
-     * @notice Used to process the `msg.sender` rewards
-     * @dev TODO
+     * @notice Used to calculate and pay pending rewards to the `msg.sender`
+     *
+     * @dev Automatically updates rewards before processing them
+     * @dev When there are no rewards to calculate, throw error
+     * @dev If `rewardsLockingPeriod` is set, rewards are staked in a new deposit,
+     *      otherwise they are transmitted directly to the user (as for flash pools)
+     * @dev Executed internally TODO WHERE ?
+     *
+     * @return userPendingRewards rewards calculated and optionally re-staked
      */
-    function processRewards() public override returns (bool) {
-        // TODO Nico
-        // User storage user = users[msg.sender];
+    function processRewards()
+        public
+        override
+        returns (uint256 userPendingRewards)
+    {
+        userPendingRewards = _processRewards(msg.sender, true);
+        require(userPendingRewards != 0, "No rewards to process");
+    }
 
-        // user.releasedRewards = user.releasedRewards.add(1);
+    /**
+     * @notice Used to calculate and pay pending rewards to the `_staker`
+     *
+     * @dev When there are no rewards to calculate, function doesn't throw and exits silently
+     * @dev If `rewardsLockingPeriod` is set, rewards are staked in a new deposit,
+     *      otherwise they are transmitted directly to the user (as for flash pools)
+     * @dev If `_withUpdate` is false, rewards MUST be updated before and user's missing rewards
+     *      MUST be reset after
+     * @dev Executed internally TODO WHEN ?
+     *
+     * @param _staker Staker address
+     * @param _withUpdate If we need to update rewards and user's missing rewards in this function
+     *
+     * @return userPendingRewards rewards calculated and optionally re-staked
+     */
 
-        emit ProcessRewards(msg.sender, 10);
+    function _processRewards(address _staker, bool _withUpdate)
+        private
+        returns (uint256 userPendingRewards)
+    {
+        if (_withUpdate && canUpdateRewardsPerWeight()) {
+            // Update rewards before use them if it hasn't been done before
+            updateRewardsPerWeight();
+        }
 
-        return true;
+        userPendingRewards = pendingRewards(_staker);
+        if (userPendingRewards == 0) {
+            return 0;
+        }
+
+        User storage user = users[_staker];
+
+        // If no locking/staking for rewards
+        if (rewardsLockingPeriod == 0) {
+            // transfer tokens for user
+            rewardToken.safeTransfer(_staker, userPendingRewards);
+        } else {
+            // Stake rewards
+            uint256 weight = calculateUserWeight(
+                userPendingRewards,
+                rewardsLockingPeriod
+            );
+
+            uint64 lockStart = uint64(block.timestamp);
+            uint64 lockEnd = lockStart + rewardsLockingPeriod;
+
+            Deposit memory deposit = Deposit({
+                amount: userPendingRewards,
+                weight: weight,
+                lockedFrom: lockStart,
+                lockedUntil: lockEnd
+            });
+            user.deposits.push(deposit);
+
+            // update user profil
+            user.totalStaked = user.totalStaked.add(userPendingRewards);
+            user.totalWeight = user.totalWeight.add(weight);
+
+            // update total record
+            totalUsersWeight = totalUsersWeight.add(weight);
+            totalTokensStaked = totalTokensStaked.add(userPendingRewards);
+        }
+
+        user.releasedRewards = user.releasedRewards.add(userPendingRewards);
+        totalProcessedRewards = totalProcessedRewards.add(userPendingRewards);
+
+        if (_withUpdate) {
+            // Reset the missingRewards of the user if it will not be done next
+            user.missingRewards = weightToReward(
+                user.totalWeight,
+                rewardsPerWeight
+            );
+        }
+
+        emit ProcessRewards(_staker, userPendingRewards);
     }
 
     /**
@@ -318,7 +418,7 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
     function updateRewardsPerWeight() public override returns (bool) {
         // TODO - also update a new variable `totalRewards`
         // TODO - rename if `updateRewards()`
-        require(block.number >= initBlock, "initBlock is not reached");
+        require(canUpdateRewardsPerWeight(), "initBlock is not reached");
 
         rewardsPerWeight = updatedRewardsPerWeight();
 
@@ -345,7 +445,9 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
             "Rewards per block new value must be superior to old value"
         );
 
-        updateRewardsPerWeight();
+        if (canUpdateRewardsPerWeight()) {
+            updateRewardsPerWeight();
+        }
 
         rewardsPerBlock = rewardsPerBlock_;
 
@@ -394,19 +496,25 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
         override
         returns (uint256)
     {
-        if (block.number < initBlock) {
+        if (block.number < initBlock || users[account].totalStaked == 0) {
             return 0;
         }
 
-        uint256 _pendingRewards = users[account].totalWeight.mul(
+        uint256 _pendingRewards = weightToReward(
+            users[account].totalWeight,
             rewardsPerWeight
         );
 
         // TODO - Nico, remove missingRewards
 
-        _pendingRewards = _pendingRewards.div(WEIGHT_MULTIPLIER);
-
         return _pendingRewards;
+    }
+
+    /**
+     * @notice Can we call the rewards function or is it useless and will cause an error
+     */
+    function canUpdateRewardsPerWeight() public view returns (bool) {
+        return block.number >= initBlock;
     }
 
     /**
@@ -519,6 +627,21 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
                     )
                 )
                 .div(WEIGHT_MULTIPLIER);
+    }
+
+    /**
+     * @dev Converts stake weight to reward value, applying the division on weight
+     *
+     * @param _weight stake weight
+     * @param _rewardsPerWeight reward per weight
+     * @return reward value normalized with WEIGHT_MULTIPLIER
+     */
+    function weightToReward(uint256 _weight, uint256 _rewardsPerWeight)
+        public
+        pure
+        returns (uint256)
+    {
+        return _weight.mul(_rewardsPerWeight).div(WEIGHT_MULTIPLIER);
     }
 
     /**
