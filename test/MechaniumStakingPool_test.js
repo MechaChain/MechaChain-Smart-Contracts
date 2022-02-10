@@ -338,7 +338,7 @@ contract("MechaniumStakingPool", (accounts) => {
     await time.advanceBlockTo(mainStakingPoolData.initBlock - 3);
 
     await expectRevert(
-      mainPool.updateRewardsPerWeight(),
+      mainPool.updateRewards(),
       "initBlock is not reached"
     );
 
@@ -372,7 +372,7 @@ contract("MechaniumStakingPool", (accounts) => {
 
     const calculatedRewardsPerWeight = await updatedRewardsPerWeight();
 
-    await mainPool.updateRewardsPerWeight();
+    await mainPool.updateRewards();
 
     const _rewardsPerWeight = await mainPool.rewardsPerWeight();
 
@@ -434,24 +434,27 @@ contract("MechaniumStakingPool", (accounts) => {
     await token.transfer(staker3, getAmount(1000));
 
     const amount = getAmount(160);
-    const staker = staker3;
 
-    const quarterTime =
-      (mainStakingPoolData.maxStakingTime.toNumber() -
-        mainStakingPoolData.minStakingTime.toNumber()) /
-      4;
+    const quarterTime = (
+      mainStakingPoolData.maxStakingTime.sub(mainStakingPoolData.minStakingTime)
+    )
+      .div(getBN(4))
+      .add(mainStakingPoolData.minStakingTime);
 
-    await stake(amount, staker, getBN(quarterTime));
+    await stake(amount, staker3, quarterTime);
 
-    const weightMultiplier =
+    const weightMultiplier = (
       (mainStakingPoolData.maxWeightMultiplier.toNumber() -
         mainStakingPoolData.minWeightMultiplier.toNumber()) /
-      4;
+      4) + 1;
 
-    const userProfil = await mainPool.getUser(staker);
+    const userProfil = await mainPool.getUser(staker3);
+
+    const expectedWeight = getAmount(160 * weightMultiplier);
+
     assert.equal(
       userProfil.totalWeight.toString(),
-      getAmount(160 * weightMultiplier).toString(), // 160 * 1.25 = 200
+      expectedWeight.toString(), // 160 * 1.25 = 200
       "Incorrect weight"
     );
   });
@@ -486,9 +489,7 @@ contract("MechaniumStakingPool", (accounts) => {
     const oldPendingRewardsStaker2 = await mainPool.pendingRewards(staker2);
     const oldPendingRewardsStaker3 = await mainPool.pendingRewards(staker3);
 
-    const blockPassed = (await time.latestBlock()).sub(
-      mainStakingPoolData.initBlock
-    );
+    const blockPassed = await getPassedBlocks();
 
     assert.equal(
       oldPendingRewardsStaker1.toString(),
@@ -498,12 +499,13 @@ contract("MechaniumStakingPool", (accounts) => {
         .toString(),
       "Incorrect pendingRewards of staker1: must still have 1/4 of totalWeight"
     );
+
     assert.equal(
       oldPendingRewardsStaker2.toString(),
       mainStakingPoolData.rewardsPerBlock
         .mul(blockPassed)
-        .div(4)
-        .mul(3)
+        .div(getBN(4))
+        .mul(getBN(3))
         .toString(),
       "Incorrect pendingRewards of staker2: must still have 3/4 of totalWeight"
     );

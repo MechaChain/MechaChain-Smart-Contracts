@@ -117,6 +117,9 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
     /// Track the last block number of rewards update
     uint256 public lastRewardsUpdate;
 
+    /// Track total rewards
+    uint256 public totalRewards;
+
     /**
      * ========================
      *     Public Functions
@@ -216,7 +219,7 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
 
         // Update rewards
         if (canUpdateRewardsPerWeight()) {
-            updateRewardsPerWeight();
+            updateRewards();
         }
 
         // Process rewards with no update to not do it twice
@@ -231,10 +234,12 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
         uint64 lockStart = uint64(block.timestamp);
         uint64 lockEnd = lockStart + lockPeriod;
 
-        // TODO - For a better understanding, can use an object instead of parameters on struct creation
-        // ex: Deposit({amount: amount, weight: weight, lockStart: lockStart, lockEnd: lockEnd})
-        // can avoid error on struct changement
-        Deposit memory deposit = Deposit(amount, weight, lockStart, lockEnd);
+        Deposit memory deposit = Deposit({
+            amount: amount,
+            weight: weight,
+            lockedFrom: lockStart,
+            lockedUntil: lockEnd
+        });
         user.deposits.push(deposit);
 
         user.totalStaked = user.totalStaked.add(amount);
@@ -282,7 +287,12 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
 
         Deposit storage deposit = user.deposits[depositId];
 
-        // TODO the lockPeriod should be greater than the previous one
+        uint256 oldLockPeriod = deposit.lockedUntil - deposit.lockedFrom;
+
+        require(
+            lockPeriod > oldLockPeriod,
+            "Lock period must be greater than old one"
+        );
 
         deposit.lockedFrom = uint64(block.timestamp);
         deposit.lockedUntil = deposit.lockedFrom + lockPeriod;
@@ -290,13 +300,8 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
         uint256 oldWeight = deposit.weight;
         uint256 newWeight = calculateUserWeight(deposit.amount, lockPeriod);
 
-        // FIXME as we are in storage, isn't it better to change the variable at once?
-        // ex : user.totalWeight = user.totalWeight.sub(oldWeight).add(newWeight);
-        user.totalWeight = user.totalWeight.sub(oldWeight);
-        totalUsersWeight = totalUsersWeight.sub(oldWeight);
-
-        user.totalWeight = user.totalWeight.add(newWeight);
-        totalUsersWeight = totalUsersWeight.add(newWeight);
+        user.totalWeight = user.totalWeight.sub(oldWeight).add(newWeight);
+        totalUsersWeight = totalUsersWeight.sub(oldWeight).add(newWeight);
 
         emit StakeLockUpdated(msg.sender, depositId, lockPeriod);
 
@@ -345,7 +350,7 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
     {
         if (_withUpdate && canUpdateRewardsPerWeight()) {
             // Update rewards before use them if it hasn't been done before
-            updateRewardsPerWeight();
+            updateRewards();
         }
 
         userPendingRewards = pendingRewards(_staker);
@@ -402,7 +407,6 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
 
     /**
      * @notice Used to unstake a `depositId` for the `msg.sender`
-     * @dev TODO
      * @param depositId The deposit id that will be unstaked
      */
     function unstake(uint256 depositId) public override returns (bool) {
@@ -413,12 +417,12 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
     }
 
     /**
-     * @notice Used to update the rewardsPerWeight
+     * @notice Used to update the rewards per weight and the total rewards
      */
-    function updateRewardsPerWeight() public override returns (bool) {
-        // TODO - also update a new variable `totalRewards`
-        // TODO - rename if `updateRewards()`
+    function updateRewards() public override returns (bool) {
         require(canUpdateRewardsPerWeight(), "initBlock is not reached");
+
+        totalRewards = updatedTotalRewards();
 
         rewardsPerWeight = updatedRewardsPerWeight();
 
@@ -446,7 +450,7 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
         );
 
         if (canUpdateRewardsPerWeight()) {
-            updateRewardsPerWeight();
+            updateRewards();
         }
 
         rewardsPerBlock = rewardsPerBlock_;
@@ -468,22 +472,13 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
     function remainingAllocatedTokens() public view override returns (uint256) {
         uint256 balance = rewardToken.balanceOf(address(this));
 
-        balance = balance.sub(totalTokensStaked);
+        uint256 remainingTokens = balance.sub(
+            totalTokensStaked.add(updatedTotalRewards()).sub(
+                totalProcessedRewards
+            )
+        );
 
-        if (block.number < initBlock) {
-            return balance;
-        }
-
-        uint256 blocksPassed = block.number.sub(initBlock);
-        // FIXME incorect calculation : rewardsPerBlock maybe changed after the initBlock and totalTokensStaked counts the rewards already processed
-        // token.balance - (totalTokensStaked + updatedTotalRewards() - totalProcessedRewards)
-        // 1. 12M - (2M + 0 - 0) = block 0, 10M de tokens alloués => remainingAllocatedTokens = 10M
-        // 2. 12M - (2M + 2M - 0) = block X, 2M de tokens rewards prévu mais aucun process rewards => remainingAllocatedTokens = 8M
-        // 3. 12M - (3M + 2M - 1M) = block X, 1M de tokens process (donc alloué)  => remainingAllocatedTokens = 8M
-        // 3. 11.5M - (2.5M + 2M - 1M) = block X, 0.5M unstake (donc enelvé de la balance et le totalTokensStaked) = 8M
-
-        // updatedTotalRewards() ~= rewardsPerBlock.mul(blocksPassed)
-        return balance.sub(rewardsPerBlock.mul(blocksPassed));
+        return remainingTokens;
     }
 
     /**
@@ -571,22 +566,14 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
         return user;
     }
 
-    // TODO updatedTotalRewards() = like updatedRewardsPerWeight, but without the weight
-
     /**
-     * @notice Get the updated rewards per weight
-     * @dev Used to calculate the rewardsPerWeight without updating them
+     * @notice Get the updated rewards
+     * @dev Used to calculate the rewards for last period ( in blocks ) without updating them
      */
-    function updatedRewardsPerWeight() public view returns (uint256) {
+    function updatedRewards() public view returns (uint256) {
         if (block.number < initBlock) {
             return 0;
         }
-
-        uint256 _remainingAllocatedTokens = remainingAllocatedTokens();
-
-        uint256 _rewardsPerBlock = _remainingAllocatedTokens < rewardsPerBlock
-            ? _remainingAllocatedTokens
-            : rewardsPerBlock;
 
         uint256 _lastRewardsUpdate = lastRewardsUpdate > 0
             ? lastRewardsUpdate
@@ -594,13 +581,46 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
 
         uint256 passedBlocks = block.number.sub(_lastRewardsUpdate);
 
-        uint256 cumulatedRewards = passedBlocks.mul(_rewardsPerBlock);
+        uint256 cumulatedRewards = passedBlocks.mul(rewardsPerBlock);
+
+        /**
+         * Calculate old remaining tokens
+         * Used to check if we have enough tokens to reward
+         */
+        uint256 balance = rewardToken.balanceOf(address(this));
+
+        uint256 oldRemainingTokens = balance.sub(
+            totalTokensStaked.add(totalRewards).sub(totalProcessedRewards)
+        );
+
+        return
+            cumulatedRewards > oldRemainingTokens
+                ? oldRemainingTokens
+                : cumulatedRewards;
+    }
+
+    /**
+     * @notice Get the total updated rewards
+     * @dev Used to calculate the rewards from the init block without updating them
+     */
+    function updatedTotalRewards() public view returns (uint256) {
+        uint256 _updatedTotalRewards = totalRewards.add(updatedRewards());
+
+        return _updatedTotalRewards;
+    }
+
+    /**
+     * @notice Get the updated rewards per weight
+     * @dev Used to calculate the rewardsPerWeight without updating them
+     */
+    function updatedRewardsPerWeight() public view returns (uint256) {
+        uint256 cumulatedRewards = updatedRewards();
 
         cumulatedRewards = cumulatedRewards.mul(WEIGHT_MULTIPLIER);
 
         uint256 _rewardsPerWeight = cumulatedRewards.div(totalUsersWeight);
 
-        // FIXME does not take into account the old rewardsPerWeight ???
+        _rewardsPerWeight = _rewardsPerWeight.add(rewardsPerWeight);
 
         return _rewardsPerWeight;
     }
