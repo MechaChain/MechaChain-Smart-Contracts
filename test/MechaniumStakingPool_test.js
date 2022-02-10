@@ -305,9 +305,10 @@ contract("MechaniumStakingPool", (accounts) => {
     const staker = staker1;
 
     await stake(amount, staker, mainStakingPoolData.maxStakingTime);
-    const userWeight = await mainPool.users(staker).totalWeight;
+    const userProfil = await mainPool.getUser(staker);
+
     assert.equal(
-      userWeight.toString(),
+      userProfil.totalWeight.toString(),
       amount.mul(mainStakingPoolData.maxWeightMultiplier).toString(), // 100 * 2 = 200
       "Incorrect weight"
     );
@@ -322,16 +323,13 @@ contract("MechaniumStakingPool", (accounts) => {
     const staker = staker2;
 
     await stake(amount, staker, mainStakingPoolData.maxStakingTime);
-
-    const expectedWeight = await mainPool
-      .totalUserWeight()
-      .div(getBN(4))
-      .mul(getBN(3));
-    const userWeight = await mainPool.users(staker).totalWeight; // 300 * 2 = 600
+    const totalUsersWeight = await mainPool.totalUsersWeight();
+    const expectedWeight = totalUsersWeight.div(getBN(4)).mul(getBN(3));
+    const userProfil = await mainPool.getUser(staker);
 
     assert.equal(
+      userProfil.totalWeight.toString(), // 300 * 2 = 600
       expectedWeight.toString(),
-      userWeight.toString(),
       "Incorrect weight"
     );
   });
@@ -450,49 +448,43 @@ contract("MechaniumStakingPool", (accounts) => {
         mainStakingPoolData.minWeightMultiplier.toNumber()) /
       4;
 
-    const userWeight = await mainPool.users(staker).totalWeight;
+    const userProfil = await mainPool.getUser(staker);
     assert.equal(
-      userWeight.toString(),
+      userProfil.totalWeight.toString(),
       getAmount(160 * weightMultiplier).toString(), // 160 * 1.25 = 200
       "Incorrect weight"
     );
   });
 
   it("Weight verification for staker1 (1/5), staker2 (3/5) and staker3 (1/5)", async () => {
-    const staker1Weight = await mainPool.users(staker1).totalWeight;
-    const staker2Weight = await mainPool.users(staker2).totalWeight;
-    const staker3Weight = await mainPool.users(staker3).totalWeight;
-    const totalUserWeight = await mainPool.totalUserWeight();
+    const staker1Profil = await mainPool.getUser(staker1);
+    const staker2Profil = await mainPool.getUser(staker2);
+    const staker3Profil = await mainPool.getUser(staker3);
+    const totalUsersWeight = await mainPool.totalUsersWeight();
 
     assert.equal(
-      staker1Weight.toString(),
-      totalUserWeight.div(getBN(5)).toString(),
+      staker1Profil.totalWeight.toString(),
+      totalUsersWeight.div(getBN(5)).toString(),
       "Incorrect weight for staker1"
     );
 
     assert.equal(
-      staker2Weight.toString(),
-      totalUserWeight.div(getBN(5)).mul(getBN(3)).toString(),
+      staker2Profil.totalWeight.toString(),
+      totalUsersWeight.div(getBN(5)).mul(getBN(3)).toString(),
       "Incorrect weight for staker2"
     );
 
     assert.equal(
-      staker3Weight.toString(),
-      totalUserWeight.div(getBN(5)).toString(),
+      staker3Profil.totalWeight.toString(),
+      totalUsersWeight.div(getBN(5)).toString(),
       "Incorrect weight for staker3"
     );
   });
 
   it("Pendings Rewards must take weight change in count", async () => {
-    const oldPendingRewardsStaker1 = await mainStakingPool.pendingRewards(
-      staker1
-    );
-    const oldPendingRewardsStaker2 = await mainStakingPool.pendingRewards(
-      staker2
-    );
-    const oldPendingRewardsStaker3 = await mainStakingPool.pendingRewards(
-      staker3
-    );
+    const oldPendingRewardsStaker1 = await mainPool.pendingRewards(staker1);
+    const oldPendingRewardsStaker2 = await mainPool.pendingRewards(staker2);
+    const oldPendingRewardsStaker3 = await mainPool.pendingRewards(staker3);
 
     const blockPassed = (await time.latestBlock()).sub(
       mainStakingPoolData.initBlock
@@ -528,15 +520,9 @@ contract("MechaniumStakingPool", (accounts) => {
     await time.advanceBlock();
     await time.advanceBlock();
 
-    const newPendingRewardsStaker1 = await mainStakingPool.pendingRewards(
-      staker1
-    );
-    const newPendingRewardsStaker2 = await mainStakingPool.pendingRewards(
-      staker2
-    );
-    const newPendingRewardsStaker3 = await mainStakingPool.pendingRewards(
-      staker3
-    );
+    const newPendingRewardsStaker1 = await mainPool.pendingRewards(staker1);
+    const newPendingRewardsStaker2 = await mainPool.pendingRewards(staker2);
+    const newPendingRewardsStaker3 = await mainPool.pendingRewards(staker3);
 
     // Pendings rewards must be increase by 4 * rewardsPerBlock / weight
     assert.equal(
