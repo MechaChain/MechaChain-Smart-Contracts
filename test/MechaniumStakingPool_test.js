@@ -337,10 +337,7 @@ contract("MechaniumStakingPool", (accounts) => {
   it("No rewards should be distributed before iniBlock", async () => {
     await time.advanceBlockTo(mainStakingPoolData.initBlock - 3);
 
-    await expectRevert(
-      mainPool.updateRewards(),
-      "initBlock is not reached"
-    );
+    await expectRevert(mainPool.updateRewards(), "initBlock is not reached");
 
     const rewardsPerWeight = await mainPool.rewardsPerWeight();
 
@@ -435,18 +432,18 @@ contract("MechaniumStakingPool", (accounts) => {
 
     const amount = getAmount(160);
 
-    const quarterTime = (
-      mainStakingPoolData.maxStakingTime.sub(mainStakingPoolData.minStakingTime)
-    )
+    const quarterTime = mainStakingPoolData.maxStakingTime
+      .sub(mainStakingPoolData.minStakingTime)
       .div(getBN(4))
       .add(mainStakingPoolData.minStakingTime);
 
     await stake(amount, staker3, quarterTime);
 
-    const weightMultiplier = (
+    const weightMultiplier =
       (mainStakingPoolData.maxWeightMultiplier.toNumber() -
         mainStakingPoolData.minWeightMultiplier.toNumber()) /
-      4) + 1;
+        4 +
+      1;
 
     const userProfil = await mainPool.getUser(staker3);
 

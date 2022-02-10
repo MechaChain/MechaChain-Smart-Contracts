@@ -218,7 +218,7 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
         );
 
         // Update rewards
-        if (canUpdateRewardsPerWeight()) {
+        if (canUpdateRewards()) {
             updateRewards();
         }
 
@@ -279,7 +279,13 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
             "Staking time greater than maximum required"
         );
 
-        processRewards();
+        // Update rewards
+        if (canUpdateRewards()) {
+            updateRewards();
+        }
+
+        // Process rewards with no update to not do it twice
+        _processRewards(msg.sender, false);
 
         User storage user = users[msg.sender];
 
@@ -302,6 +308,12 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
 
         user.totalWeight = user.totalWeight.sub(oldWeight).add(newWeight);
         totalUsersWeight = totalUsersWeight.sub(oldWeight).add(newWeight);
+
+        // Reset the missingRewards of the user
+        user.missingRewards = weightToReward(
+            user.totalWeight,
+            rewardsPerWeight
+        );
 
         emit StakeLockUpdated(msg.sender, depositId, lockPeriod);
 
@@ -336,7 +348,7 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
      *      otherwise they are transmitted directly to the user (as for flash pools)
      * @dev If `_withUpdate` is false, rewards MUST be updated before and user's missing rewards
      *      MUST be reset after
-     * @dev Executed internally TODO WHEN ?
+     * @dev Executed internally TODO WHERE ?
      *
      * @param _staker Staker address
      * @param _withUpdate If we need to update rewards and user's missing rewards in this function
@@ -348,7 +360,7 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
         private
         returns (uint256 userPendingRewards)
     {
-        if (_withUpdate && canUpdateRewardsPerWeight()) {
+        if (_withUpdate && canUpdateRewards()) {
             // Update rewards before use them if it hasn't been done before
             updateRewards();
         }
@@ -418,9 +430,10 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
 
     /**
      * @notice Used to update the rewards per weight and the total rewards
+     * @dev Must be called before each total weight change
      */
     function updateRewards() public override returns (bool) {
-        require(canUpdateRewardsPerWeight(), "initBlock is not reached");
+        require(canUpdateRewards(), "initBlock is not reached");
 
         totalRewards = updatedTotalRewards();
 
@@ -449,7 +462,7 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
             "Rewards per block new value must be superior to old value"
         );
 
-        if (canUpdateRewardsPerWeight()) {
+        if (canUpdateRewards()) {
             updateRewards();
         }
 
@@ -484,6 +497,7 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
     /**
      * @notice Used to get the pending rewards for an `account`
      * @param account The account to calculate the pending rewards for
+     * @return the rewards that the user has but which have not been processed
      */
     function pendingRewards(address account)
         public
@@ -495,20 +509,22 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
             return 0;
         }
 
+        // All rewards according to account weight
         uint256 _pendingRewards = weightToReward(
             users[account].totalWeight,
-            rewardsPerWeight
+            updatedRewardsPerWeight()
         );
 
-        // TODO - Nico, remove missingRewards
+        // Remove rewards released before accounts allocations or that they have already been processed
+        _pendingRewards = _pendingRewards.sub(users[account].missingRewards);
 
         return _pendingRewards;
     }
 
     /**
-     * @notice Can we call the rewards function or is it useless and will cause an error
+     * @notice Can we call the rewards update function or is it useless and will cause an error
      */
-    function canUpdateRewardsPerWeight() public view returns (bool) {
+    function canUpdateRewards() public view returns (bool) {
         return block.number >= initBlock;
     }
 
