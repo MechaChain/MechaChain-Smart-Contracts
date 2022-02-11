@@ -402,7 +402,7 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
         _decreaseUserRecords(user, amount, weight, true);
 
         // Transfer tokens
-        rewardToken.safeTransfer(msg.sender, amount);
+        stakedToken.safeTransfer(msg.sender, amount);
 
         emit Unstake(msg.sender, amount, depositId);
         return true;
