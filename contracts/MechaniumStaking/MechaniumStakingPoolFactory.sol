@@ -86,9 +86,9 @@ contract MechaniumStakingPoolFactory is IMechaniumStakingPoolFactory, Ownable {
      * ========================
      */
 
-    /// List of registred staking pools
-    mapping(address => bool) public registredPools;
-    address[] public registredPoolsList;
+    /// List of registered staking pools
+    mapping(address => bool) public registeredPools;
+    address[] public registeredPoolsList;
 
     /**
      * ========================
@@ -144,8 +144,8 @@ contract MechaniumStakingPoolFactory is IMechaniumStakingPoolFactory, Ownable {
 
         address stakingPoolAddr = address(stakingPool);
 
-        registredPools[stakingPoolAddr] = true;
-        registredPoolsList.push(stakingPoolAddr);
+        registeredPools[stakingPoolAddr] = true;
+        registeredPoolsList.push(stakingPoolAddr);
 
         addAllocatedTokens(stakingPoolAddr, allocatedTokens);
 
@@ -206,8 +206,8 @@ contract MechaniumStakingPoolFactory is IMechaniumStakingPoolFactory, Ownable {
 
         address stakingPoolAddr = address(stakingPool);
 
-        registredPools[stakingPoolAddr] = true;
-        registredPoolsList.push(stakingPoolAddr);
+        registeredPools[stakingPoolAddr] = true;
+        registeredPoolsList.push(stakingPoolAddr);
 
         addAllocatedTokens(stakingPoolAddr, allocatedTokens);
 
@@ -237,7 +237,7 @@ contract MechaniumStakingPoolFactory is IMechaniumStakingPoolFactory, Ownable {
         onlyOwner
         returns (bool)
     {
-        require(registredPools[poolAddr], "Staking pool not registred");
+        require(registeredPools[poolAddr], "Staking pool not registered");
 
         _transferTokens(poolAddr, amount);
 
@@ -258,7 +258,7 @@ contract MechaniumStakingPoolFactory is IMechaniumStakingPoolFactory, Ownable {
         uint256 amount,
         uint256 rewardsPerBlock
     ) public override onlyOwner returns (bool) {
-        require(registredPools[poolAddr], "Staking pool not registred");
+        require(registeredPools[poolAddr], "Staking pool not registered");
 
         _transferTokens(poolAddr, amount);
 
@@ -341,7 +341,7 @@ contract MechaniumStakingPoolFactory is IMechaniumStakingPoolFactory, Ownable {
         override
         returns (PoolData memory)
     {
-        require(registredPools[poolAddr], "Pool not registred");
+        require(registeredPools[poolAddr], "Pool not registered");
 
         MechaniumStakingPool pool = MechaniumStakingPool(poolAddr);
 

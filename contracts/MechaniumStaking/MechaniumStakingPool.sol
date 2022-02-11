@@ -142,8 +142,8 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
      * @param initBlock_ The init block ( if set to 0 will take the current block )
      * @param minStakingTime_ The minimum allowed locking time
      * @param maxStakingTime_ The maximum allowed locking time
-     * @param minWeightMultiplier_ The minimum weight multipler ( Used to calculate weight range )
-     * @param maxWeightMultiplier_ The maximum weight multipler ( Used to calculate weight range )
+     * @param minWeightMultiplier_ The minimum weight multiplier ( Used to calculate weight range )
+     * @param maxWeightMultiplier_ The maximum weight multiplier ( Used to calculate weight range )
      * @param rewardsLockingPeriod_  The rewards locking period ( Can be 0 if flash pool )
      * @param rewardsPerBlock_ The amount of tokens to be rewarded per block passed
      */
@@ -297,7 +297,7 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
     /**
      * @notice Used to unstake several deposits for the `msg.sender`
      *
-     * @dev ProccessRewards and transfer all deposits to the user
+     * @dev ProcessRewards and transfer all deposits to the user
      * @dev Revert if the `lockedUntil` of a deposit has not passed
      *
      * @param depositIds Array of deposit id that will be unstaked
@@ -341,7 +341,7 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
     /**
      * @notice Used to unstake a `depositId` for the `msg.sender`
      *
-     * @dev ProccessRewards and transfer all the deposit to the user
+     * @dev ProcessRewards and transfer all the deposit to the user
      * @dev Revert if the `lockedUntil` of the deposit has not passed
      *
      * @param depositId The deposit id that will be unstaked
@@ -708,11 +708,11 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
     /**
      * @notice Remove a deposit if the locking is over and return its amount and weight
      *
-     * @dev Set the deposit's `isClamed` to true
+     * @dev Set the deposit's `isClaimed` to true
      * @dev Revert if `depositId` does not exist or if the `lockedUntil`
      *      of the deposit has not passed
      * @dev Does not update records : rewards MUST be updated before and
-     *      user's profil and total record MUST be updated after
+     *      user's profile and total record MUST be updated after
      *
      * @param user The user who owns the deposit
      * @param depositId The deposit id that will be drain

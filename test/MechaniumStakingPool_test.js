@@ -35,7 +35,7 @@ contract("MechaniumStakingPool", (accounts) => {
 
   /**
    * ========================
-   *          FONCTIONS
+   *        FUNCTIONS
    * ========================
    */
 
@@ -65,9 +65,9 @@ contract("MechaniumStakingPool", (accounts) => {
     const userNewBalance = await token.balanceOf(staker);
     const userNewPoolBalance = await mainPool.balanceOf(staker);
     const poolNewBalance = await token.balanceOf(mainPool.address);
-    const userNewProfil = await mainPool.getUser(staker);
+    const userNewProfile = await mainPool.getUser(staker);
     const lastDeposit =
-      userNewProfil.deposits[userNewProfil.deposits.length - 1];
+      userNewProfile.deposits[userNewProfile.deposits.length - 1];
     const lastBlock = await time.latestBlock();
 
     // Add deposit
@@ -107,7 +107,7 @@ contract("MechaniumStakingPool", (accounts) => {
       usersDeposits[staker]
         .reduce((acc, value) => acc.add(value.weight), getBN(0))
         .toString(),
-      userNewProfil.totalWeight.toString(),
+      userNewProfile.totalWeight.toString(),
       "Incorrect user weight"
     );
 
@@ -141,7 +141,7 @@ contract("MechaniumStakingPool", (accounts) => {
    * Process rewards for `staker` and test staked tokens, new pending rewards, new weight and lock times
    */
   const processRewards = async (staker) => {
-    const userOldPoolProfil = await mainPool.getUser(staker);
+    const userOldPoolProfile = await mainPool.getUser(staker);
 
     const userRewards = await getNextPendingRewards(staker);
 
@@ -149,10 +149,10 @@ contract("MechaniumStakingPool", (accounts) => {
       from: staker,
     });
 
-    const userNewProfil = await mainPool.getUser(staker);
+    const userNewProfile = await mainPool.getUser(staker);
     const userNewPendingRewards = await mainPool.pendingRewards(staker);
     const lastDeposit =
-      userNewProfil.deposits[userNewProfil.deposits.length - 1];
+      userNewProfile.deposits[userNewProfile.deposits.length - 1];
     const lastBlock = await time.latestBlock();
 
     // Add rewards deposit
@@ -171,8 +171,8 @@ contract("MechaniumStakingPool", (accounts) => {
 
     // Staked token test
     assert.equal(
-      userNewProfil.totalStaked.toString(),
-      getBN(userOldPoolProfil.totalStaked).add(userRewards).toString(),
+      userNewProfile.totalStaked.toString(),
+      getBN(userOldPoolProfile.totalStaked).add(userRewards).toString(),
       "Incorrect user tokens staked"
     );
 
@@ -185,7 +185,7 @@ contract("MechaniumStakingPool", (accounts) => {
 
     // Weight test
     assert.equal(
-      userNewProfil.totalWeight.toString(),
+      userNewProfile.totalWeight.toString(),
       usersDeposits[staker]
         .reduce((acc, value) => acc.add(value.weight), getBN(0))
         .toString(),
@@ -220,7 +220,7 @@ contract("MechaniumStakingPool", (accounts) => {
    * @param {number[]|number} deposit can by an array of depositId or a simple deposit ID
    */
   const unstake = async (staker, deposit) => {
-    const userOldPoolProfil = await mainPool.getUser(staker);
+    const userOldPoolProfile = await mainPool.getUser(staker);
     const userOldBalance = await token.balanceOf(staker);
     const poolOldBalance = await token.balanceOf(mainPool.address);
 
@@ -237,11 +237,11 @@ contract("MechaniumStakingPool", (accounts) => {
     }
     const userNewBalance = await token.balanceOf(staker);
     const poolNewBalance = await token.balanceOf(mainPool.address);
-    const userNewProfil = await mainPool.getUser(staker);
+    const userNewProfile = await mainPool.getUser(staker);
     const userNewPendingRewards = await mainPool.pendingRewards(staker);
     const poolNewTotalStaked = await mainPool.totalTokensStaked();
     const lastDeposit =
-      userNewProfil.deposits[userNewProfil.deposits.length - 1];
+      userNewProfile.deposits[userNewProfile.deposits.length - 1];
     const lastBlock = await time.latestBlock();
 
     // Add rewards deposit
@@ -273,8 +273,8 @@ contract("MechaniumStakingPool", (accounts) => {
 
     // Staked token test
     assert.equal(
-      userNewProfil.totalStaked.toString(),
-      getBN(userOldPoolProfil.totalStaked)
+      userNewProfile.totalStaked.toString(),
+      getBN(userOldPoolProfile.totalStaked)
         .add(userRewards)
         .sub(unstakedAmount)
         .toString(),
@@ -290,7 +290,7 @@ contract("MechaniumStakingPool", (accounts) => {
 
     // Weight test
     assert.equal(
-      userNewProfil.totalWeight.toString(),
+      userNewProfile.totalWeight.toString(),
       usersDeposits[staker]
         .reduce((acc, value) => acc.add(value.weight), getBN(0))
         .toString(),
@@ -411,7 +411,7 @@ contract("MechaniumStakingPool", (accounts) => {
     token = await Mechanium.deployed();
   });
 
-  it("Can't instanciate a pool if rewardsPerBlock is null", async () => {
+  it("Can't instantiate a pool if rewardsPerBlock is null", async () => {
     await expectRevert(
       factory.createPool(
         ...Object.values({
@@ -423,7 +423,7 @@ contract("MechaniumStakingPool", (accounts) => {
     );
   });
 
-  it("Can't instanciate a pool if minStakingTime is greater than maxStakingTime", async () => {
+  it("Can't instantiate a pool if minStakingTime is greater than maxStakingTime", async () => {
     await expectRevert(
       factory.createPool(
         ...Object.values({
@@ -436,7 +436,7 @@ contract("MechaniumStakingPool", (accounts) => {
     );
   });
 
-  it("Can't instanciate a pool if minWeightMultiplier is greater than maxWeightMultiplier", async () => {
+  it("Can't instantiate a pool if minWeightMultiplier is greater than maxWeightMultiplier", async () => {
     await expectRevert(
       factory.createPool(
         ...Object.values({
@@ -449,7 +449,7 @@ contract("MechaniumStakingPool", (accounts) => {
     );
   });
 
-  it("Can't instanciate a pool if minWeightMultiplier is null", async () => {
+  it("Can't instantiate a pool if minWeightMultiplier is null", async () => {
     await expectRevert(
       factory.createPool(
         ...Object.values({
@@ -464,7 +464,7 @@ contract("MechaniumStakingPool", (accounts) => {
   it("Factory owner should be able to create staking pool instance", async () => {
     await factory.createPool(...Object.values(mainStakingPoolData));
 
-    mainPool = await factory.registredPoolsList(0);
+    mainPool = await factory.registeredPoolsList(0);
     mainPool = await MechaniumStakingPool.at(mainPool);
 
     assert(mainPool);
@@ -478,7 +478,7 @@ contract("MechaniumStakingPool", (accounts) => {
     );
   });
 
-  it("Owner of the pool should be the fatory", async () => {
+  it("Owner of the pool should be the factory", async () => {
     assert.equal(await mainPool.owner(), factory.address, "Wrong pool owner");
   });
 
@@ -530,10 +530,10 @@ contract("MechaniumStakingPool", (accounts) => {
     const staker = staker1;
 
     await stake(amount, staker, mainStakingPoolData.maxStakingTime);
-    const userProfil = await mainPool.getUser(staker);
+    const userProfile = await mainPool.getUser(staker);
 
     assert.equal(
-      userProfil.totalWeight.toString(),
+      userProfile.totalWeight.toString(),
       amount.mul(mainStakingPoolData.maxWeightMultiplier).toString(), // 100 * 2 = 200
       "Incorrect weight"
     );
@@ -550,10 +550,10 @@ contract("MechaniumStakingPool", (accounts) => {
     await stake(amount, staker, mainStakingPoolData.maxStakingTime);
     const totalUsersWeight = await mainPool.totalUsersWeight();
     const expectedWeight = totalUsersWeight.div(getBN(4)).mul(getBN(3));
-    const userProfil = await mainPool.getUser(staker);
+    const userProfile = await mainPool.getUser(staker);
 
     assert.equal(
-      userProfil.totalWeight.toString(), // 300 * 2 = 600
+      userProfile.totalWeight.toString(), // 300 * 2 = 600
       expectedWeight.toString(),
       "Incorrect weight"
     );
@@ -670,43 +670,43 @@ contract("MechaniumStakingPool", (accounts) => {
         4 +
       1;
 
-    const userProfil = await mainPool.getUser(staker3);
+    const userProfile = await mainPool.getUser(staker3);
 
     const expectedWeight = getAmount(160 * weightMultiplier);
 
     assert.equal(
-      userProfil.totalWeight.toString(),
+      userProfile.totalWeight.toString(),
       expectedWeight.toString(), // 160 * 1.25 = 200
       "Incorrect weight"
     );
   });
 
   it("Weight verification for staker1 (1/5), staker2 (3/5) and staker3 (1/5)", async () => {
-    const staker1Profil = await mainPool.getUser(staker1);
-    const staker2Profil = await mainPool.getUser(staker2);
-    const staker3Profil = await mainPool.getUser(staker3);
+    const staker1Profile = await mainPool.getUser(staker1);
+    const staker2Profile = await mainPool.getUser(staker2);
+    const staker3Profile = await mainPool.getUser(staker3);
     const totalUsersWeight = await mainPool.totalUsersWeight();
 
     assert.equal(
-      staker1Profil.totalWeight.toString(),
+      staker1Profile.totalWeight.toString(),
       totalUsersWeight.div(getBN(5)).toString(),
       "Incorrect weight for staker1"
     );
 
     assert.equal(
-      staker2Profil.totalWeight.toString(),
+      staker2Profile.totalWeight.toString(),
       totalUsersWeight.div(getBN(5)).mul(getBN(3)).toString(),
       "Incorrect weight for staker2"
     );
 
     assert.equal(
-      staker3Profil.totalWeight.toString(),
+      staker3Profile.totalWeight.toString(),
       totalUsersWeight.div(getBN(5)).toString(),
       "Incorrect weight for staker3"
     );
   });
 
-  it("Pendings Rewards must take weight change in count", async () => {
+  it("Pending Rewards must take weight change in count", async () => {
     const oldPendingRewardsStaker1 = await mainPool.pendingRewards(staker1);
     const oldPendingRewardsStaker2 = await mainPool.pendingRewards(staker2);
     const oldPendingRewardsStaker3 = await mainPool.pendingRewards(staker3);
@@ -748,7 +748,7 @@ contract("MechaniumStakingPool", (accounts) => {
     const newPendingRewardsStaker2 = await mainPool.pendingRewards(staker2);
     const newPendingRewardsStaker3 = await mainPool.pendingRewards(staker3);
 
-    // Pendings rewards must be increase by 4 * rewardsPerBlock / weight
+    // Pending rewards must be increase by 4 * rewardsPerBlock / weight
     assert.equal(
       newPendingRewardsStaker1.toString(),
       oldPendingRewardsStaker1
@@ -789,7 +789,7 @@ contract("MechaniumStakingPool", (accounts) => {
     await processRewards(staker1);
   });
 
-  it("Pendings Rewards of staker1 should now be 0", async () => {
+  it("Pending Rewards of staker1 should now be 0", async () => {
     const userNewPendingRewards = await mainPool.pendingRewards(staker1);
 
     assert.equal(
@@ -869,7 +869,7 @@ contract("MechaniumStakingPool", (accounts) => {
     // TODO
   });
 
-  it("Stakers can unstake all tokens and rewards after locking periods (multpile unstake)", async () => {
+  it("Stakers can unstake all tokens and rewards after locking periods (multiple unstake)", async () => {
     // TODO
   });
 
