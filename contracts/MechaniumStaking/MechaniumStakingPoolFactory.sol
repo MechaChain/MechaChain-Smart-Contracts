@@ -302,7 +302,7 @@ contract MechaniumStakingPoolFactory is IMechaniumStakingPoolFactory, Ownable {
         require(account != address(0), "Address must not be 0");
         require(amount > 0, "Amount must be superior to zero");
 
-        uint256 factoryBalance = _token.balanceOf(address(this));
+        uint256 factoryBalance = balance();
 
         require(factoryBalance >= amount, "Not enough tokens in factory");
 
@@ -322,6 +322,13 @@ contract MechaniumStakingPoolFactory is IMechaniumStakingPoolFactory, Ownable {
      */
     function token() public view returns (IERC20) {
         return _token;
+    }
+
+    /**
+     * @notice Get the factory ERC20 token balance
+     */
+    function balance() public view returns (uint256) {
+        return _token.balanceOf(address(this));
     }
 
     /**
