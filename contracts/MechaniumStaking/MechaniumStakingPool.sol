@@ -341,6 +341,8 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
         require(userPendingRewards != 0, "No rewards to process");
     }
 
+    // TODO : unstake an array of deposit
+
     /**
      * @notice Used to unstake a `depositId` for the `msg.sender`
      *

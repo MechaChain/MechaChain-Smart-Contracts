@@ -553,4 +553,80 @@ contract("MechaniumStakingPool", (accounts) => {
       "Incorrect pendingRewards of staker3"
     );
   });
+
+  it("Staker1 can process his rewards and these are stacked again (weight test)", async () => {
+    // TODO
+  });
+
+  it("Pendings Rewards of staker1 should now be 0", async () => {
+    // TODO
+  });
+
+  it("Staker2 can't unstake his tokens (reason: deposit not yet complete)", async () => {
+    // TODO
+  });
+
+  it("Staker3 can unstake his tokens after the locking period and his rewards are stacked", async () => {
+    // TODO
+  });
+
+  it("Staker2 and staker1 can unstake his tokens after the locking period and his rewards are stacked", async () => {
+    // TODO
+  });
+
+  it("Staker3 can't unstake the same deposit a second time", async () => {
+    // TODO
+  });
+
+  it("Remaining allocated tokens takes into account the number of rewarded tokens", async () => {
+    await time.advanceBlock();
+    await time.advanceBlock();
+    await time.advanceBlock();
+    await time.advanceBlock();
+
+    const blockPassed = await getPassedBlocks();
+
+    const calculatedRemainingAllocatedTokens =
+      mainStakingPoolData.allocatedTokens.sub(
+        mainStakingPoolData.rewardsPerBlock.mul(blockPassed)
+      );
+
+    const remainingAllocatedTokens = await mainPool.remainingAllocatedTokens();
+
+    assert.equal(
+      calculatedRemainingAllocatedTokens.toString(),
+      remainingAllocatedTokens.toString(),
+      "Incorrect remainingAllocatedTokens"
+    );
+  });
+
+  it("Admin or random user can't directly change rewardsPerBlock (reason: no owner)", async () => {
+    // TODO
+  });
+
+  it("Random user can refill the pool for one block", async () => {
+    // TODO
+  });
+
+  it("Admin can refill the staking pool through the factory and change rewardsPerBlock", async () => {
+    // TODO
+  });
+
+  it("The pool is now empty", async () => {
+    // TODO
+  });
+
+  it("Pending rewards does not increase if the pool is empty", async () => {
+    // TODO
+  });
+
+  it("Stakers can unstake all rewards", async () => {
+    // TODO
+  });
+
+  it("The pool must no longer have any tokens and totalUsersWeight and totalTokensStaked are 0", async () => {
+    // TODO
+  });
+
+  // what happens if there is no longer any stacker at the level of the updateRewards ?
 });
