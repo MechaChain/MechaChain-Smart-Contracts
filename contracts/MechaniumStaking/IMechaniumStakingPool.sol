@@ -37,6 +37,8 @@ interface IMechaniumStakingPool {
 
     function processRewards() external returns (uint256);
 
+    function unstake(uint256[] memory depositIds) external returns (bool);
+
     function unstake(uint256 depositId) external returns (bool);
 
     function updateRewards() external returns (bool);

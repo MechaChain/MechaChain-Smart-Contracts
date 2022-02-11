@@ -34,6 +34,15 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
     event Unstake(address indexed account, uint256 amount, uint256 depositId);
 
     /**
+     * @notice Event emitted when an `account` unstaked several deposits (`depositIds`)
+     */
+    event Unstake(
+        address indexed account,
+        uint256 amount,
+        uint256[] depositIds
+    );
+
+    /**
      * @notice Event emitted when an `account` updated stake `lockPeriod` for a `depositId`
      */
     event StakeLockUpdated(
@@ -325,6 +334,49 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
         require(userPendingRewards != 0, "No rewards to process");
     }
 
+    /**
+     * @notice Used to unstake several deposits for the `msg.sender`
+     *
+     * @dev ProccessRewards and transfer all deposits to the user
+     * @dev Revert if the `lockedUntil` of a deposit has not passed
+     *
+     * @param depositIds Array of deposit id that will be unstaked
+     */
+    function unstake(uint256[] memory depositIds)
+        public
+        override
+        returns (bool)
+    {
+        // Update rewards
+        if (canUpdateRewards()) {
+            updateRewards();
+        }
+
+        // Process rewards with no update to not do it twice
+        _processRewards(msg.sender, false);
+
+        User storage user = users[msg.sender];
+
+        uint256 totalAmount;
+        uint256 totalWeight;
+        for (uint256 i = 0; i < depositIds.length; i++) {
+            (uint256 amount, uint256 weight) = _drainDeposit(
+                user,
+                depositIds[i]
+            );
+            totalAmount = totalAmount.add(amount);
+            totalWeight = totalWeight.add(weight);
+        }
+
+        // Update user and total records
+        _decreaseUserRecords(user, totalAmount, totalWeight, true);
+
+        // Transfer tokens
+        rewardToken.safeTransfer(msg.sender, totalAmount);
+
+        emit Unstake(msg.sender, totalAmount, depositIds);
+        return true;
+    }
 
     /**
      * @notice Used to unstake a `depositId` for the `msg.sender`
