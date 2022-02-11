@@ -38,13 +38,6 @@ interface IMechaniumStakingPool {
     ) external returns (bool);
 
     /**
-     * @notice Used to update a `depositId`'s `lockPeriod`
-     */
-    function updateStakeLock(uint256 depositId, uint64 lockPeriod)
-        external
-        returns (bool);
-
-    /**
      * @notice Used to calculate and pay pending rewards to the `msg.sender`
      */
     function processRewards() external returns (uint256);

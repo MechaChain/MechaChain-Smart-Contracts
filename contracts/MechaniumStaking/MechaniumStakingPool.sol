@@ -274,63 +274,6 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
     }
 
     /**
-     * @notice Used to update a `depositId`'s `lockPeriod`
-     * @dev Will recalculate substitue the old weight and calculate the new one
-     * @param depositId The deposit id that will have it's locking period updated
-     * @param lockPeriod The new locking period ( in seconds )
-     */
-    function updateStakeLock(uint256 depositId, uint64 lockPeriod)
-        public
-        override
-        returns (bool)
-    {
-        // TODO : remove it ?
-        require(
-            lockPeriod >= minStakingTime,
-            "Staking time less than minimum required"
-        );
-        require(
-            lockPeriod <= maxStakingTime,
-            "Staking time greater than maximum required"
-        );
-
-        // Update rewards
-        if (canUpdateRewards()) {
-            updateRewards();
-        }
-
-        // Process rewards with no update to not do it twice
-        _processRewards(msg.sender, false);
-
-        User storage user = users[msg.sender];
-
-        require(depositId < user.deposits.length, "Deposit does not exist");
-        // TODO : Need test for already deleted deposit ?
-
-        Deposit storage deposit = user.deposits[depositId];
-
-        uint256 oldLockPeriod = deposit.lockedUntil - deposit.lockedFrom;
-
-        require(
-            lockPeriod > oldLockPeriod,
-            "Lock period must be greater than old one"
-        );
-
-        deposit.lockedFrom = uint64(block.timestamp);
-        deposit.lockedUntil = deposit.lockedFrom + lockPeriod;
-
-        uint256 oldWeight = deposit.weight;
-        uint256 newWeight = calculateUserWeight(deposit.amount, lockPeriod);
-
-        // Update user and total records
-        _increaseUserRecords(user, 0, newWeight.sub(oldWeight), true);
-
-        emit StakeLockUpdated(msg.sender, depositId, lockPeriod);
-
-        return true;
-    }
-
-    /**
      * @notice Used to calculate and pay pending rewards to the `msg.sender`
      *
      * @dev Automatically updates rewards before processing them
