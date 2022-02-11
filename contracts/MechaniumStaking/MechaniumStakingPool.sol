@@ -206,6 +206,8 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
         return true;
     }
 
+    // TODO : add depositFor()
+
     /**
      * @notice Used to stake an `amount` of tokens for a `lockPeriod` for an `account`
      * @dev Will make a safe transfer from the `account` and calculate the weight and create a deposit
@@ -282,6 +284,7 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
         override
         returns (bool)
     {
+        // TODO : remove it ?
         require(
             lockPeriod >= minStakingTime,
             "Staking time less than minimum required"
