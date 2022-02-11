@@ -761,8 +761,8 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
         Deposit memory deposit = user.deposits[depositId];
         // TODO : Need test for already deleted deposit ?
         require(
-            deposit.lockedUntil >= uint64(block.timestamp),
-            "Staking for this deposit is not yet complete"
+            deposit.lockedUntil <= uint64(block.timestamp),
+            "Staking of this deposit is not yet complete"
         );
 
         amount = deposit.amount;
