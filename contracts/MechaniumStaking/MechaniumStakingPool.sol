@@ -31,7 +31,7 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
     /**
      * @notice Event emitted when an `account` unstaked a deposit (`depositId`)
      */
-    event Unstake(address indexed account, uint256 depositId);
+    event Unstake(address indexed account, uint256 amount, uint256 depositId);
 
     /**
      * @notice Event emitted when an `account` updated stake `lockPeriod` for a `depositId`
@@ -241,19 +241,9 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
             lockedUntil: lockEnd
         });
 
-        // update user profil
+        // Update user and total records
         user.deposits.push(deposit);
-        user.totalStaked = user.totalStaked.add(amount);
-        user.totalWeight = user.totalWeight.add(weight);
-
-        // Reset the missingRewards of the user
-        user.missingRewards = weightToReward(
-            user.totalWeight,
-            rewardsPerWeight
-        );
-
-        totalUsersWeight = totalUsersWeight.add(weight);
-        totalTokensStaked = totalTokensStaked.add(amount);
+        _increaseUserRecords(user, amount, weight, true);
 
         emit Stake(account, amount, lockPeriod);
 
@@ -308,14 +298,8 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
         uint256 oldWeight = deposit.weight;
         uint256 newWeight = calculateUserWeight(deposit.amount, lockPeriod);
 
-        user.totalWeight = user.totalWeight.sub(oldWeight).add(newWeight);
-        totalUsersWeight = totalUsersWeight.sub(oldWeight).add(newWeight);
-
-        // Reset the missingRewards of the user
-        user.missingRewards = weightToReward(
-            user.totalWeight,
-            rewardsPerWeight
-        );
+        // Update user and total records
+        _increaseUserRecords(user, 0, newWeight.sub(oldWeight), true);
 
         emit StakeLockUpdated(msg.sender, depositId, lockPeriod);
 
@@ -341,7 +325,6 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
         require(userPendingRewards != 0, "No rewards to process");
     }
 
-    // TODO : unstake an array of deposit
 
     /**
      * @notice Used to unstake a `depositId` for the `msg.sender`
@@ -361,33 +344,15 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
         _processRewards(msg.sender, false);
 
         User storage user = users[msg.sender];
-        require(depositId < user.deposits.length, "Deposit does not exist");
-        Deposit memory deposit = user.deposits[depositId];
-        // TODO : Need test for already deleted deposit ?
-        require(
-            deposit.lockedUntil >= uint64(block.timestamp),
-            "Staking for this deposit is not yet complete"
-        );
+        (uint256 amount, uint256 weight) = _drainDeposit(user, depositId);
 
-        // Update user record
-        user.totalStaked = user.totalStaked.sub(deposit.amount);
-        user.totalWeight = user.totalWeight.sub(deposit.weight);
-        user.missingRewards = weightToReward(
-            user.totalWeight,
-            rewardsPerWeight
-        );
-
-        // Update total record
-        totalUsersWeight = totalUsersWeight.sub(deposit.weight);
-        totalTokensStaked = totalTokensStaked.sub(deposit.amount);
+        // Update user and total records
+        _decreaseUserRecords(user, amount, weight, true);
 
         // Transfer tokens
-        rewardToken.safeTransfer(msg.sender, deposit.amount);
+        rewardToken.safeTransfer(msg.sender, amount);
 
-        // Remove deposit
-        delete user.deposits[depositId];
-
-        emit Unstake(msg.sender, depositId);
+        emit Unstake(msg.sender, amount, depositId);
         return true;
     }
 
@@ -497,6 +462,8 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
      */
     function balanceOf(address account) public view override returns (uint256) {
         User memory user = users[account];
+
+        // FIXME : Why remove `releasedRewards` ?
         return user.totalStaked.sub(user.releasedRewards);
     }
 
@@ -650,6 +617,110 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
      */
 
     /**
+     * @notice Update the user and total records by increasing the weight and the total staked
+     *
+     * @dev Increase user's `totalStaked`, `totalWeight` and reset `missingRewards`
+     * @dev Increase `totalUsersWeight` and `totalTokensStaked`
+     * @dev Rewards MUST be updated before and processed for this users
+     *
+     * @param user The user to update
+     * @param amount The amount to increase
+     * @param weight The weight to increase
+     */
+    function _increaseUserRecords(
+        User storage user,
+        uint256 amount,
+        uint256 weight,
+        bool updateMissingRewards
+    ) private returns (bool) {
+        // Update user records
+        user.totalStaked = user.totalStaked.add(amount);
+        user.totalWeight = user.totalWeight.add(weight);
+
+        if (updateMissingRewards) {
+            // Reset the missingRewards of the user
+            user.missingRewards = weightToReward(
+                user.totalWeight,
+                rewardsPerWeight
+            );
+        }
+
+        // Update total records
+        totalUsersWeight = totalUsersWeight.add(weight);
+        totalTokensStaked = totalTokensStaked.add(amount);
+        return true;
+    }
+
+    /**
+     * @notice Update the user and total records by decreasing the weight and the total staked
+     *
+     * @dev Decrease user's `totalStaked`, `totalWeight` and reset `missingRewards`
+     * @dev Decrease `totalUsersWeight` and `totalTokensStaked`
+     * @dev Rewards MUST be updated before and processed for this users
+     * @dev If `updateMissingRewards` is false, `missingRewards` rewards MUST be updated after
+     *
+     * @param user The user to update
+     * @param amount The amount to decrease
+     * @param weight The weight to decrease
+     * @param updateMissingRewards If we have to update the missing rewards of the user
+     */
+    function _decreaseUserRecords(
+        User storage user,
+        uint256 amount,
+        uint256 weight,
+        bool updateMissingRewards
+    ) private returns (bool) {
+        // Update user records
+        user.totalStaked = user.totalStaked.sub(amount);
+        user.totalWeight = user.totalWeight.sub(weight);
+
+        if (updateMissingRewards) {
+            // Reset the missingRewards of the user
+            user.missingRewards = weightToReward(
+                user.totalWeight,
+                rewardsPerWeight
+            );
+        }
+
+        // Update total records
+        totalUsersWeight = totalUsersWeight.sub(weight);
+        totalTokensStaked = totalTokensStaked.sub(amount);
+        return true;
+    }
+
+    /**
+     * @notice Remove a deposit if the locking is over and return its amount and weight
+     *
+     * @dev Delete the deposit by resetting all its values : the deposit
+     *      will always be present in the array but set to 0
+     * @dev Revert if `depositId` does not exist or if the `lockedUntil`
+     *      of the deposit has not passed
+     * @dev Does not update records : rewards MUST be updated before and
+     *      user's profil and total record MUST be updated after
+     *
+     * @param user The user who owns the deposit
+     * @param depositId The deposit id that will be drain
+     */
+    function _drainDeposit(User storage user, uint256 depositId)
+        private
+        returns (uint256 amount, uint256 weight)
+    {
+        require(depositId < user.deposits.length, "Deposit does not exist");
+        Deposit memory deposit = user.deposits[depositId];
+        // TODO : Need test for already deleted deposit ?
+        require(
+            deposit.lockedUntil >= uint64(block.timestamp),
+            "Staking for this deposit is not yet complete"
+        );
+
+        amount = deposit.amount;
+        weight = deposit.weight;
+
+        // Reset deposit
+        delete user.deposits[depositId];
+    }
+
+    /**
      * @notice Used to calculate and pay pending rewards to the `_staker`
      *
      * @dev When there are no rewards to calculate, function doesn't throw and exits silently
@@ -702,14 +773,9 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
                 lockedUntil: lockEnd
             });
 
-            // update user profil
+            // Update user and total records
             user.deposits.push(deposit);
-            user.totalStaked = user.totalStaked.add(userPendingRewards);
-            user.totalWeight = user.totalWeight.add(weight);
-
-            // update total record
-            totalUsersWeight = totalUsersWeight.add(weight);
-            totalTokensStaked = totalTokensStaked.add(userPendingRewards);
+            _increaseUserRecords(user, userPendingRewards, weight, false);
         }
 
         user.releasedRewards = user.releasedRewards.add(userPendingRewards);
