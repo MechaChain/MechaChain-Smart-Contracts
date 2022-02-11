@@ -1,5 +1,5 @@
 // Load modules
-const { time, expectRevert } = require("@openzeppelin/test-helpers");
+const { time, expectRevert, snapshot } = require("@openzeppelin/test-helpers");
 
 // Load artifacts
 const Mechanium = artifacts.require("Mechanium");
@@ -70,6 +70,7 @@ contract("MechaniumStakingPool", (accounts) => {
       userNewProfil.deposits[userNewProfil.deposits.length - 1];
     const lastBlock = await time.latestBlock();
 
+    // Add deposit
     const newDeposit = {
       block:
         mainStakingPoolData.initBlock.cmp(lastBlock) == -1
@@ -86,18 +87,18 @@ contract("MechaniumStakingPool", (accounts) => {
 
     // Balances tests
     assert.equal(
-      userOldBalance.sub(amount).toString(),
       userNewBalance.toString(),
+      userOldBalance.sub(amount).toString(),
       "Incorrect user token balance"
     );
     assert.equal(
-      userOldPoolBalance.add(amount).toString(),
       userNewPoolBalance.toString(),
+      userOldPoolBalance.add(amount).toString(),
       "Incorrect user balance in the pool"
     );
     assert.equal(
-      poolOldBalance.add(amount).toString(),
       poolNewBalance.toString(),
+      poolOldBalance.add(amount).toString(),
       "Incorrect pool balance"
     );
 
@@ -110,15 +111,13 @@ contract("MechaniumStakingPool", (accounts) => {
       "Incorrect user weight"
     );
 
-    expectedTotalWeight = expectedTotalWeight.add(
-      getBN(userNewProfil.totalWeight)
-    );
+    expectedTotalWeight = expectedTotalWeight.add(getBN(lastDeposit.weight));
 
     const totalUsersWeight = await mainPool.totalUsersWeight();
 
     assert.equal(
-      expectedTotalWeight.toString(),
       totalUsersWeight.toString(),
+      expectedTotalWeight.toString(),
       "Incorrect total weight"
     );
 
@@ -136,6 +135,232 @@ contract("MechaniumStakingPool", (accounts) => {
       latestTime.add(stakingTime).toString(),
       "Incorrect deposit lockedUntil"
     );
+  };
+
+  /**
+   * Process rewards for `staker` and test staked tokens, new pending rewards, new weight and lock times
+   */
+  const processRewards = async (staker) => {
+    const userOldPoolProfil = await mainPool.getUser(staker);
+
+    const userRewards = await getNextPendingRewards(staker);
+
+    await mainPool.processRewards({
+      from: staker,
+    });
+
+    const userNewProfil = await mainPool.getUser(staker);
+    const userNewPendingRewards = await mainPool.pendingRewards(staker);
+    const lastDeposit =
+      userNewProfil.deposits[userNewProfil.deposits.length - 1];
+    const lastBlock = await time.latestBlock();
+
+    // Add rewards deposit
+    const newDeposit = {
+      block:
+        mainStakingPoolData.initBlock.cmp(lastBlock) == -1
+          ? lastBlock
+          : mainStakingPoolData.initBlock,
+      amount: userRewards,
+      weight: userRewards
+        .mul(getWeightMultiplierRange(mainStakingPoolData.rewardsLockingPeriod))
+        .div(WEIGHT_MULTIPLIER),
+    };
+    usersDeposits[staker] = usersDeposits[staker] || [];
+    usersDeposits[staker].push(newDeposit);
+
+    // Staked token test
+    assert.equal(
+      userNewProfil.totalStaked.toString(),
+      getBN(userOldPoolProfil.totalStaked).add(userRewards).toString(),
+      "Incorrect user tokens staked"
+    );
+
+    // Pending rewards test
+    assert.equal(
+      userNewPendingRewards.toString(),
+      "0",
+      "Incorrect new pending rewards"
+    );
+
+    // Weight test
+    assert.equal(
+      userNewProfil.totalWeight.toString(),
+      usersDeposits[staker]
+        .reduce((acc, value) => acc.add(value.weight), getBN(0))
+        .toString(),
+      "Incorrect user weight"
+    );
+    expectedTotalWeight = expectedTotalWeight.add(getBN(lastDeposit.weight));
+    const totalUsersWeight = await mainPool.totalUsersWeight();
+    assert.equal(
+      totalUsersWeight.toString(),
+      expectedTotalWeight.toString(),
+      "Incorrect total weight"
+    );
+
+    const latestTime = await time.latest();
+
+    // Lock times tests
+    assert.equal(
+      lastDeposit.lockedFrom.toString(),
+      latestTime.toString(),
+      "Incorrect deposit lockedFrom"
+    );
+    assert.equal(
+      lastDeposit.lockedUntil.toString(),
+      latestTime.add(mainStakingPoolData.rewardsLockingPeriod).toString(),
+      "Incorrect deposit lockedUntil"
+    );
+  };
+
+  /**
+   * Unstake `deposit` for `staker` and test staked tokens, balances, new pending rewards, new weight and lock times
+   *
+   * @param {number[]|number} deposit can by an array of depositId or a simple deposit ID
+   */
+  const unstake = async (staker, deposit) => {
+    const userOldPoolProfil = await mainPool.getUser(staker);
+    const userOldBalance = await token.balanceOf(staker);
+    const poolOldBalance = await token.balanceOf(mainPool.address);
+
+    const userRewards = await getNextPendingRewards(staker);
+
+    if (Array.isArray(deposit)) {
+      await mainPool.methods["unstake(uint256[])"](deposit, {
+        from: staker,
+      });
+    } else {
+      await mainPool.methods["unstake(uint256)"](deposit, {
+        from: staker,
+      });
+    }
+    const userNewBalance = await token.balanceOf(staker);
+    const poolNewBalance = await token.balanceOf(mainPool.address);
+    const userNewProfil = await mainPool.getUser(staker);
+    const userNewPendingRewards = await mainPool.pendingRewards(staker);
+    const poolNewTotalStaked = await mainPool.totalTokensStaked();
+    const lastDeposit =
+      userNewProfil.deposits[userNewProfil.deposits.length - 1];
+    const lastBlock = await time.latestBlock();
+
+    // Add rewards deposit
+    const newDeposit = {
+      block:
+        mainStakingPoolData.initBlock.cmp(lastBlock) == -1
+          ? lastBlock
+          : mainStakingPoolData.initBlock,
+      amount: userRewards,
+      weight: userRewards
+        .mul(getWeightMultiplierRange(mainStakingPoolData.rewardsLockingPeriod))
+        .div(WEIGHT_MULTIPLIER),
+    };
+    usersDeposits[staker] = usersDeposits[staker] || [];
+    usersDeposits[staker].push(newDeposit);
+
+    // Force array
+    const deposits = Array.isArray(deposit) ? deposit : [deposit];
+
+    // Remove unstake deposits
+    let unstakedAmount = getBN(0);
+    let unstakedWeight = getBN(0);
+    deposits.forEach((id) => {
+      unstakedAmount = unstakedAmount.add(usersDeposits[staker][id].amount);
+      unstakedWeight = unstakedWeight.add(usersDeposits[staker][id].weight);
+      usersDeposits[staker][id].amount = getBN(0);
+      usersDeposits[staker][id].weight = getBN(0);
+    });
+
+    // Staked token test
+    assert.equal(
+      userNewProfil.totalStaked.toString(),
+      getBN(userOldPoolProfil.totalStaked)
+        .add(userRewards)
+        .sub(unstakedAmount)
+        .toString(),
+      "Incorrect user tokens staked"
+    );
+
+    // Pending rewards test
+    assert.equal(
+      userNewPendingRewards.toString(),
+      "0",
+      "Incorrect new pending rewards"
+    );
+
+    // Weight test
+    assert.equal(
+      userNewProfil.totalWeight.toString(),
+      usersDeposits[staker]
+        .reduce((acc, value) => acc.add(value.weight), getBN(0))
+        .toString(),
+      "Incorrect user weight"
+    );
+    expectedTotalWeight = expectedTotalWeight
+      .add(getBN(lastDeposit.weight))
+      .sub(unstakedWeight);
+    const totalUsersWeight = await mainPool.totalUsersWeight();
+    assert.equal(
+      totalUsersWeight.toString(),
+      expectedTotalWeight.toString(),
+      "Incorrect total weight"
+    );
+
+    // Balances tests
+    assert.equal(
+      userNewBalance.toString(),
+      userOldBalance.add(unstakedAmount).toString(),
+      "Incorrect user token balance"
+    );
+    assert.equal(
+      poolNewBalance.toString(),
+      poolOldBalance.sub(unstakedAmount).toString(),
+      "Incorrect pool balance"
+    );
+
+    // TotalStaked test
+    assert.equal(
+      poolNewTotalStaked.toString(),
+      Object.keys(usersDeposits)
+        .reduce(
+          (acc, key) =>
+            acc.add(
+              usersDeposits[key].reduce(
+                (acc2, value) => acc2.add(value.amount),
+                getBN(0)
+              )
+            ),
+          getBN(0)
+        )
+        .toString(),
+      "Incorrect pool total staked"
+    );
+
+    // Lock times tests
+    const latestTime = await time.latest();
+    assert.equal(
+      lastDeposit.lockedFrom.toString(),
+      latestTime.toString(),
+      "Incorrect deposit lockedFrom"
+    );
+    assert.equal(
+      lastDeposit.lockedUntil.toString(),
+      latestTime.add(mainStakingPoolData.rewardsLockingPeriod).toString(),
+      "Incorrect deposit lockedUntil"
+    );
+  };
+
+  /**
+   * Return the pending rewards for the next block
+   */
+  const getNextPendingRewards = async (staker) => {
+    // advance one block and revert it to have the same block number as in processRewards
+    const snapshotA = await snapshot();
+    await time.advanceBlock();
+    const userRewards = await mainPool.pendingRewards(staker);
+    await snapshotA.restore(); // revert the last block
+
+    return userRewards;
   };
 
   const updatedRewardsPerWeight = async () => {
@@ -555,27 +780,58 @@ contract("MechaniumStakingPool", (accounts) => {
   });
 
   it("Staker1 can process his rewards and these are stacked again (weight test)", async () => {
-    // TODO
+    // advance 4 blocks
+    await time.advanceBlock();
+    await time.advanceBlock();
+    await time.advanceBlock();
+    await time.advanceBlock();
+
+    await processRewards(staker1);
   });
 
   it("Pendings Rewards of staker1 should now be 0", async () => {
-    // TODO
+    const userNewPendingRewards = await mainPool.pendingRewards(staker1);
+
+    assert.equal(
+      userNewPendingRewards.toString(),
+      "0",
+      "Incorrect new pending rewards"
+    );
+  });
+
+  it("Staker2 can't unstake his tokens (reason: deposit does not exist)", async () => {
+    await expectRevert(
+      mainPool.methods["unstake(uint256)"](2, {
+        from: staker2,
+      }),
+      "Deposit does not exist"
+    );
   });
 
   it("Staker2 can't unstake his tokens (reason: deposit not yet complete)", async () => {
-    // TODO
+    await expectRevert(
+      mainPool.methods["unstake(uint256)"](0, {
+        from: staker2,
+      }),
+      "Staking of this deposit is not yet complete"
+    );
   });
 
   it("Staker3 can unstake his tokens after the locking period and his rewards are stacked", async () => {
-    // TODO
-  });
+    const deposit = await mainPool.getDeposit(staker3, 0);
+    await time.increase(deposit.lockedUntil);
 
-  it("Staker2 and staker1 can unstake his tokens after the locking period and his rewards are stacked", async () => {
-    // TODO
+    await unstake(staker3, 0);
   });
+  return;
 
-  it("Staker3 can't unstake the same deposit a second time", async () => {
-    // TODO
+  it("Staker3 can't unstake the same deposit a second time (reason: Deposit is empty)", async () => {
+    await expectRevert(
+      mainPool.methods["unstake(uint256)"](0, {
+        from: staker3,
+      }),
+      "Deposit is empty"
+    );
   });
 
   it("Remaining allocated tokens takes into account the number of rewarded tokens", async () => {
@@ -612,6 +868,10 @@ contract("MechaniumStakingPool", (accounts) => {
     // TODO
   });
 
+  it("Stakers can unstake all tokens and rewards after locking periods (multpile unstake)", async () => {
+    // TODO
+  });
+
   it("The pool is now empty", async () => {
     // TODO
   });
@@ -629,4 +889,6 @@ contract("MechaniumStakingPool", (accounts) => {
   });
 
   // what happens if there is no longer any stacker at the level of the updateRewards ?
+
+  // Add updateStakeLock
 });
