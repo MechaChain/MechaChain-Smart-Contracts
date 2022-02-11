@@ -514,9 +514,7 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
      */
     function balanceOf(address account) public view override returns (uint256) {
         User memory user = users[account];
-
-        // FIXME : Why remove `releasedRewards` ?
-        return user.totalStaked.sub(user.releasedRewards);
+        return user.totalStaked.add(pendingRewards(account));
     }
 
     /**
