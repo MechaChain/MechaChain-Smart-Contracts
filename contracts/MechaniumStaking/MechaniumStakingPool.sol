@@ -135,6 +135,18 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
      * ========================
      */
 
+    /**
+     * @notice Contract constructor sets the configuration of the staking pool
+     * @param stakedToken_ The token to be staked ( can be same as rewardToken if not flash pool )
+     * @param rewardToken_  The token to be rewarded
+     * @param initBlock_ The init block ( if set to 0 will take the current block )
+     * @param minStakingTime_ The minimum allowed locking time
+     * @param maxStakingTime_ The maximum allowed locking time
+     * @param minWeightMultiplier_ The minimum weight multipler ( Used to calculate weight range )
+     * @param maxWeightMultiplier_ The maximum weight multipler ( Used to calculate weight range )
+     * @param rewardsLockingPeriod_  The rewards locking period ( Can be 0 if flash pool )
+     * @param rewardsPerBlock_ The amount of tokens to be rewarded per block passed
+     */
     constructor(
         IERC20 stakedToken_,
         IERC20 rewardToken_,
@@ -203,6 +215,8 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
         return true;
     }
 
+    // TODO : add depositFor()
+
     /**
      * @notice Used to stake an `amount` of tokens for a `lockPeriod` for an `account`
      * @dev Will make a safe transfer from the `account` and calculate the weight and create a deposit
@@ -270,6 +284,7 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
         override
         returns (bool)
     {
+        // TODO : remove it ?
         require(
             lockPeriod >= minStakingTime,
             "Staking time less than minimum required"
@@ -504,7 +519,7 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
     /**
      * @notice Can we call the rewards update function or is it useless and will cause an error
      */
-    function canUpdateRewards() public view returns (bool) {
+    function canUpdateRewards() public view override returns (bool) {
         return block.number >= initBlock;
     }
 
@@ -556,7 +571,12 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
      * @notice Used to get the User data for an `account`
      * @param account The account address
      */
-    function getUser(address account) public view returns (User memory) {
+    function getUser(address account)
+        public
+        view
+        override
+        returns (User memory)
+    {
         User memory user = users[account];
 
         return user;
@@ -566,7 +586,7 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
      * @notice Get the updated rewards
      * @dev Used to calculate the rewards for last period ( in blocks ) without updating them
      */
-    function updatedRewards() public view returns (uint256) {
+    function updatedRewards() public view override returns (uint256) {
         if (block.number < initBlock) {
             return 0;
         }
@@ -599,7 +619,7 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
      * @notice Get the total updated rewards
      * @dev Used to calculate the rewards from the init block without updating them
      */
-    function updatedTotalRewards() public view returns (uint256) {
+    function updatedTotalRewards() public view override returns (uint256) {
         uint256 _updatedTotalRewards = totalRewards.add(updatedRewards());
 
         return _updatedTotalRewards;
@@ -609,7 +629,7 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
      * @notice Get the updated rewards per weight
      * @dev Used to calculate the rewardsPerWeight without updating them
      */
-    function updatedRewardsPerWeight() public view returns (uint256) {
+    function updatedRewardsPerWeight() public view override returns (uint256) {
         uint256 cumulatedRewards = updatedRewards();
 
         cumulatedRewards = cumulatedRewards.mul(WEIGHT_MULTIPLIER);
@@ -629,6 +649,7 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
     function calculateUserWeight(uint256 amount, uint64 stakingTime)
         public
         view
+        override
         returns (uint256)
     {
         return
@@ -655,6 +676,7 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
     function weightToReward(uint256 _weight, uint256 _rewardsPerWeight)
         public
         pure
+        override
         returns (uint256)
     {
         return _weight.mul(_rewardsPerWeight).div(WEIGHT_MULTIPLIER);
