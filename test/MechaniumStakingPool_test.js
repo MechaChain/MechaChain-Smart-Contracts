@@ -823,14 +823,13 @@ contract("MechaniumStakingPool", (accounts) => {
 
     await unstake(staker3, 0);
   });
-  return;
 
-  it("Staker3 can't unstake the same deposit a second time (reason: Deposit is empty)", async () => {
+  it("Staker3 can't unstake the same deposit a second time (reason: Deposit already claimed)", async () => {
     await expectRevert(
       mainPool.methods["unstake(uint256)"](0, {
         from: staker3,
       }),
-      "Deposit is empty"
+      "Deposit already claimed"
     );
   });
 
@@ -855,6 +854,8 @@ contract("MechaniumStakingPool", (accounts) => {
       "Incorrect remainingAllocatedTokens"
     );
   });
+
+  return;
 
   it("Admin or random user can't directly change rewardsPerBlock (reason: no owner)", async () => {
     // TODO
@@ -887,8 +888,4 @@ contract("MechaniumStakingPool", (accounts) => {
   it("The pool must no longer have any tokens and totalUsersWeight and totalTokensStaked are 0", async () => {
     // TODO
   });
-
-  // what happens if there is no longer any stacker at the level of the updateRewards ?
-
-  // Add updateStakeLock
 });

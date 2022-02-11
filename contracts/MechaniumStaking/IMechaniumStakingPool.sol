@@ -21,6 +21,8 @@ interface IMechaniumStakingPool {
         uint256 weight;
         uint64 lockedFrom;
         uint64 lockedUntil;
+        bool isRewards;
+        bool isClaimed;
     }
 
     /**

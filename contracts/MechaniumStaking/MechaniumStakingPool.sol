@@ -261,7 +261,9 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
             amount: amount,
             weight: weight,
             lockedFrom: lockStart,
-            lockedUntil: lockEnd
+            lockedUntil: lockEnd,
+            isRewards: false,
+            isClaimed: false
         });
 
         // Update user and total records
@@ -706,8 +708,7 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
     /**
      * @notice Remove a deposit if the locking is over and return its amount and weight
      *
-     * @dev Delete the deposit by resetting all its values : the deposit
-     *      will always be present in the array but set to 0
+     * @dev Set the deposit's `isClamed` to true
      * @dev Revert if `depositId` does not exist or if the `lockedUntil`
      *      of the deposit has not passed
      * @dev Does not update records : rewards MUST be updated before and
@@ -721,8 +722,8 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
         returns (uint256 amount, uint256 weight)
     {
         require(depositId < user.deposits.length, "Deposit does not exist");
-        Deposit memory deposit = user.deposits[depositId];
-        // TODO : Need test for already deleted deposit ?
+        Deposit storage deposit = user.deposits[depositId];
+        require(!deposit.isClaimed, "Deposit already claimed");
         require(
             deposit.lockedUntil <= uint64(block.timestamp),
             "Staking of this deposit is not yet complete"
@@ -731,8 +732,8 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
         amount = deposit.amount;
         weight = deposit.weight;
 
-        // Reset deposit
-        delete user.deposits[depositId];
+        // Claim deposit
+        deposit.isClaimed = true;
     }
 
     /**
@@ -785,7 +786,9 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
                 amount: userPendingRewards,
                 weight: weight,
                 lockedFrom: lockStart,
-                lockedUntil: lockEnd
+                lockedUntil: lockEnd,
+                isRewards: true,
+                isClaimed: false
             });
 
             // Update user and total records
