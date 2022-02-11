@@ -33,7 +33,7 @@ interface IMechaniumStakingPool {
     /**
      * @notice Used to stake an `amount` of tokens for a `lockPeriod` for an `account`
      */
-    function stakeFor(
+    function depositFor(
         address account,
         uint256 amount,
         uint64 lockPeriod

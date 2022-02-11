@@ -199,7 +199,7 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
 
     /**
      * @notice Used to stake an `amount` of tokens for a `lockPeriod` for the `msg.sender`
-     * @dev Uses the `stakeFor` function
+     * @dev Uses the `depositFor` function
      * @param amount The amount of tokens to stake
      * @param lockPeriod The locking period ( in seconds )
      */
@@ -210,12 +210,10 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
     {
         address account = msg.sender;
 
-        stakeFor(account, amount, lockPeriod);
+        depositFor(account, amount, lockPeriod);
 
         return true;
     }
-
-    // TODO : add depositFor()
 
     /**
      * @notice Used to stake an `amount` of tokens for a `lockPeriod` for an `account`
@@ -224,7 +222,7 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
      * @param amount The amount of tokens to stake
      * @param lockPeriod The locking period ( in seconds )
      */
-    function stakeFor(
+    function depositFor(
         address account,
         uint256 amount,
         uint64 lockPeriod
@@ -744,7 +742,7 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
      *      otherwise they are transmitted directly to the user (as for flash pools)
      * @dev If `_withUpdate` is false, rewards MUST be updated before and user's missing rewards
      *      MUST be reset after
-     * @dev Executed internally in `unstake`, `stakeFor`, `updateStakeLock` and `processRewards` functions
+     * @dev Executed internally in `unstake`, `depositFor`, `updateStakeLock` and `processRewards` functions
      *
      * @param _staker Staker address
      * @param _withUpdate If we need to update rewards and user's missing rewards in this function
