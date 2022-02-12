@@ -274,18 +274,6 @@ contract("MechaniumStakingPool", (accounts) => {
       usersDeposits[staker][id].weight = getBN(0);
     });
 
-    console.log("\n");
-
-    console.log("staker", staker);
-    console.log("unstakedAmount", unstakedAmount.toString());
-    console.log(
-      "userOldPoolProfile.totalStaked",
-      userOldPoolProfile.totalStaked.toString()
-    );
-    console.log("userRewards", userRewards.toString());
-    console.log("new totalStaked", userNewProfile.totalStaked.toString());
-    console.log("\n");
-
     // Staked token test
     assert.equal(
       userNewProfile.totalStaked.toString(),
@@ -979,21 +967,16 @@ contract("MechaniumStakingPool", (accounts) => {
   it("Stakers can unstake all tokens and rewards after locking periods (multiple unstake)", async () => {
     await time.increase(mainStakingPoolData.maxStakingTime);
     await time.advanceBlock();
-    console.log("staker1", staker1);
-    console.log("staker2", staker2);
-    console.log("staker3", staker3);
 
     // Foreach users
-    await Promise.all(
-      Object.keys(usersDeposits).map(async (user) => {
-        await unstake(
-          user,
-          usersDeposits[user]
-            .filter((deposit) => deposit.amount > 0)
-            .map((deposit) => deposit.id)
-        );
-      })
-    );
+    for (const user of Object.keys(usersDeposits)) {
+      await unstake(
+        user,
+        usersDeposits[user]
+          .filter((deposit) => deposit.amount > 0)
+          .map((deposit) => deposit.id)
+      );
+    }
   });
   return;
 
