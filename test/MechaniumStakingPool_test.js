@@ -72,6 +72,7 @@ contract("MechaniumStakingPool", (accounts) => {
 
     // Add deposit
     const newDeposit = {
+      id: userNewProfile.deposits.length - 1,
       block:
         mainStakingPoolData.initBlock.cmp(lastBlock) == -1
           ? lastBlock
@@ -157,6 +158,7 @@ contract("MechaniumStakingPool", (accounts) => {
 
     // Add rewards deposit
     const newDeposit = {
+      id: userNewProfile.deposits.length - 1,
       block:
         mainStakingPoolData.initBlock.cmp(lastBlock) == -1
           ? lastBlock
@@ -246,6 +248,7 @@ contract("MechaniumStakingPool", (accounts) => {
 
     // Add rewards deposit
     const newDeposit = {
+      id: userNewProfile.deposits.length - 1,
       block:
         mainStakingPoolData.initBlock.cmp(lastBlock) == -1
           ? lastBlock
@@ -270,6 +273,18 @@ contract("MechaniumStakingPool", (accounts) => {
       usersDeposits[staker][id].amount = getBN(0);
       usersDeposits[staker][id].weight = getBN(0);
     });
+
+    console.log("\n");
+
+    console.log("staker", staker);
+    console.log("unstakedAmount", unstakedAmount.toString());
+    console.log(
+      "userOldPoolProfile.totalStaked",
+      userOldPoolProfile.totalStaked.toString()
+    );
+    console.log("userRewards", userRewards.toString());
+    console.log("new totalStaked", userNewProfile.totalStaked.toString());
+    console.log("\n");
 
     // Staked token test
     assert.equal(
@@ -855,27 +870,150 @@ contract("MechaniumStakingPool", (accounts) => {
     );
   });
 
-  return;
-
   it("Admin or random user can't directly change rewardsPerBlock (reason: no owner)", async () => {
-    // TODO
+    await expectRevert(
+      mainPool.setRewardsPerBlock(
+        mainStakingPoolData.rewardsPerBlock.mul(getBN(2)),
+        {
+          from: staker2,
+        }
+      ),
+      "Ownable: caller is not the owner"
+    );
+    await expectRevert(
+      mainPool.setRewardsPerBlock(
+        mainStakingPoolData.rewardsPerBlock.mul(getBN(2)),
+        {
+          from: owner,
+        }
+      ),
+      "Ownable: caller is not the owner"
+    );
   });
 
-  it("Random user can refill the pool for one block", async () => {
-    // TODO
+  it("Random user can refill the pool by sending own tokens", async () => {
+    const amount = getAmount(10);
+    const poolOldRemaining = await mainPool.remainingAllocatedTokens();
+
+    await token.transfer(mainPool.address, amount, {
+      from: staker1,
+    });
+
+    const poolNewRemaining = await mainPool.remainingAllocatedTokens();
+
+    const expectedRemaining = poolOldRemaining
+      .add(amount)
+      // the remaining has decrease with the block of the transfer so rewards increased by one block
+      .sub(mainStakingPoolData.rewardsPerBlock);
+
+    assert.equal(
+      poolNewRemaining.toString(),
+      expectedRemaining.toString(),
+      "Incorrect remainingAllocatedTokens"
+    );
+  });
+
+  it("Admin can't change rewardsPerBlock through the factory (reason: Rewards per block must be greater than the previous one)", async () => {
+    await expectRevert(
+      factory.addAllocatedTokens(
+        mainPool.address,
+        getAmount(20),
+        mainStakingPoolData.rewardsPerBlock.div(getBN(2)),
+        {
+          from: owner,
+        }
+      ),
+      "Rewards per block must be greater than the previous one"
+    );
   });
 
   it("Admin can refill the staking pool through the factory and change rewardsPerBlock", async () => {
-    // TODO
+    const amount = getAmount(20);
+    const poolOldRemaining = await mainPool.remainingAllocatedTokens();
+    const poolOldRewardsPerBlock = await mainPool.rewardsPerBlock();
+
+    const newRewardsPerBlock = poolOldRemaining.add(amount).div(getBN(10)); // Pool must be empty in 10 blocks
+
+    await factory.addAllocatedTokens(
+      mainPool.address,
+      amount,
+      newRewardsPerBlock,
+      {
+        from: owner,
+      }
+    );
+    mainStakingPoolData.rewardsPerBlock = newRewardsPerBlock;
+
+    const poolNewRemaining = await mainPool.remainingAllocatedTokens();
+    const poolNewRewardsPerBlock = await mainPool.rewardsPerBlock();
+
+    const expectedRemaining = poolOldRemaining
+      .add(amount)
+      // the remaining has decrease with the block of the allocated (before rewardsPerBlock has changed)
+      .sub(poolOldRewardsPerBlock);
+
+    assert.equal(
+      poolNewRemaining.toString(),
+      expectedRemaining.toString(),
+      "Incorrect remainingAllocatedTokens"
+    );
+
+    assert.equal(
+      poolNewRewardsPerBlock.toString(),
+      newRewardsPerBlock.toString(),
+      "Incorrect rewardsPerBlock"
+    );
+
+    // Next block must increase rewards by the newRewardsPerBlock
+    const poolOldUpdatedRewards = await mainPool.updatedTotalRewards();
+    await time.advanceBlock();
+    const poolNewUpdatedRewards = await mainPool.updatedTotalRewards();
+
+    assert.equal(
+      poolNewUpdatedRewards.toString(),
+      poolOldUpdatedRewards.add(newRewardsPerBlock).toString(),
+      "Incorrect updatedTotalRewards (not increase by the new rewardsPerBlock)"
+    );
   });
 
   it("Stakers can unstake all tokens and rewards after locking periods (multiple unstake)", async () => {
-    // TODO
+    await time.increase(mainStakingPoolData.maxStakingTime);
+    await time.advanceBlock();
+    console.log("staker1", staker1);
+    console.log("staker2", staker2);
+    console.log("staker3", staker3);
+
+    // Foreach users
+    await Promise.all(
+      Object.keys(usersDeposits).map(async (user) => {
+        await unstake(
+          user,
+          usersDeposits[user]
+            .filter((deposit) => deposit.amount > 0)
+            .map((deposit) => deposit.id)
+        );
+      })
+    );
+  });
+  return;
+
+  it("The rewards of the penultimate block must be lower than the rewards per block", async () => {
+    const poolRewardsPerBlock = await mainPool.rewardsPerBlock();
+    const poolRemaining = await mainPool.remainingAllocatedTokens();
+
+    const blockNumber = poolRemaining.div(poolRewardsPerBlock).sub(getBN(1));
+    const lastBlock = await time.latestBlock();
+
+    // Advance to penultimate block
+    await time.advanceBlockTo(lastBlock + blockNumber.toNumber());
+
+    const poolNewRemaining = await mainPool.remainingAllocatedTokens();
+
+    console.log("poolRewardsPerBlock", poolRewardsPerBlock.toString());
+    console.log("poolNewRemaining", poolNewRemaining.toString());
   });
 
-  it("The pool is now empty", async () => {
-    // TODO
-  });
+  it("The pool is now empty (no more remaining allocated tokens)", async () => {});
 
   it("Pending rewards does not increase if the pool is empty", async () => {
     // TODO

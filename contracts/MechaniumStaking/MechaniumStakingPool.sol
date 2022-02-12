@@ -315,8 +315,8 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
 
         User storage user = users[msg.sender];
 
-        uint256 totalAmount;
-        uint256 totalWeight;
+        uint256 totalAmount = 0;
+        uint256 totalWeight = 0;
         for (uint256 i = 0; i < depositIds.length; i++) {
             (uint256 amount, uint256 weight) = _drainDeposit(
                 user,
@@ -386,7 +386,11 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
 
     /**
      * @notice Used to change the rewardsPerBlock
+     *
      * @dev Will update the rewardsPerWeight before changing the rewardsPerBlock
+     * @dev Can only by call by owner (the factory if deployed by it)
+     * @dev Revert if the new rewards per block is less than the previous one
+     *
      * @param rewardsPerBlock_ the new value for rewardsPerBlock ( must be superior to old value )
      */
     function setRewardsPerBlock(uint256 rewardsPerBlock_)
@@ -397,7 +401,7 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
     {
         require(
             rewardsPerBlock_ > rewardsPerBlock,
-            "Rewards per block new value must be superior to old value"
+            "Rewards per block must be greater than the previous one"
         );
 
         if (canUpdateRewards()) {
