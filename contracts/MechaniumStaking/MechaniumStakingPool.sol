@@ -97,7 +97,7 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
     uint16 public immutable maxWeightMultiplier;
 
     /// Weight multiplier ( used for floating weight )
-    uint256 public immutable WEIGHT_MULTIPLIER = 1e6;
+    uint256 public immutable WEIGHT_MULTIPLIER = 1e12;
 
     /**
      * ========================
