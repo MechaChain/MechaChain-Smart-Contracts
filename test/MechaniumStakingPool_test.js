@@ -31,7 +31,7 @@ contract("MechaniumStakingPool", (accounts) => {
     rewardsPerBlock: getAmount(1),
   };
 
-  const WEIGHT_MULTIPLIER = getBN(1e6);
+  const WEIGHT_MULTIPLIER = getBN(1e12);
 
   /**
    * ========================
@@ -246,20 +246,24 @@ contract("MechaniumStakingPool", (accounts) => {
       userNewProfile.deposits[userNewProfile.deposits.length - 1];
     const lastBlock = await time.latestBlock();
 
-    // Add rewards deposit
-    const newDeposit = {
-      id: userNewProfile.deposits.length - 1,
-      block:
-        mainStakingPoolData.initBlock.cmp(lastBlock) == -1
-          ? lastBlock
-          : mainStakingPoolData.initBlock,
-      amount: userRewards,
-      weight: userRewards
-        .mul(getWeightMultiplierRange(mainStakingPoolData.rewardsLockingPeriod))
-        .div(WEIGHT_MULTIPLIER),
-    };
-    usersDeposits[staker] = usersDeposits[staker] || [];
-    usersDeposits[staker].push(newDeposit);
+    if (userRewards > 0) {
+      // Add rewards deposit
+      const newDeposit = {
+        id: userNewProfile.deposits.length - 1,
+        block:
+          mainStakingPoolData.initBlock.cmp(lastBlock) == -1
+            ? lastBlock
+            : mainStakingPoolData.initBlock,
+        amount: userRewards,
+        weight: userRewards
+          .mul(
+            getWeightMultiplierRange(mainStakingPoolData.rewardsLockingPeriod)
+          )
+          .div(WEIGHT_MULTIPLIER),
+      };
+      usersDeposits[staker] = usersDeposits[staker] || [];
+      usersDeposits[staker].push(newDeposit);
+    }
 
     // Force array
     const deposits = Array.isArray(deposit) ? deposit : [deposit];
@@ -300,7 +304,7 @@ contract("MechaniumStakingPool", (accounts) => {
       "Incorrect user weight"
     );
     expectedTotalWeight = expectedTotalWeight
-      .add(getBN(lastDeposit.weight))
+      .add(getBN(userRewards > 0 ? lastDeposit.weight : 0))
       .sub(unstakedWeight);
     const totalUsersWeight = await mainPool.totalUsersWeight();
     assert.equal(
@@ -339,18 +343,20 @@ contract("MechaniumStakingPool", (accounts) => {
       "Incorrect pool total staked"
     );
 
-    // Lock times tests
-    const latestTime = await time.latest();
-    assert.equal(
-      lastDeposit.lockedFrom.toString(),
-      latestTime.toString(),
-      "Incorrect deposit lockedFrom"
-    );
-    assert.equal(
-      lastDeposit.lockedUntil.toString(),
-      latestTime.add(mainStakingPoolData.rewardsLockingPeriod).toString(),
-      "Incorrect deposit lockedUntil"
-    );
+    if (userRewards > 0) {
+      // Lock times tests
+      const latestTime = await time.latest();
+      assert.equal(
+        lastDeposit.lockedFrom.toString(),
+        latestTime.toString(),
+        "Incorrect deposit lockedFrom"
+      );
+      assert.equal(
+        lastDeposit.lockedUntil.toString(),
+        latestTime.add(mainStakingPoolData.rewardsLockingPeriod).toString(),
+        "Incorrect deposit lockedUntil"
+      );
+    }
   };
 
   /**
@@ -916,11 +922,14 @@ contract("MechaniumStakingPool", (accounts) => {
   });
 
   it("Admin can refill the staking pool through the factory and change rewardsPerBlock", async () => {
-    const amount = getAmount(20);
+    let amount = getAmount(20);
     const poolOldRemaining = await mainPool.remainingAllocatedTokens();
     const poolOldRewardsPerBlock = await mainPool.rewardsPerBlock();
 
-    const newRewardsPerBlock = poolOldRemaining.add(amount).div(getBN(10)); // Pool must be empty in 10 blocks
+    // Pool must be almost empty in 20 blocks
+    // the remaining block must have 1/4 of the newRewardsPerBlock
+    const newRewardsPerBlock = poolOldRemaining.add(amount).div(getBN(20));
+    amount = amount.add(newRewardsPerBlock.div(getBN(4)));
 
     await factory.addAllocatedTokens(
       mainPool.address,
@@ -978,35 +987,162 @@ contract("MechaniumStakingPool", (accounts) => {
       );
     }
   });
-  return;
 
   it("The rewards of the penultimate block must be lower than the rewards per block", async () => {
     const poolRewardsPerBlock = await mainPool.rewardsPerBlock();
     const poolRemaining = await mainPool.remainingAllocatedTokens();
 
-    const blockNumber = poolRemaining.div(poolRewardsPerBlock).sub(getBN(1));
+    const blockNumber = poolRemaining.div(poolRewardsPerBlock);
     const lastBlock = await time.latestBlock();
 
     // Advance to penultimate block
-    await time.advanceBlockTo(lastBlock + blockNumber.toNumber());
+    await time.advanceBlockTo(lastBlock.add(blockNumber));
 
     const poolNewRemaining = await mainPool.remainingAllocatedTokens();
 
-    console.log("poolRewardsPerBlock", poolRewardsPerBlock.toString());
-    console.log("poolNewRemaining", poolNewRemaining.toString());
+    assert.equal(
+      poolRewardsPerBlock.cmp(poolNewRemaining),
+      1,
+      "Rewards per block must be lower than remaining tokens"
+    );
   });
 
-  it("The pool is now empty (no more remaining allocated tokens)", async () => {});
+  it("The latest block takes only takes the remaining tokens", async () => {
+    const poolOldRemaining = await mainPool.remainingAllocatedTokens();
+    const poolOldRewards = await mainPool.updatedTotalRewards();
+
+    await time.advanceBlock();
+
+    const poolNewRewards = await mainPool.updatedTotalRewards();
+
+    assert.equal(
+      poolNewRewards.toString(),
+      poolOldRewards.add(poolOldRemaining).toString(),
+      "Incorrect updatedTotalRewards"
+    );
+  });
+
+  it("The pool is now empty (no more remaining tokens)", async () => {
+    const poolRemaining = await mainPool.remainingAllocatedTokens();
+
+    assert.equal(
+      poolRemaining.toString(),
+      "0",
+      "Incorrect remainingAllocatedTokens"
+    );
+  });
 
   it("Pending rewards does not increase if the pool is empty", async () => {
-    // TODO
+    const oldRewardsPerWeight = await mainPool.updatedRewardsPerWeight();
+    const oldTotalRewards = await mainPool.updatedTotalRewards();
+    const staker1OldPendingRewards = await mainPool.pendingRewards(staker1);
+    const staker2OldPendingRewards = await mainPool.pendingRewards(staker2);
+    const staker3OldPendingRewards = await mainPool.pendingRewards(staker3);
+
+    await time.advanceBlock();
+    await time.advanceBlock();
+    await time.advanceBlock();
+    await time.advanceBlock();
+    await time.advanceBlock();
+    await mainPool.updateRewards();
+    await time.advanceBlock();
+    await time.advanceBlock();
+    await mainPool.updateRewards();
+    await time.advanceBlock();
+    await time.advanceBlock();
+
+    const newUpdatedRewards = await mainPool.updatedRewards();
+    const newRewardsPerWeight = await mainPool.updatedRewardsPerWeight();
+    const newTotalRewards = await mainPool.updatedTotalRewards();
+    const staker1NewPendingRewards = await mainPool.pendingRewards(staker1);
+    const staker2NewPendingRewards = await mainPool.pendingRewards(staker2);
+    const staker3NewPendingRewards = await mainPool.pendingRewards(staker3);
+
+    assert.equal(newUpdatedRewards.toString(), "0", "Incorrect updatedRewards");
+
+    assert.equal(
+      newTotalRewards.toString(),
+      oldTotalRewards.toString(),
+      "Incorrect updatedTotalRewards"
+    );
+
+    assert.equal(
+      newRewardsPerWeight.toString(),
+      oldRewardsPerWeight.toString(),
+      "Incorrect updatedRewardsPerWeight"
+    );
+
+    assert.equal(
+      staker1NewPendingRewards.toString(),
+      staker1OldPendingRewards.toString(),
+      "Incorrect pendingRewards(staker1)"
+    );
+
+    assert.equal(
+      staker2NewPendingRewards.toString(),
+      staker2OldPendingRewards.toString(),
+      "Incorrect pendingRewards(staker2)"
+    );
+
+    assert.equal(
+      staker3NewPendingRewards.toString(),
+      staker3OldPendingRewards.toString(),
+      "Incorrect pendingRewards(staker3)"
+    );
+  });
+
+  it("Stakers can process all rewards", async () => {
+    for (const user of Object.keys(usersDeposits)) {
+      await processRewards(user);
+    }
   });
 
   it("Stakers can unstake all rewards", async () => {
-    // TODO
+    await time.advanceBlock();
+    await time.advanceBlock();
+    await time.increase(
+      mainStakingPoolData.maxStakingTime.add(time.duration.hours(1))
+    );
+
+    // Foreach users
+    for (const user of Object.keys(usersDeposits)) {
+      await unstake(
+        user,
+        usersDeposits[user]
+          .filter((deposit) => deposit.amount > 0)
+          .map((deposit) => deposit.id)
+      );
+
+      const userProfile = await mainPool.getUser(user);
+    }
   });
 
-  it("The pool must no longer have any tokens and totalUsersWeight and totalTokensStaked are 0", async () => {
-    // TODO
+  it("The pool must no longer have any tokens (>1 $MECHA) and totalUsersWeight and totalTokensStaked are 0", async () => {
+    await time.advanceBlock();
+    await time.advanceBlock();
+    await time.advanceBlock();
+    await time.advanceBlock();
+    await time.advanceBlock();
+    await time.advanceBlock();
+
+    const poolBalance = await token.balanceOf(mainPool.address);
+    const totalUsersWeight = await mainPool.totalUsersWeight();
+    const totalTokensStaked = await mainPool.totalTokensStaked();
+
+    assert.equal(
+      totalTokensStaked.toString(),
+      "0",
+      "Incorrect totalTokensStaked"
+    );
+    assert.equal(
+      totalUsersWeight.toString(),
+      "0",
+      "Incorrect totalUsersWeight"
+    );
+    assert.equal(
+      poolBalance.cmp(getAmount(1)),
+      -1,
+      "Incorrect pool balance (must be close to 0)"
+    );
   });
 });
