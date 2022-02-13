@@ -62,9 +62,9 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
     event ProcessRewards(address indexed account, uint256 rewards);
 
     /**
-     * @notice Event emitted when `rewardsPerWeight` is updated
+     * @notice Event emitted when `_rewardsPerWeight` is updated
      */
-    event RewardsPerWeightUpdated(uint256 rewardsPerWeight);
+    event RewardsPerWeightUpdated(uint256 _rewardsPerWeight);
 
     /**
      * ========================
@@ -117,17 +117,17 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
     /// Total tokens staked by users
     uint256 public totalTokensStaked;
 
-    /// Rewards in tokens per weight
-    uint256 public rewardsPerWeight;
-
     /// Total of processed rewards
     uint256 public totalProcessedRewards;
 
     /// Track the last block number of rewards update
     uint256 public lastRewardsUpdate;
 
-    /// Track total rewards
-    uint256 public totalRewards;
+    /// Total rewards at the last update, use `updatedTotalRewards` for get the last value
+    uint256 internal _totalRewards;
+
+    /// Rewards in tokens per weight at the last update, use `updatedRewardsPerWeight` for get the last value
+    uint256 internal _rewardsPerWeight;
 
     /**
      * ========================
@@ -373,12 +373,12 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
     function updateRewards() public override returns (bool) {
         require(canUpdateRewards(), "initBlock is not reached");
 
-        rewardsPerWeight = updatedRewardsPerWeight();
-        totalRewards = updatedTotalRewards();
+        _rewardsPerWeight = updatedRewardsPerWeight();
+        _totalRewards = updatedTotalRewards();
 
         lastRewardsUpdate = block.number;
 
-        emit RewardsPerWeightUpdated(rewardsPerWeight);
+        emit RewardsPerWeightUpdated(_rewardsPerWeight);
 
         return true;
     }
@@ -386,7 +386,7 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
     /**
      * @notice Used to change the rewardsPerBlock
      *
-     * @dev Will update the rewardsPerWeight before changing the rewardsPerBlock
+     * @dev Will update rewards before changing the rewardsPerBlock
      * @dev Can only by call by owner (the factory if deployed by it)
      * @dev Revert if the new rewards per block is less than the previous one
      *
@@ -552,7 +552,7 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
         uint256 balance = rewardToken.balanceOf(address(this));
 
         uint256 oldRemainingTokens = balance.sub(
-            totalTokensStaked.add(totalRewards).sub(totalProcessedRewards)
+            totalTokensStaked.add(_totalRewards).sub(totalProcessedRewards)
         );
 
         return
@@ -566,25 +566,25 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
      * @dev Used to calculate the rewards from the init block without updating them
      */
     function updatedTotalRewards() public view override returns (uint256) {
-        uint256 _updatedTotalRewards = totalRewards.add(updatedRewards());
+        uint256 _updatedTotalRewards = _totalRewards.add(updatedRewards());
 
         return _updatedTotalRewards;
     }
 
     /**
      * @notice Get the updated rewards per weight
-     * @dev Used to calculate the rewardsPerWeight without updating them
+     * @dev Used to calculate `_rewardsPerWeight` without updating them
      */
     function updatedRewardsPerWeight() public view override returns (uint256) {
         uint256 cumulatedRewards = updatedRewards();
 
         cumulatedRewards = cumulatedRewards.mul(WEIGHT_MULTIPLIER);
 
-        uint256 _rewardsPerWeight = cumulatedRewards.div(totalUsersWeight);
+        uint256 newRewardsPerWeight = cumulatedRewards.div(totalUsersWeight);
 
-        _rewardsPerWeight = _rewardsPerWeight.add(rewardsPerWeight);
+        newRewardsPerWeight = newRewardsPerWeight.add(_rewardsPerWeight);
 
-        return _rewardsPerWeight;
+        return newRewardsPerWeight;
     }
 
     /**
@@ -615,17 +615,17 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
     /**
      * @dev Converts stake weight to reward value, applying the division on weight
      *
-     * @param _weight stake weight
-     * @param _rewardsPerWeight reward per weight
+     * @param weight_ stake weight
+     * @param rewardsPerWeight_ reward per weight
      * @return reward value normalized with WEIGHT_MULTIPLIER
      */
-    function weightToReward(uint256 _weight, uint256 _rewardsPerWeight)
+    function weightToReward(uint256 weight_, uint256 rewardsPerWeight_)
         public
         pure
         override
         returns (uint256)
     {
-        return _weight.mul(_rewardsPerWeight).div(WEIGHT_MULTIPLIER);
+        return weight_.mul(rewardsPerWeight_).div(WEIGHT_MULTIPLIER);
     }
 
     /**
@@ -659,7 +659,7 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
             // Reset the missingRewards of the user
             user.missingRewards = weightToReward(
                 user.totalWeight,
-                rewardsPerWeight
+                _rewardsPerWeight
             );
         }
 
@@ -696,7 +696,7 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
             // Reset the missingRewards of the user
             user.missingRewards = weightToReward(
                 user.totalWeight,
-                rewardsPerWeight
+                _rewardsPerWeight
             );
         }
 
@@ -804,7 +804,7 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
             // Reset the missingRewards of the user if it will not be done next
             user.missingRewards = weightToReward(
                 user.totalWeight,
-                rewardsPerWeight
+                _rewardsPerWeight
             );
         }
 

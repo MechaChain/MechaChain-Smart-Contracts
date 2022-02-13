@@ -573,7 +573,7 @@ contract("MechaniumStakingPool", (accounts) => {
 
     await expectRevert(mainPool.updateRewards(), "initBlock is not reached");
 
-    const rewardsPerWeight = await mainPool.rewardsPerWeight();
+    const rewardsPerWeight = await mainPool.updatedRewardsPerWeight();
 
     assert.equal(
       rewardsPerWeight.toString(),
@@ -601,17 +601,7 @@ contract("MechaniumStakingPool", (accounts) => {
   it("Distribution of rewards must have started (first block)", async () => {
     await time.advanceBlockTo(mainStakingPoolData.initBlock);
 
-    const calculatedRewardsPerWeight = await updatedRewardsPerWeight();
-
     await mainPool.updateRewards();
-
-    const _rewardsPerWeight = await mainPool.rewardsPerWeight();
-
-    assert.equal(
-      _rewardsPerWeight.toString(),
-      calculatedRewardsPerWeight.toString(),
-      "Incorrect rewardsPerWeight"
-    );
 
     let staker1PendingRewards = await mainPool.pendingRewards(staker1);
 
