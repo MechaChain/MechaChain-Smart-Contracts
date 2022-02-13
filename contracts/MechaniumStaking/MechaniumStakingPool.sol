@@ -373,9 +373,8 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
     function updateRewards() public override returns (bool) {
         require(canUpdateRewards(), "initBlock is not reached");
 
-        totalRewards = updatedTotalRewards();
-
         rewardsPerWeight = updatedRewardsPerWeight();
+        totalRewards = updatedTotalRewards();
 
         lastRewardsUpdate = block.number;
 
