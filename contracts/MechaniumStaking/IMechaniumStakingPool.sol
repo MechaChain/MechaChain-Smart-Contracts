@@ -21,6 +21,8 @@ interface IMechaniumStakingPool {
         uint256 weight;
         uint64 lockedFrom;
         uint64 lockedUntil;
+        bool isRewards;
+        bool isClaimed;
     }
 
     /**
@@ -31,23 +33,21 @@ interface IMechaniumStakingPool {
     /**
      * @notice Used to stake an `amount` of tokens for a `lockPeriod` for an `account`
      */
-    function stakeFor(
+    function depositFor(
         address account,
         uint256 amount,
         uint64 lockPeriod
     ) external returns (bool);
 
     /**
-     * @notice Used to update a `depositId`'s `lockPeriod`
-     */
-    function updateStakeLock(uint256 depositId, uint64 lockPeriod)
-        external
-        returns (bool);
-
-    /**
      * @notice Used to calculate and pay pending rewards to the `msg.sender`
      */
     function processRewards() external returns (uint256);
+
+    /**
+     * @notice Used to unstake several deposits for the `msg.sender`
+     */
+    function unstake(uint256[] memory depositIds) external returns (bool);
 
     /**
      * @notice Used to unstake a `depositId` for the `msg.sender`
@@ -79,7 +79,7 @@ interface IMechaniumStakingPool {
     /**
      * @notice Can we call the rewards function or is it useless and will cause an error
      */
-    function canUpdateRewardsPerWeight() external returns (bool);
+    function canUpdateRewards() external returns (bool);
 
     /**
      * @notice Used to get the balance for an `account`

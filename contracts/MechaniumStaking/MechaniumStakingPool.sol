@@ -36,7 +36,16 @@ contract MechaniumStakingPool is
     /**
      * @notice Event emitted when an `account` unstaked a deposit (`depositId`)
      */
-    event Unstake(address indexed account, uint256 depositId);
+    event Unstake(address indexed account, uint256 amount, uint256 depositId);
+
+    /**
+     * @notice Event emitted when an `account` unstaked several deposits (`depositIds`)
+     */
+    event Unstake(
+        address indexed account,
+        uint256 amount,
+        uint256[] depositIds
+    );
 
     /**
      * @notice Event emitted when an `account` updated stake `lockPeriod` for a `depositId`
@@ -58,9 +67,9 @@ contract MechaniumStakingPool is
     event ProcessRewards(address indexed account, uint256 rewards);
 
     /**
-     * @notice Event emitted when `rewardsPerWeight` is updated
+     * @notice Event emitted when `_rewardsPerWeight` is updated
      */
-    event RewardsPerWeightUpdated(uint256 rewardsPerWeight);
+    event RewardsPerWeightUpdated(uint256 _rewardsPerWeight);
 
     /**
      * ========================
@@ -93,7 +102,7 @@ contract MechaniumStakingPool is
     uint16 public immutable maxWeightMultiplier;
 
     /// Weight multiplier ( used for floating weight )
-    uint256 public immutable WEIGHT_MULTIPLIER = 1e6;
+    uint256 public immutable WEIGHT_MULTIPLIER = 1e12;
 
     /**
      * ========================
@@ -113,17 +122,17 @@ contract MechaniumStakingPool is
     /// Total tokens staked by users
     uint256 public totalTokensStaked;
 
-    /// Rewards in tokens per weight
-    uint256 public rewardsPerWeight;
-
     /// Total of processed rewards
     uint256 public totalProcessedRewards;
 
     /// Track the last block number of rewards update
     uint256 public lastRewardsUpdate;
 
-    /// Track total rewards
-    uint256 public totalRewards;
+    /// Total rewards at the last update, use `updatedTotalRewards` for get the last value
+    uint256 internal _totalRewards;
+
+    /// Rewards in tokens per weight at the last update, use `updatedRewardsPerWeight` for get the last value
+    uint256 internal _rewardsPerWeight;
 
     /**
      * ========================
@@ -138,8 +147,8 @@ contract MechaniumStakingPool is
      * @param initBlock_ The init block ( if set to 0 will take the current block )
      * @param minStakingTime_ The minimum allowed locking time
      * @param maxStakingTime_ The maximum allowed locking time
-     * @param minWeightMultiplier_ The minimum weight multipler ( Used to calculate weight range )
-     * @param maxWeightMultiplier_ The maximum weight multipler ( Used to calculate weight range )
+     * @param minWeightMultiplier_ The minimum weight multiplier ( Used to calculate weight range )
+     * @param maxWeightMultiplier_ The maximum weight multiplier ( Used to calculate weight range )
      * @param rewardsLockingPeriod_  The rewards locking period ( Can be 0 if flash pool )
      * @param rewardsPerBlock_ The amount of tokens to be rewarded per block passed
      */
@@ -198,7 +207,7 @@ contract MechaniumStakingPool is
 
     /**
      * @notice Used to stake an `amount` of tokens for a `lockPeriod` for the `msg.sender`
-     * @dev Uses the `stakeFor` function
+     * @dev Uses the `depositFor` function
      * @param amount The amount of tokens to stake
      * @param lockPeriod The locking period ( in seconds )
      */
@@ -209,7 +218,7 @@ contract MechaniumStakingPool is
     {
         address account = msg.sender;
 
-        stakeFor(account, amount, lockPeriod);
+        depositFor(account, amount, lockPeriod);
 
         return true;
     }
@@ -221,7 +230,7 @@ contract MechaniumStakingPool is
      * @param amount The amount of tokens to stake
      * @param lockPeriod The locking period ( in seconds )
      */
-    function stakeFor(
+    function depositFor(
         address account,
         uint256 amount,
         uint64 lockPeriod
@@ -238,7 +247,7 @@ contract MechaniumStakingPool is
         );
 
         // Update rewards
-        if (canUpdateRewardsPerWeight()) {
+        if (canUpdateRewards()) {
             updateRewards();
         }
 
@@ -258,72 +267,16 @@ contract MechaniumStakingPool is
             amount: amount,
             weight: weight,
             lockedFrom: lockStart,
-            lockedUntil: lockEnd
+            lockedUntil: lockEnd,
+            isRewards: false,
+            isClaimed: false
         });
+
+        // Update user and total records
         user.deposits.push(deposit);
-
-        user.totalStaked = user.totalStaked.add(amount);
-        user.totalWeight = user.totalWeight.add(weight);
-
-        // Reset the missingRewards of the user
-        user.missingRewards = weightToReward(
-            user.totalWeight,
-            rewardsPerWeight
-        );
-
-        totalUsersWeight = totalUsersWeight.add(weight);
-        totalTokensStaked = totalTokensStaked.add(amount);
+        _increaseUserRecords(user, amount, weight, true);
 
         emit Stake(account, amount, lockPeriod);
-
-        return true;
-    }
-
-    /**
-     * @notice Used to update a `depositId`'s `lockPeriod`
-     * @dev Will recalculate substitue the old weight and calculate the new one
-     * @param depositId The deposit id that will have it's locking period updated
-     * @param lockPeriod The new locking period ( in seconds )
-     */
-    function updateStakeLock(uint256 depositId, uint64 lockPeriod)
-        public
-        override
-        returns (bool)
-    {
-        require(
-            lockPeriod >= minStakingTime,
-            "Staking time less than minimum required"
-        );
-        require(
-            lockPeriod <= maxStakingTime,
-            "Staking time greater than maximum required"
-        );
-
-        processRewards();
-
-        User storage user = users[msg.sender];
-
-        require(depositId < user.deposits.length, "Deposit does not exist");
-
-        Deposit storage deposit = user.deposits[depositId];
-
-        uint256 oldLockPeriod = deposit.lockedUntil - deposit.lockedFrom;
-
-        require(
-            lockPeriod > oldLockPeriod,
-            "Lock period must be greater than old one"
-        );
-
-        deposit.lockedFrom = uint64(block.timestamp);
-        deposit.lockedUntil = deposit.lockedFrom + lockPeriod;
-
-        uint256 oldWeight = deposit.weight;
-        uint256 newWeight = calculateUserWeight(deposit.amount, lockPeriod);
-
-        user.totalWeight = user.totalWeight.sub(oldWeight).add(newWeight);
-        totalUsersWeight = totalUsersWeight.sub(oldWeight).add(newWeight);
-
-        emit StakeLockUpdated(msg.sender, depositId, lockPeriod);
 
         return true;
     }
@@ -335,7 +288,6 @@ contract MechaniumStakingPool is
      * @dev When there are no rewards to calculate, throw error
      * @dev If `rewardsLockingPeriod` is set, rewards are staked in a new deposit,
      *      otherwise they are transmitted directly to the user (as for flash pools)
-     * @dev Executed internally TODO WHERE ?
      *
      * @return userPendingRewards rewards calculated and optionally re-staked
      */
@@ -349,113 +301,103 @@ contract MechaniumStakingPool is
     }
 
     /**
-     * @notice Used to calculate and pay pending rewards to the `_staker`
+     * @notice Used to unstake several deposits for the `msg.sender`
      *
-     * @dev When there are no rewards to calculate, function doesn't throw and exits silently
-     * @dev If `rewardsLockingPeriod` is set, rewards are staked in a new deposit,
-     *      otherwise they are transmitted directly to the user (as for flash pools)
-     * @dev If `_withUpdate` is false, rewards MUST be updated before and user's missing rewards
-     *      MUST be reset after
-     * @dev Executed internally TODO WHEN ?
+     * @dev ProcessRewards and transfer all deposits to the user
+     * @dev Revert if the `lockedUntil` of a deposit has not passed
      *
-     * @param _staker Staker address
-     * @param _withUpdate If we need to update rewards and user's missing rewards in this function
-     *
-     * @return userPendingRewards rewards calculated and optionally re-staked
+     * @param depositIds Array of deposit id that will be unstaked
      */
-
-    function _processRewards(address _staker, bool _withUpdate)
-        private
-        returns (uint256 userPendingRewards)
+    function unstake(uint256[] memory depositIds)
+        public
+        override
+        returns (bool)
     {
-        if (_withUpdate && canUpdateRewardsPerWeight()) {
-            // Update rewards before use them if it hasn't been done before
+        // Update rewards
+        if (canUpdateRewards()) {
             updateRewards();
         }
 
-        userPendingRewards = pendingRewards(_staker);
-        if (userPendingRewards == 0) {
-            return 0;
-        }
+        // Process rewards with no update to not do it twice
+        _processRewards(msg.sender, false);
 
-        User storage user = users[_staker];
+        User storage user = users[msg.sender];
 
-        // If no locking/staking for rewards
-        if (rewardsLockingPeriod == 0) {
-            // transfer tokens for user
-            rewardToken.safeTransfer(_staker, userPendingRewards);
-        } else {
-            // Stake rewards
-            uint256 weight = calculateUserWeight(
-                userPendingRewards,
-                rewardsLockingPeriod
+        uint256 totalAmount = 0;
+        uint256 totalWeight = 0;
+        for (uint256 i = 0; i < depositIds.length; i++) {
+            (uint256 amount, uint256 weight) = _drainDeposit(
+                user,
+                depositIds[i]
             );
-
-            uint64 lockStart = uint64(block.timestamp);
-            uint64 lockEnd = lockStart + rewardsLockingPeriod;
-
-            Deposit memory deposit = Deposit({
-                amount: userPendingRewards,
-                weight: weight,
-                lockedFrom: lockStart,
-                lockedUntil: lockEnd
-            });
-            user.deposits.push(deposit);
-
-            // update user profil
-            user.totalStaked = user.totalStaked.add(userPendingRewards);
-            user.totalWeight = user.totalWeight.add(weight);
-
-            // update total record
-            totalUsersWeight = totalUsersWeight.add(weight);
-            totalTokensStaked = totalTokensStaked.add(userPendingRewards);
+            totalAmount = totalAmount.add(amount);
+            totalWeight = totalWeight.add(weight);
         }
 
-        user.releasedRewards = user.releasedRewards.add(userPendingRewards);
-        totalProcessedRewards = totalProcessedRewards.add(userPendingRewards);
+        // Update user and total records
+        _decreaseUserRecords(user, totalAmount, totalWeight, true);
 
-        if (_withUpdate) {
-            // Reset the missingRewards of the user if it will not be done next
-            user.missingRewards = weightToReward(
-                user.totalWeight,
-                rewardsPerWeight
-            );
-        }
+        // Transfer tokens
+        rewardToken.safeTransfer(msg.sender, totalAmount);
 
-        emit ProcessRewards(_staker, userPendingRewards);
+        emit Unstake(msg.sender, totalAmount, depositIds);
+        return true;
     }
 
     /**
      * @notice Used to unstake a `depositId` for the `msg.sender`
+     *
+     * @dev ProcessRewards and transfer all the deposit to the user
+     * @dev Revert if the `lockedUntil` of the deposit has not passed
+     *
      * @param depositId The deposit id that will be unstaked
      */
     function unstake(uint256 depositId) public override returns (bool) {
-        // TODO Nico
+        // Update rewards
+        if (canUpdateRewards()) {
+            updateRewards();
+        }
 
-        emit Unstake(msg.sender, depositId);
+        // Process rewards with no update to not do it twice
+        _processRewards(msg.sender, false);
+
+        User storage user = users[msg.sender];
+        (uint256 amount, uint256 weight) = _drainDeposit(user, depositId);
+
+        // Update user and total records
+        _decreaseUserRecords(user, amount, weight, true);
+
+        // Transfer tokens
+        stakedToken.safeTransfer(msg.sender, amount);
+
+        emit Unstake(msg.sender, amount, depositId);
         return true;
     }
 
     /**
      * @notice Used to update the rewards per weight and the total rewards
+     * @dev Must be called before each total weight change
      */
     function updateRewards() public override returns (bool) {
-        require(canUpdateRewardsPerWeight(), "initBlock is not reached");
+        require(canUpdateRewards(), "initBlock is not reached");
 
-        totalRewards = updatedTotalRewards();
-
-        rewardsPerWeight = updatedRewardsPerWeight();
+        _rewardsPerWeight = updatedRewardsPerWeight();
+        _totalRewards = updatedTotalRewards();
 
         lastRewardsUpdate = block.number;
 
-        emit RewardsPerWeightUpdated(rewardsPerWeight);
+        emit RewardsPerWeightUpdated(_rewardsPerWeight);
 
         return true;
     }
 
     /**
      * @notice Used to change the rewardsPerBlock
-     * @dev Will update the rewardsPerWeight before changing the rewardsPerBlock
+     *
+     * @dev Will update rewards before changing the rewardsPerBlock
+     * @dev Can only by call by owner (the factory if deployed by it)
+     * @dev Revert if the new rewards per block is less than the previous one
+     *
      * @param rewardsPerBlock_ the new value for rewardsPerBlock ( must be superior to old value )
      */
     function setRewardsPerBlock(uint256 rewardsPerBlock_)
@@ -466,10 +408,10 @@ contract MechaniumStakingPool is
     {
         require(
             rewardsPerBlock_ > rewardsPerBlock,
-            "Rewards per block new value must be superior to old value"
+            "Rewards per block must be greater than the previous one"
         );
 
-        if (canUpdateRewardsPerWeight()) {
+        if (canUpdateRewards()) {
             updateRewards();
         }
 
@@ -504,6 +446,7 @@ contract MechaniumStakingPool is
     /**
      * @notice Used to get the pending rewards for an `account`
      * @param account The account to calculate the pending rewards for
+     * @return the rewards that the user has but which have not been processed
      */
     function pendingRewards(address account)
         public
@@ -515,20 +458,22 @@ contract MechaniumStakingPool is
             return 0;
         }
 
+        // All rewards according to account weight
         uint256 _pendingRewards = weightToReward(
             users[account].totalWeight,
-            rewardsPerWeight
+            updatedRewardsPerWeight()
         );
 
-        // TODO - Nico, remove missingRewards
+        // Remove rewards released before accounts allocations or that they have already been processed
+        _pendingRewards = _pendingRewards.sub(users[account].missingRewards);
 
         return _pendingRewards;
     }
 
     /**
-     * @notice Can we call the rewards function or is it useless and will cause an error
+     * @notice Can we call the rewards update function or is it useless and will cause an error
      */
-    function canUpdateRewardsPerWeight() public view override returns (bool) {
+    function canUpdateRewards() public view override returns (bool) {
         return block.number >= initBlock;
     }
 
@@ -538,7 +483,7 @@ contract MechaniumStakingPool is
      */
     function balanceOf(address account) public view override returns (uint256) {
         User memory user = users[account];
-        return user.totalStaked.sub(user.releasedRewards);
+        return user.totalStaked.add(pendingRewards(account));
     }
 
     /**
@@ -615,7 +560,7 @@ contract MechaniumStakingPool is
         uint256 balance = rewardToken.balanceOf(address(this));
 
         uint256 oldRemainingTokens = balance.sub(
-            totalTokensStaked.add(totalRewards).sub(totalProcessedRewards)
+            totalTokensStaked.add(_totalRewards).sub(totalProcessedRewards)
         );
 
         return
@@ -629,25 +574,25 @@ contract MechaniumStakingPool is
      * @dev Used to calculate the rewards from the init block without updating them
      */
     function updatedTotalRewards() public view override returns (uint256) {
-        uint256 _updatedTotalRewards = totalRewards.add(updatedRewards());
+        uint256 _updatedTotalRewards = _totalRewards.add(updatedRewards());
 
         return _updatedTotalRewards;
     }
 
     /**
      * @notice Get the updated rewards per weight
-     * @dev Used to calculate the rewardsPerWeight without updating them
+     * @dev Used to calculate `_rewardsPerWeight` without updating them
      */
     function updatedRewardsPerWeight() public view override returns (uint256) {
         uint256 cumulatedRewards = updatedRewards();
 
         cumulatedRewards = cumulatedRewards.mul(WEIGHT_MULTIPLIER);
 
-        uint256 _rewardsPerWeight = cumulatedRewards.div(totalUsersWeight);
+        uint256 newRewardsPerWeight = cumulatedRewards.div(totalUsersWeight);
 
-        _rewardsPerWeight = _rewardsPerWeight.add(rewardsPerWeight);
+        newRewardsPerWeight = newRewardsPerWeight.add(_rewardsPerWeight);
 
-        return _rewardsPerWeight;
+        return newRewardsPerWeight;
     }
 
     /**
@@ -678,17 +623,17 @@ contract MechaniumStakingPool is
     /**
      * @dev Converts stake weight to reward value, applying the division on weight
      *
-     * @param _weight stake weight
-     * @param _rewardsPerWeight reward per weight
+     * @param weight_ stake weight
+     * @param rewardsPerWeight_ reward per weight
      * @return reward value normalized with WEIGHT_MULTIPLIER
      */
-    function weightToReward(uint256 _weight, uint256 _rewardsPerWeight)
+    function weightToReward(uint256 weight_, uint256 rewardsPerWeight_)
         public
         pure
         override
         returns (uint256)
     {
-        return _weight.mul(_rewardsPerWeight).div(WEIGHT_MULTIPLIER);
+        return weight_.mul(rewardsPerWeight_).div(WEIGHT_MULTIPLIER);
     }
 
     /**
@@ -696,6 +641,183 @@ contract MechaniumStakingPool is
      *     Private functions
      * ========================
      */
+
+    /**
+     * @notice Update the user and total records by increasing the weight and the total staked
+     *
+     * @dev Increase user's `totalStaked`, `totalWeight` and reset `missingRewards`
+     * @dev Increase `totalUsersWeight` and `totalTokensStaked`
+     * @dev Rewards MUST be updated before and processed for this users
+     *
+     * @param user The user to update
+     * @param amount The amount to increase
+     * @param weight The weight to increase
+     */
+    function _increaseUserRecords(
+        User storage user,
+        uint256 amount,
+        uint256 weight,
+        bool updateMissingRewards
+    ) private returns (bool) {
+        // Update user records
+        user.totalStaked = user.totalStaked.add(amount);
+        user.totalWeight = user.totalWeight.add(weight);
+
+        if (updateMissingRewards) {
+            // Reset the missingRewards of the user
+            user.missingRewards = weightToReward(
+                user.totalWeight,
+                _rewardsPerWeight
+            );
+        }
+
+        // Update total records
+        totalUsersWeight = totalUsersWeight.add(weight);
+        totalTokensStaked = totalTokensStaked.add(amount);
+        return true;
+    }
+
+    /**
+     * @notice Update the user and total records by decreasing the weight and the total staked
+     *
+     * @dev Decrease user's `totalStaked`, `totalWeight` and reset `missingRewards`
+     * @dev Decrease `totalUsersWeight` and `totalTokensStaked`
+     * @dev Rewards MUST be updated before and processed for this users
+     * @dev If `updateMissingRewards` is false, `missingRewards` rewards MUST be updated after
+     *
+     * @param user The user to update
+     * @param amount The amount to decrease
+     * @param weight The weight to decrease
+     * @param updateMissingRewards If we have to update the missing rewards of the user
+     */
+    function _decreaseUserRecords(
+        User storage user,
+        uint256 amount,
+        uint256 weight,
+        bool updateMissingRewards
+    ) private returns (bool) {
+        // Update user records
+        user.totalStaked = user.totalStaked.sub(amount);
+        user.totalWeight = user.totalWeight.sub(weight);
+
+        if (updateMissingRewards) {
+            // Reset the missingRewards of the user
+            user.missingRewards = weightToReward(
+                user.totalWeight,
+                _rewardsPerWeight
+            );
+        }
+
+        // Update total records
+        totalUsersWeight = totalUsersWeight.sub(weight);
+        totalTokensStaked = totalTokensStaked.sub(amount);
+        return true;
+    }
+
+    /**
+     * @notice Remove a deposit if the locking is over and return its amount and weight
+     *
+     * @dev Set the deposit's `isClaimed` to true
+     * @dev Revert if `depositId` does not exist or if the `lockedUntil`
+     *      of the deposit has not passed
+     * @dev Does not update records : rewards MUST be updated before and
+     *      user's profile and total record MUST be updated after
+     *
+     * @param user The user who owns the deposit
+     * @param depositId The deposit id that will be drain
+     */
+    function _drainDeposit(User storage user, uint256 depositId)
+        private
+        returns (uint256 amount, uint256 weight)
+    {
+        require(depositId < user.deposits.length, "Deposit does not exist");
+        Deposit storage deposit = user.deposits[depositId];
+        require(!deposit.isClaimed, "Deposit already claimed");
+        require(
+            deposit.lockedUntil <= uint64(block.timestamp),
+            "Staking of this deposit is not yet complete"
+        );
+
+        amount = deposit.amount;
+        weight = deposit.weight;
+
+        // Claim deposit
+        deposit.isClaimed = true;
+    }
+
+    /**
+     * @notice Used to calculate and pay pending rewards to the `_staker`
+     *
+     * @dev When there are no rewards to calculate, function doesn't throw and exits silently
+     * @dev If `rewardsLockingPeriod` is set, rewards are staked in a new deposit,
+     *      otherwise they are transmitted directly to the user (as for flash pools)
+     * @dev If `_withUpdate` is false, rewards MUST be updated before and user's missing rewards
+     *      MUST be reset after
+     * @dev Executed internally in `unstake`, `depositFor`, `updateStakeLock` and `processRewards` functions
+     *
+     * @param _staker Staker address
+     * @param _withUpdate If we need to update rewards and user's missing rewards in this function
+     *
+     * @return userPendingRewards rewards calculated and optionally re-staked
+     */
+
+    function _processRewards(address _staker, bool _withUpdate)
+        private
+        returns (uint256 userPendingRewards)
+    {
+        if (_withUpdate && canUpdateRewards()) {
+            // Update rewards before use them if it hasn't been done before
+            updateRewards();
+        }
+
+        userPendingRewards = pendingRewards(_staker);
+        if (userPendingRewards == 0) {
+            return 0;
+        }
+
+        User storage user = users[_staker];
+
+        // If no locking/staking for rewards
+        if (rewardsLockingPeriod == 0) {
+            // transfer tokens for user
+            rewardToken.safeTransfer(_staker, userPendingRewards);
+        } else {
+            // Stake rewards
+            uint256 weight = calculateUserWeight(
+                userPendingRewards,
+                rewardsLockingPeriod
+            );
+
+            uint64 lockStart = uint64(block.timestamp);
+            uint64 lockEnd = lockStart + rewardsLockingPeriod;
+
+            Deposit memory deposit = Deposit({
+                amount: userPendingRewards,
+                weight: weight,
+                lockedFrom: lockStart,
+                lockedUntil: lockEnd,
+                isRewards: true,
+                isClaimed: false
+            });
+
+            // Update user and total records
+            user.deposits.push(deposit);
+            _increaseUserRecords(user, userPendingRewards, weight, false);
+        }
+
+        user.releasedRewards = user.releasedRewards.add(userPendingRewards);
+        totalProcessedRewards = totalProcessedRewards.add(userPendingRewards);
+
+        if (_withUpdate) {
+            // Reset the missingRewards of the user if it will not be done next
+            user.missingRewards = weightToReward(
+                user.totalWeight,
+                _rewardsPerWeight
+            );
+        }
+
+        emit ProcessRewards(_staker, userPendingRewards);
+    }
 
     /**
      * @notice Used to get the range for the staking time
