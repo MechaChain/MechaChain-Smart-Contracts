@@ -7,7 +7,7 @@ import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "./IMechaniumStakingPoolFactory.sol";
 import "./IMechaniumStakingPool.sol";
 import "./MechaniumStakingPool.sol";
-import "../MechaniumUtils/MechaniumCanReleaseUnintentedOwnable.sol";
+import "../MechaniumUtils/MechaniumCanReleaseUnintendedOwnable.sol";
 
 /**
  * @title MechaniumStakingPoolFactory - Staking pool factory smart contract
@@ -18,7 +18,7 @@ import "../MechaniumUtils/MechaniumCanReleaseUnintentedOwnable.sol";
 contract MechaniumStakingPoolFactory is
     IMechaniumStakingPoolFactory,
     Ownable,
-    MechaniumCanReleaseUnintentedOwnable
+    MechaniumCanReleaseUnintendedOwnable
 {
     using SafeERC20 for IERC20;
 

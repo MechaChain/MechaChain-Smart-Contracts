@@ -3,22 +3,22 @@ pragma solidity ^0.8.2;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-import "./IMechaniumCanReleaseUnintentedOwnable.sol";
+import "./IMechaniumCanReleaseUnintendedOwnable.sol";
 
 /**
- * @title MechaniumCanReleaseUnintentedOwnable - Abstract class for util can release unintented tokens smart contract
+ * @title MechaniumCanReleaseUnintendedOwnable - Abstract class for util can release unintended tokens smart contract
  * @author EthernalHorizons - <https://ethernalhorizons.com/>
  * @custom:project-website  https://mechachain.io/
  * @custom:security-contact contracts@ethernalhorizons.com
  */
-abstract contract MechaniumCanReleaseUnintentedOwnable is
+abstract contract MechaniumCanReleaseUnintendedOwnable is
     Ownable,
-    IMechaniumCanReleaseUnintentedOwnable
+    IMechaniumCanReleaseUnintendedOwnable
 {
     using SafeERC20 for IERC20;
 
     /**
-     * @notice Event emitted when release unintented `amount` of `token` for `account` address
+     * @notice Event emitted when release unintended `amount` of `token` for `account` address
      */
     event ReleaseUintentedTokens(
         address indexed token,
@@ -44,12 +44,12 @@ abstract contract MechaniumCanReleaseUnintentedOwnable is
 
     /**
      * @notice Release an `amount` of `token` to an `account`
-     * This function is used to prevent unintented tokens that got sent to be stuck on the contract
+     * This function is used to prevent unintended tokens that got sent to be stuck on the contract
      * @param token The address of the token contract (zero address for claiming native coins).
      * @param account The address of the tokens/coins receiver.
      * @param amount Amount to claim.
      */
-    function releaseUnintented(
+    function releaseUnintended(
         address token,
         address account,
         uint256 amount
