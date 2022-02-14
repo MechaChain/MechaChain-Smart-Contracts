@@ -7,6 +7,7 @@ import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "./IMechaniumStakingPoolFactory.sol";
 import "./IMechaniumStakingPool.sol";
 import "./MechaniumStakingPool.sol";
+import "../MechaniumUtils/MechaniumCanReleaseUnintentedOwnable.sol";
 
 /**
  * @title MechaniumStakingPoolFactory - Staking pool factory smart contract
@@ -14,7 +15,11 @@ import "./MechaniumStakingPool.sol";
  * @custom:project-website  https://mechachain.io/
  * @custom:security-contact contracts@ethernalhorizons.com
  */
-contract MechaniumStakingPoolFactory is IMechaniumStakingPoolFactory, Ownable {
+contract MechaniumStakingPoolFactory is
+    IMechaniumStakingPoolFactory,
+    Ownable,
+    MechaniumCanReleaseUnintentedOwnable
+{
     using SafeERC20 for IERC20;
 
     /**
@@ -99,6 +104,8 @@ contract MechaniumStakingPoolFactory is IMechaniumStakingPoolFactory, Ownable {
     constructor(IERC20 token_) {
         require(address(token_) != address(0));
         _token = token_;
+
+        _addLockedToken(address(token_));
     }
 
     /**

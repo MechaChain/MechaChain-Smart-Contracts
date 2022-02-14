@@ -6,6 +6,7 @@ import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
 import "./IMechaniumStakingPool.sol";
+import "../MechaniumUtils/MechaniumCanReleaseUnintentedOwnable.sol";
 
 /**
  * @title MechaniumStakingPool - Staking pool smart contract
@@ -13,7 +14,11 @@ import "./IMechaniumStakingPool.sol";
  * @custom:project-website  https://mechachain.io/
  * @custom:security-contact contracts@ethernalhorizons.com
  */
-contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
+contract MechaniumStakingPool is
+    IMechaniumStakingPool,
+    Ownable,
+    MechaniumCanReleaseUnintentedOwnable
+{
     using SafeERC20 for IERC20;
     using SafeMath for uint256;
 
@@ -186,6 +191,9 @@ contract MechaniumStakingPool is IMechaniumStakingPool, Ownable {
         minWeightMultiplier = minWeightMultiplier_;
         maxWeightMultiplier = maxWeightMultiplier_;
         rewardsPerBlock = rewardsPerBlock_;
+
+        _addLockedToken(address(stakedToken));
+        _addLockedToken(address(rewardToken));
     }
 
     /**
