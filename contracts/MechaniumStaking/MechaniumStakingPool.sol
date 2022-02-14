@@ -254,7 +254,7 @@ contract MechaniumStakingPool is
         // Process rewards with no update to not do it twice
         _processRewards(account, false);
 
-        stakedToken.safeTransferFrom(account, address(this), amount);
+        stakedToken.safeTransferFrom(msg.sender, address(this), amount);
 
         User storage user = users[account];
 

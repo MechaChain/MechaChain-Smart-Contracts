@@ -1,4 +1,5 @@
 const Mechanium = artifacts.require("Mechanium");
+const MechaniumBis = artifacts.require("MechaniumBis");
 const MechaniumStakingPoolFactory = artifacts.require("MechaniumStakingPoolFactory");
 
 // Load utils
@@ -10,6 +11,7 @@ module.exports = async function (deployer, network, accounts) {
   // For local development
   if (network === "development") {
     const mechaniumInstance = await Mechanium.deployed();
+    const mechaniumBisInstance = await MechaniumBis.deployed();
 
     await deployer.deploy(MechaniumStakingPoolFactory, mechaniumInstance.address);
 
@@ -18,6 +20,11 @@ module.exports = async function (deployer, network, accounts) {
     await mechaniumInstance.transfer(
       mechaniumStakingPoolFactoryInstance.address,
       getAmount(2000000)
+    );
+
+    await mechaniumBisInstance.transfer(
+      mechaniumStakingPoolFactoryInstance.address,
+      getAmount(1000000)
     );
 
     return;

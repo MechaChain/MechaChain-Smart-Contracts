@@ -4,7 +4,7 @@ const { time, expectRevert } = require('@openzeppelin/test-helpers');
 // Load artifacts
 const Mechanium = artifacts.require('Mechanium');
 const MechaniumPresaleDistribution = artifacts.require('MechaniumPresaleDistribution');
-const StakingPool = artifacts.require('StakingPool');
+const MechaniumStakingPool = artifacts.require('MechaniumStakingPool');
 
 // Load utils
 const { getAmount, getBN } = require('../utils');
@@ -17,7 +17,7 @@ contract('MechaniumPresaleDistribution', (accounts) => {
     instance = await MechaniumPresaleDistribution.deployed();
     assert(instance.address !== '');
     token = await Mechanium.deployed();
-    stakingPool = await StakingPool.deployed();
+    stakingPool = await MechaniumStakingPool.deployed();
     DEFAULT_ADMIN_ROLE = await instance.DEFAULT_ADMIN_ROLE();
   });
 
@@ -265,7 +265,7 @@ contract('MechaniumPresaleDistribution', (accounts) => {
 
     await expectRevert(
       instance.transferToStakingPool(amount, duration, { from: _user }),
-      'Staking time must be lower to maximum staking time',
+      'Staking time greater than maximum required',
     );
   });
 
@@ -305,14 +305,18 @@ contract('MechaniumPresaleDistribution', (accounts) => {
 
     const userBalance = await instance.balanceOf(_user);
 
+    const oldContractTokens = await token.balanceOf(stakingPool.address);
+
     await instance.transferToStakingPool(amount, duration, { from: _user });
 
     const stakedBalance = await stakingPool.balanceOf(_user);
 
     const contractTokens = await token.balanceOf(stakingPool.address);
 
-    assert.equal(contractTokens.cmp(stakedBalance), 0, 'Staking Contract balance not valid');
-    assert.equal(userBalance.cmp(stakedBalance), 0, 'User staking balance not valid');
+    const contractBalanceDiff = contractTokens.sub(oldContractTokens);
+
+    assert.equal(contractBalanceDiff.toString(), stakedBalance.toString(), 'Staking Contract balance not valid');
+    assert.equal(userBalance.toString(), stakedBalance.toString(), 'User staking balance not valid');
   });
 
   it('User should not set pte pool address', async () => {

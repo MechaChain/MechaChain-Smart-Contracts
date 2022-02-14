@@ -3,16 +3,18 @@ const { time, expectRevert } = require("@openzeppelin/test-helpers");
 
 // Load artifacts
 const Mechanium = artifacts.require("Mechanium");
+const MechaniumBis = artifacts.require("MechaniumBis");
 const MechaniumStakingPoolFactory = artifacts.require(
   "MechaniumStakingPoolFactory"
 );
+const MechaniumStakingPool = artifacts.require("MechaniumStakingPool");
 
 // Load utils
 const { getAmount, getBN } = require("../utils");
 
 contract("MechaniumStakingPoolFactory", (accounts) => {
-  const [owner, fakePool] = accounts;
-  let instance, token, mainPoolAddr;
+  const [owner, fakePool, user] = accounts;
+  let instance, token, tokenBis, mainPoolAddr;
 
   const mainStakingPoolData = {
     allocatedTokens: getAmount(10000),
@@ -29,6 +31,7 @@ contract("MechaniumStakingPoolFactory", (accounts) => {
     instance = await MechaniumStakingPoolFactory.deployed();
     assert(instance.address !== "");
     token = await Mechanium.deployed();
+    tokenBis = await MechaniumBis.deployed();
   });
 
   it("Owner should be able to create staking pool instance", async () => {
@@ -188,5 +191,124 @@ contract("MechaniumStakingPoolFactory", (accounts) => {
         assert(initialValue.toString() === poolValue, `Wrong ${key} value`);
       }
     });
+  });
+
+  it("Owner should not be able to release unintented $MECHA", async () => {
+    const amount = getAmount(100);
+
+    await expectRevert(
+      instance.releaseUnintended(token.address, user, amount),
+      "Token can't be released -- Reason given: Token can't be released."
+    );
+  });
+
+  it("Owner should not be able to release unintented $MECHA in pool (from factory)", async () => {
+    const amount = getAmount(100);
+
+    await expectRevert(
+      instance.releaseUnintendedFromPool(
+        mainPoolAddr,
+        token.address,
+        user,
+        amount
+      ),
+      "Token can't be released -- Reason given: Token can't be released."
+    );
+  });
+
+  it("Owner should be able to release unintented $MECHABIS", async () => {
+    const amount = getAmount(100);
+
+    await instance.releaseUnintended(tokenBis.address, user, amount);
+
+    const userBalance = await tokenBis.balanceOf(user);
+
+    assert.equal(userBalance.cmp(amount), 0, "Wrong balance");
+  });
+
+  it("Owner should be able to release unintented $MECHABIS in pool (from factory)", async () => {
+    const amount = getAmount(100);
+
+    const oldUserBalance = await tokenBis.balanceOf(user);
+
+    await tokenBis.transfer(mainPoolAddr, getAmount(1000));
+
+    await instance.releaseUnintended(tokenBis.address, user, amount);
+
+    const newUserBalance = await tokenBis.balanceOf(user);
+
+    const userBalanceDiff = newUserBalance.sub(oldUserBalance);
+
+    assert.equal(userBalanceDiff.toString(), amount.toString(), "Wrong balance");
+  });
+
+  it("Owner should not be able to release unintented ETH (Reason: insufficient balance)", async () => {
+    const amount = getAmount(100);
+
+    await expectRevert(
+      instance.releaseUnintended(
+        "0x0000000000000000000000000000000000000000",
+        owner,
+        amount
+      ),
+      "Address: insufficient balance"
+    );
+  });
+
+  it("Owner should not be able to release unintented ETH (Reason: insufficient balance) in pool (from factory)", async () => {
+    const amount = getAmount(100);
+
+    await expectRevert(
+      instance.releaseUnintendedFromPool(
+        mainPoolAddr,
+        "0x0000000000000000000000000000000000000000",
+        owner,
+        amount
+      ),
+      "Address: insufficient balance"
+    );
+  });
+
+  it("Owner should be able to release unintented ETH", async () => {
+    const amount = getAmount(10);
+
+    await instance.send(amount, { from: owner });
+
+    const oldBalance = await web3.eth.getBalance(instance.address);
+
+    assert.equal(oldBalance, 10000000000000000000, "Error sending ETH");
+
+    await instance.releaseUnintended(
+      "0x0000000000000000000000000000000000000000",
+      owner,
+      amount
+    );
+
+    const newBalance = await web3.eth.getBalance(instance.address);
+
+    assert.equal(newBalance, 0, "Error releasing unintented ETH");
+  });
+
+  it("Owner should be able to release unintented ETH in pool ( from factory )", async () => {
+    const amount = getAmount(10);
+    
+    const mainPool = await MechaniumStakingPool.at(mainPoolAddr);
+    
+    await mainPool.send(amount, { from: owner });
+
+    const oldBalance = await web3.eth.getBalance(mainPoolAddr);
+
+    assert.equal(oldBalance, 10000000000000000000, "Error sending ETH");
+
+    await instance.releaseUnintendedFromPool(
+      mainPoolAddr,
+      "0x0000000000000000000000000000000000000000",
+      owner,
+      amount
+    );
+
+    const newBalance = await web3.eth.getBalance(instance.address);
+
+    assert.equal(newBalance, 0, "Error releasing unintented ETH");
   });
 });

@@ -308,7 +308,7 @@ contract MechaniumStakingPoolFactory is
         address token_,
         address account,
         uint256 amount
-    ) public onlyOwner returns (bool) {
+    ) public override onlyOwner returns (bool) {
         MechaniumStakingPool stakingPool = MechaniumStakingPool(pool);
 
         stakingPool.releaseUnintended(token_, account, amount);
@@ -372,8 +372,10 @@ contract MechaniumStakingPoolFactory is
 
         MechaniumStakingPool pool = MechaniumStakingPool(poolAddr);
 
+        uint256 poolBalance = _token.balanceOf(poolAddr);
+
         PoolData memory poolData = PoolData(
-            pool.totalTokensStaked(),
+            poolBalance - pool.totalTokensStaked(),
             pool.initBlock(),
             pool.minStakingTime(),
             pool.maxStakingTime(),

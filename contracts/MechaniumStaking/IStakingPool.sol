@@ -11,11 +11,9 @@ interface IStakingPool {
     /**
      * @dev Stake tokens
      */
-    function depositFor(address account, uint256 amount, uint256 stakingTime)
-        external
-        returns (bool);
-
-    function getAllocatedTokens() external view returns (uint256);
-
-    function setRewardsPerBlock(uint256 rewardsPerBlock) external returns (bool);
+    function depositFor(
+        address account,
+        uint256 amount,
+        uint256 lockPeriod
+    ) external returns (bool);
 }

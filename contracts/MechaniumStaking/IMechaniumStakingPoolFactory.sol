@@ -73,6 +73,13 @@ interface IMechaniumStakingPoolFactory {
         external
         returns (bool);
 
+    function releaseUnintendedFromPool(
+        address payable pool,
+        address token_,
+        address account,
+        uint256 amount
+    ) external returns (bool);
+
     function getPoolData(address payable poolAddr)
         external
         view

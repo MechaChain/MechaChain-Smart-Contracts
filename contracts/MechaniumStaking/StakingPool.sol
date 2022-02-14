@@ -99,11 +99,14 @@ contract StakingPool is IStakingPool {
         return _allocatedTokens[account];
     }
 
-    function getAllocatedTokens() public override view returns (uint256) {
+    function getAllocatedTokens() public view returns (uint256) {
         return _token.balanceOf(address(this));
     }
 
-    function setRewardsPerBlock(uint256 rewardsPerBlock_) public override returns (bool) {
+    function setRewardsPerBlock(uint256 rewardsPerBlock_)
+        public
+        returns (bool)
+    {
         rewardsPerBlock = rewardsPerBlock_;
         return true;
     }

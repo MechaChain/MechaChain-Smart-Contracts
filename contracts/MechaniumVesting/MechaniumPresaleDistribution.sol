@@ -4,7 +4,7 @@ pragma solidity ^0.8.2;
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "./MechaniumVesting.sol";
-import "../MechaniumStaking/IStakingPool.sol";
+import "../MechaniumStaking/IMechaniumStakingPool.sol";
 
 /**
  * @title MechaniumPresaleDistribution - Pre-sale distribution smart contract
@@ -67,7 +67,7 @@ contract MechaniumPresaleDistribution is MechaniumVesting {
 
     /// Staking pool address & interface
     address internal _stakingPoolAddress;
-    IStakingPool internal _stakingPool;
+    IMechaniumStakingPool internal _stakingPool;
 
     /// Time to transfer tokens to staking pool
     uint256 private _stakingTransferTimeLimit;
@@ -244,7 +244,7 @@ contract MechaniumPresaleDistribution is MechaniumVesting {
         returns (bool)
     {
         _stakingPoolAddress = stakingPoolAddress;
-        _stakingPool = IStakingPool(stakingPoolAddress);
+        _stakingPool = IMechaniumStakingPool(stakingPoolAddress);
         return true;
     }
 
@@ -277,7 +277,7 @@ contract MechaniumPresaleDistribution is MechaniumVesting {
     /**
      * @notice Transfer tokens balance ( allocated but not claimed ) to the staking pool
      */
-    function transferToStakingPool(uint256 amount, uint256 stakingTime)
+    function transferToStakingPool(uint256 amount, uint64 stakingTime)
         public
         returns (bool)
     {
