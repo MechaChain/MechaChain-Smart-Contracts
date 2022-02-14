@@ -201,8 +201,8 @@ contract MechaniumStakingPool is
         maxWeightMultiplier = maxWeightMultiplier_;
         rewardsPerBlock = rewardsPerBlock_;
 
-        _addLockedToken(address(stakedToken));
-        _addLockedToken(address(rewardToken));
+        _addLockedToken(address(stakedToken_));
+        _addLockedToken(address(rewardToken_));
     }
 
     /**

@@ -261,7 +261,7 @@ contract MechaniumStakingPoolFactory is
      * @param rewardsPerBlock The new rewards per block
      */
     function addAllocatedTokens(
-        address poolAddr,
+        address payable poolAddr,
         uint256 amount,
         uint256 rewardsPerBlock
     ) public override onlyOwner returns (bool) {
@@ -292,6 +292,26 @@ contract MechaniumStakingPoolFactory is
         _transferTokens(account, amount);
 
         emit WithdrawUnallocated(account, amount);
+
+        return true;
+    }
+
+    /**
+     * @notice Release unintended tokens
+     * @param pool The staking pool to release from
+     * @param token_ The token to release
+     * @param account The account to send the tokens to
+     * @param amount The amount of tokens to release
+     */
+    function releaseUnintendedFromPool(
+        address payable pool,
+        address token_,
+        address account,
+        uint256 amount
+    ) public onlyOwner returns (bool) {
+        MechaniumStakingPool stakingPool = MechaniumStakingPool(pool);
+
+        stakingPool.releaseUnintended(token_, account, amount);
 
         return true;
     }
@@ -342,7 +362,7 @@ contract MechaniumStakingPoolFactory is
      * @notice Get staking pool data
      * @param poolAddr The pool address
      */
-    function getPoolData(address poolAddr)
+    function getPoolData(address payable poolAddr)
         public
         view
         override

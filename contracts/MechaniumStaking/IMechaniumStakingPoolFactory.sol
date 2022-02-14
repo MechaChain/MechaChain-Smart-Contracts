@@ -61,7 +61,7 @@ interface IMechaniumStakingPoolFactory {
      * @notice Function used to add more tokens to a staking pool
      */
     function addAllocatedTokens(
-        address pool,
+        address payable pool,
         uint256 amount,
         uint256 rewardPerBlock
     ) external returns (bool);
@@ -73,7 +73,7 @@ interface IMechaniumStakingPoolFactory {
         external
         returns (bool);
 
-    function getPoolData(address poolAddr)
+    function getPoolData(address payable poolAddr)
         external
         view
         returns (PoolData memory);
