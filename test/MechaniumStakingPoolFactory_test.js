@@ -10,7 +10,7 @@ const MechaniumStakingPoolFactory = artifacts.require(
 const MechaniumStakingPool = artifacts.require("MechaniumStakingPool");
 
 // Load utils
-const { getAmount, getBN } = require("../utils");
+const { getAmount } = require("../utils");
 
 contract("MechaniumStakingPoolFactory", (accounts) => {
   const [owner, fakePool, user] = accounts;
@@ -193,7 +193,7 @@ contract("MechaniumStakingPoolFactory", (accounts) => {
     });
   });
 
-  it("Owner should not be able to release unintented $MECHA", async () => {
+  it("Owner should not be able to release unintended $MECHA", async () => {
     const amount = getAmount(100);
 
     await expectRevert(
@@ -202,7 +202,7 @@ contract("MechaniumStakingPoolFactory", (accounts) => {
     );
   });
 
-  it("Owner should not be able to release unintented $MECHA in pool (from factory)", async () => {
+  it("Owner should not be able to release unintended $MECHA in pool (from factory)", async () => {
     const amount = getAmount(100);
 
     await expectRevert(
@@ -216,7 +216,7 @@ contract("MechaniumStakingPoolFactory", (accounts) => {
     );
   });
 
-  it("Owner should be able to release unintented $MECHABIS", async () => {
+  it("Owner should be able to release unintended $MECHABIS", async () => {
     const amount = getAmount(100);
 
     await instance.releaseUnintended(tokenBis.address, user, amount);
@@ -226,7 +226,7 @@ contract("MechaniumStakingPoolFactory", (accounts) => {
     assert.equal(userBalance.cmp(amount), 0, "Wrong balance");
   });
 
-  it("Owner should be able to release unintented $MECHABIS in pool (from factory)", async () => {
+  it("Owner should be able to release unintended $MECHABIS in pool (from factory)", async () => {
     const amount = getAmount(100);
 
     const oldUserBalance = await tokenBis.balanceOf(user);
@@ -242,7 +242,7 @@ contract("MechaniumStakingPoolFactory", (accounts) => {
     assert.equal(userBalanceDiff.toString(), amount.toString(), "Wrong balance");
   });
 
-  it("Owner should not be able to release unintented ETH (Reason: insufficient balance)", async () => {
+  it("Owner should not be able to release unintended ETH (Reason: insufficient balance)", async () => {
     const amount = getAmount(100);
 
     await expectRevert(
@@ -255,7 +255,7 @@ contract("MechaniumStakingPoolFactory", (accounts) => {
     );
   });
 
-  it("Owner should not be able to release unintented ETH (Reason: insufficient balance) in pool (from factory)", async () => {
+  it("Owner should not be able to release unintended ETH (Reason: insufficient balance) in pool (from factory)", async () => {
     const amount = getAmount(100);
 
     await expectRevert(
@@ -269,7 +269,7 @@ contract("MechaniumStakingPoolFactory", (accounts) => {
     );
   });
 
-  it("Owner should be able to release unintented ETH", async () => {
+  it("Owner should be able to release unintended ETH", async () => {
     const amount = getAmount(10);
 
     await instance.send(amount, { from: owner });
@@ -286,10 +286,10 @@ contract("MechaniumStakingPoolFactory", (accounts) => {
 
     const newBalance = await web3.eth.getBalance(instance.address);
 
-    assert.equal(newBalance, 0, "Error releasing unintented ETH");
+    assert.equal(newBalance, 0, "Error releasing unintended ETH");
   });
 
-  it("Owner should be able to release unintented ETH in pool ( from factory )", async () => {
+  it("Owner should be able to release unintended ETH in pool ( from factory )", async () => {
     const amount = getAmount(10);
     
     const mainPool = await MechaniumStakingPool.at(mainPoolAddr);
@@ -309,6 +309,6 @@ contract("MechaniumStakingPoolFactory", (accounts) => {
 
     const newBalance = await web3.eth.getBalance(instance.address);
 
-    assert.equal(newBalance, 0, "Error releasing unintented ETH");
+    assert.equal(newBalance, 0, "Error releasing unintended ETH");
   });
 });

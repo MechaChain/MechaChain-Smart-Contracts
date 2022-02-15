@@ -2,7 +2,7 @@
 pragma solidity ^0.8.2;
 
 /**
- * @dev Mechanim can release unintended ( ownable ) smart contract interface
+ * @dev Mechanium can release unintended ( ownable ) smart contract interface
  * @author EthernalHorizons - <https://ethernalhorizons.com/>
  * @custom:project-website  https://mechachain.io/
  * @custom:security-contact contracts@ethernalhorizons.com
