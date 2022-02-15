@@ -52,9 +52,15 @@ function setDeployedContract(network, name, address) {
   );
 }
 
+const getRange = (x1, y1, x2, y2, a) => y1 + ((a - x1) * (y2 - y1)) / (x2 - x1);
+const getBNRange = (x1, y1, x2, y2, a) =>
+  y1.add(a.sub(x1).mul(y2.sub(y1)).div(x2.sub(x1)));
+
 module.exports = {
   getAmount,
   getBN,
   getDeployedContract,
   setDeployedContract,
+  getRange,
+  getBNRange,
 };
