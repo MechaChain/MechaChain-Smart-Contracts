@@ -660,7 +660,7 @@ contract MechaniumStakingPool is
         uint256 amount,
         uint256 weight,
         bool updateMissingRewards
-    ) private returns (bool) {
+    ) internal returns (bool) {
         // Update user records
         user.totalStaked = user.totalStaked.add(amount);
         user.totalWeight = user.totalWeight.add(weight);
@@ -697,7 +697,7 @@ contract MechaniumStakingPool is
         uint256 amount,
         uint256 weight,
         bool updateMissingRewards
-    ) private returns (bool) {
+    ) internal returns (bool) {
         // Update user records
         user.totalStaked = user.totalStaked.sub(amount);
         user.totalWeight = user.totalWeight.sub(weight);
@@ -729,7 +729,7 @@ contract MechaniumStakingPool is
      * @param depositId The deposit id that will be drain
      */
     function _drainDeposit(User storage user, uint256 depositId)
-        private
+        internal
         returns (uint256 amount, uint256 weight)
     {
         require(depositId < user.deposits.length, "Deposit does not exist");
@@ -764,7 +764,7 @@ contract MechaniumStakingPool is
      */
 
     function _processRewards(address _staker, bool _withUpdate)
-        private
+        internal
         returns (uint256 userPendingRewards)
     {
         if (_withUpdate && canUpdateRewards()) {
@@ -835,7 +835,7 @@ contract MechaniumStakingPool is
         uint256 x2,
         uint256 y2,
         uint256 a
-    ) private pure returns (uint256) {
+    ) internal pure returns (uint256) {
         return y1.add(a.sub(x1).mul(y2.sub(y1)).div(x2.sub(x1)));
     }
 }

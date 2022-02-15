@@ -83,7 +83,7 @@ contract MechaniumStakingPoolFactory is
      */
 
     /// Main staking ERC20 token
-    IERC20 private immutable _token;
+    IERC20 internal immutable _token;
 
     /**
      * ========================
@@ -323,7 +323,7 @@ contract MechaniumStakingPoolFactory is
      */
 
     function _transferTokens(address account, uint256 amount)
-        private
+        internal
         returns (bool)
     {
         require(account != address(0), "Address must not be 0");
