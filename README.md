@@ -1,5 +1,5 @@
 # MechaChain Smart Contracts
-All smart contracts for the play to earn [Mechachain project](https://mechachain.io/en/)
+All smart contracts for the play to earn [MechaChain project](https://mechachain.io/en/)
 
 
 [![Ethereum Version][ethereum-image]][ethereum-url]
@@ -18,9 +18,22 @@ All smart contracts for the play to earn [Mechachain project](https://mechachain
   - [Guidelines](#guidelines)
   - [HOW TO USE AND DEPLOY](#how-to-use-and-deploy)
     - [Use with Remix](#use-with-remix)
+    - [Deploy with Truffle](#deploy-with-truffle)
+    - [Launch unit tests](#launch-unit-tests)
     - [Use on Testnets](#use-on-testnets)
+    - [Generate doc](#generate-doc)
+    - [Verify contract](#verify-contract)
+    - [Generate typescript types definition](#generate-typescript-types-definition)
   - [SMART CONTRACTS](#smart-contracts)
     - [Mechanium.sol](#mechaniumsol)
+    - [MechaniumVesting.sol](#mechaniumvestingsol)
+    - [MechaniumPresaleDistribution.sol](#mechaniumpresaledistributionsol)
+    - [MechaniumTeamDistribution.sol](#mechaniumteamdistributionsol)
+    - [MechaniumFoundersDistribution.sol](#mechaniumfoundersdistributionsol)
+    - [MechaniumAdvisorsDistribution.sol](#mechaniumadvisorsdistributionsol)
+    - [MechaniumDevDistribution.sol](#mechaniumdevdistributionsol)
+    - [MechaniumVestingWallet.sol](#mechaniumvestingwalletsol)
+    - [MechaniumGrowthVestingWallet.sol](#mechaniumgrowthvestingwalletsol)
 
 ## Guidelines
 
@@ -36,26 +49,87 @@ All smart contracts for the play to earn [Mechachain project](https://mechachain
 
 _For more informations : https://remix-ide.readthedocs.io/en/latest/remixd.html_
 
+### Deploy with Truffle
+First, please fill the `.env` file with `INFURA_PROJECT_ID` and, for testnets, `DEV_WALLET_PRIVATE_KEY`.
+```
+truffle migrate --f <contractIndex> --to <contractIndex> --network <networkName>
+```
+- `--f <contractIndex>` is the frist index of the migration file to run
+- `--to <contractIndex>` is the last index of the migration file to run (can be the same as the previous one)
+- `<networkName>` can be `development` _(local network)_, `matic`, `goerli`, `ropsten`, `mumbai` or `rinkeby`.
+
+### Launch unit tests
+
+For testing contract with [Truffle](https://www.trufflesuite.com/docs/truffle/testing/writing-tests-in-javascript): 
+  1. Install dependencies: `npm install -g truffle`
+```
+npm install -g truffle
+npm install -g ganache-cli
+npm install
+```
+  2. Run Ganache Ethereum simulator: `ganache-cli --accounts=20`
+  3. Run test: `truffle test` or `truffle test ./test/<test_file_name>.js`
+
+For testing scaling on contract with [Truffle](https://www.trufflesuite.com/docs/truffle/testing/writing-tests-in-javascript): 
+  1. Run Ganache Ethereum simulator: `ganache-cli --accounts=502 -l 90000000000000`
+  2. Run test: `truffle test ./scalingTest/<test_file_name>.js`
 ### Use on Testnets
 
 Here are the different private keys of developer accounts on testnet
 
 **Admin account**
 
-Administrator of all smart contracts and keeps tokens - use internal tool
+Administrator of all smart contracts and keeps tokens - stored in internal tool
 
 **Faucets for Goerli**
 
 For get more eth on Goerli, use this link : https://app.mycrypto.com/faucet
+
+**Faucets tokens for Mumbai or Goerli**
+
+For get more tokens on Mumbai or Goerli, use this link : https://faucet.polygon.technology/
+
+### Generate doc
+
+To generate the markdown documentation, first install [solidity-docgen](https://github.com/OpenZeppelin/solidity-docgen) for solidity v0.8.2.
+
+```
+npm install -G solc-0.8@npm:solc@^0.8.2
+```
+Then, run : 
+
+```
+npx solidity-docgen --solc-module solc-0.8 -t ./docs-templates
+```
+
+
+### Verify contract
+
+To verify contracts use either [Remix Etherscan Plugin](https://remix-etherscan-plugin.readthedocs.io/en/latest/) for Ethereum mainnet or [Truffle plugin verify](https://github.com/rkalis/truffle-plugin-verify) for other networks.
+
+
+**Verify contract on polygonscan with Truffle**
+
+  1. Configure `.env` with a `POLYGONSCAN_API_KEYS` which can be found here [found here](https://polygonscan.com/apis).
+  2. Check that the compilers config used for the deployment is the same as registered in `truffle-config.js`
+  3. Encode constructors arguments with a [ABI Encoding Service](https://abi.hashex.org/) if necessary
+  4. Run the command
+```
+truffle run verify <contractName>@<contractAddress> --forceConstructorArgs string:<contractEncodedArguments > --network matic
+```
+
+### Generate typescript types definition
+  1. `npm run build`
+  2. `npm run generate-types`
+
 ## SMART CONTRACTS
 
 ### Mechanium.sol
-A simple ERC20 inheritance of lib from [OpenZeppelin](https://docs.openzeppelin.com/contracts/4.x/erc20) 
+>Official \$MECHA ERC20 for MechaChain play to earn project.
+100 000 000 \$MECHA are preminted on deployment to the admin wallet.
+Build with a simple ERC20 inheritance from [OpenZeppelin ERC20 lib](https://docs.openzeppelin.com/contracts/4.x/erc20).
 
-**Features**
-  - 100 000 000 premint tokens
-  - No Burnable 
-  - No mintable  
+[Mechanium.sol documentation](.\docs\Mechanium.md)
 
 **Smart contract address**
 
@@ -64,5 +138,121 @@ Testnets
   - Mumbai : [0x3dc6451e45dde42D3e376863F1ae4b24AFec5256](https://mumbai.polygonscan.com/address/0x3dc6451e45dde42D3e376863F1ae4b24AFec5256)
 
 Mainnets
+  - Polygon : [0xacd4e2d936be9b16c01848a3742a34b3d5a5bdfa](https://polygonscan.com/address/0xacd4e2d936be9b16c01848a3742a34b3d5a5bdfa)
+  - Etherium : [0xc5bcc8ba3f33ab0d64f3473e861bdc0685b19ef5](https://etherscan.io/address/0xc5bcc8ba3f33ab0d64f3473e861bdc0685b19ef5)
+
+### MechaniumVesting.sol
+>Abstract class for vesting and distribution smart contract.
+Set `vestingPerClock` and `vestingClockTime`
+
+[MechaniumVesting.sol documentation](.\docs\MechaniumVesting\MechaniumVesting.md)
+
+### MechaniumPresaleDistribution.sol
+>Pre-sale distribution smart contract.
+Distribute the tokens according to the lock & vesting schedule: 
+>- Schedule start time determined by administrator or maximum 6 months _(180 days)_ after deployment
+>- 20% once the schedule has started
+>- then 20% every month _(30 days)_
+
+_Inherit from [MechaniumVesting.sol](#MechaniumVesting)_
+
+[MechaniumPresaleDistribution.sol documentation](.\docs\MechaniumVesting\MechaniumPresaleDistribution.md)
+
+**Smart contract address**
+
+Testnets
+  - Mumbai : ...
+
+Mainnets
   - Polygon : ...
-  - Etherium : ...
+
+### MechaniumTeamDistribution.sol
+>Vesting and distribution smart contract for the MechaChain team.
+Set `timeBeforeStarting`.
+
+_Inherit from [MechaniumVesting.sol](#MechaniumVesting)_
+
+[MechaniumTeamDistribution.sol documentation](.\docs\MechaniumVesting\MechaniumTeamDistribution.md)
+
+### MechaniumFoundersDistribution.sol
+>Vesting and distribution smart contract for the MechaChain founders.
+Administrators have the right to whitdraw all tokens from the contract if the code fails the audit. If the contract is shifted secure, the whitdraw function is permanently blocked.
+Distribute the tokens according to the lock & vesting schedule: 
+>- 1 year after allocation _(360 days)_
+>- unlock 20%
+>- and repeat every 6 months _(180 days)_
+
+_Inherit from [MechaniumTeamDistribution.sol](#MechaniumTeamDistribution)_
+
+[MechaniumFoundersDistribution.sol documentation](.\docs\MechaniumVesting\MechaniumFoundersDistribution.md)
+
+**Smart contract address**
+
+Testnets
+  - Mumbai : ...
+
+Mainnets
+  - Polygon : [0xc4e4154a56f8f7bf5fb783cde83d2d26f6b3cd87](https://polygonscan.com/address/0xc4e4154a56f8f7bf5fb783cde83d2d26f6b3cd87)
+
+### MechaniumAdvisorsDistribution.sol
+>Vesting and distribution smart contract for the MechaChain advisors.
+Distribute the tokens according to the lock & vesting schedule: 
+>- 6 months _(180 days)_ after allocation
+>- unlock 20%
+>- and repeat every 6 months _(180 days)_
+
+_Inherit from [MechaniumTeamDistribution.sol](#MechaniumTeamDistribution)_
+
+[MechaniumAdvisorsDistribution.sol documentation](.\docs\MechaniumVesting\MechaniumAdvisorsDistribution.md)
+
+**Smart contract address**
+
+Testnets
+  - Mumbai : ...
+
+Mainnets
+  - Polygon : ...
+
+
+### MechaniumDevDistribution.sol
+>Vesting and distribution smart contract for the MechaChain development team.
+Distribute the tokens according to the lock & vesting schedule: 
+>- at the allocation
+>- unlock 20%
+>- and repeat every 3 months _(90 days)_
+
+_Inherit from [MechaniumTeamDistribution.sol](#MechaniumTeamDistribution)_
+
+[MechaniumDevDistribution.sol documentation](.\docs\MechaniumVesting\MechaniumDevDistribution.md)
+
+**Smart contract address**
+
+Testnets
+  - Mumbai : ...
+
+Mainnets
+  - Polygon : ...
+
+
+### MechaniumVestingWallet.sol
+>Hold $MECHA allocated for different operations with a vesting schedule
+Set `initialVesting`, `vestingPerClock` and `vestingClockTime`
+
+[MechaniumVestingWallet.sol documentation](.\docs\MechaniumVestingWallet\MechaniumVestingWallet.md)
+
+### MechaniumGrowthVestingWallet.sol
+>Hold $MECHA allocated to the growth and marketing operations with the vesting schedule:
+>- unlock 40% at deployment
+>- then unlock 20% every 6 months _(180 days)_
+
+_Inherit from [MechaniumVestingWallet.sol](#mechaniumvestingwalletsol)_
+
+[MechaniumGrowthVestingWallet.sol documentation](.\docs\MechaniumVestingWallet\MechaniumGrowthVestingWallet.md)
+
+**Smart contract address**
+
+Testnets
+  - Mumbai : ...
+
+Mainnets
+  - Polygon : ...

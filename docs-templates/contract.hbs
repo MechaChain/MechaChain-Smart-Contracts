@@ -1,0 +1,78 @@
+# `{{name}}`
+{{{natspec.title}}}
+{{{natspec.userdoc}}}
+{{{natspec.devdoc}}}
+
+**Table of Contents**
+{{#if ownFunctions}}
+- FUNCTIONS
+{{#ownFunctions}}
+{{#if (or (eq visibility "public") (eq visibility "external"))}}
+    - [`{{name}}`](#{{anchor}})
+{{/if}}
+{{/ownFunctions}}
+{{/if}}
+{{#if ownEvents}}
+- EVENTS
+{{#ownEvents}}
+    - [`{{name}}`](#{{anchor}})
+{{/ownEvents}}
+{{/if}}
+
+{{#if ownModifiers}}
+## MODIFIERS
+{{#each ownModifiers}}
+### `{{name}}({{args}})`
+
+{{{natspec.userdoc}}}
+{{{natspec.devdoc}}}
+{{#natspec.params}}
+- `{{param}}`: {{description}}
+{{/natspec.params}}
+{{/each}}
+{{/if}}
+
+{{#if ownFunctions}}
+## FUNCTIONS
+{{#each ownFunctions}}
+### `{{name}}({{args}}){{#if outputs}} → {{outputs}}{{/if}}` ({{visibility}})
+{{{natspec.userdoc}}}
+{{{natspec.devdoc}}}
+{{#natspec.params}}
+- `{{param}}`: {{description}}
+{{/natspec.params}}
+{{/each}}
+{{/if}}
+
+{{#if ownEvents}}
+## EVENTS
+{{#each ownEvents}}
+### `{{name}}({{args}})`
+{{{natspec.userdoc}}}
+{{{natspec.devdoc}}}
+{{#natspec.params}}
+- `{{param}}`: {{description}}
+{{/natspec.params}}
+{{/each}}
+{{/if}}
+
+
+{{#if ownStructs}}
+## STRUCTS
+{{#each ownStructs}}
+### `{{name}}`
+{{#each members}}
+- {{type}} {{name}}
+{{/each}}
+{{/each}}
+{{/if}}
+
+{{#if ownEnums}}
+## ENUMS
+{{#each ownEnums}}
+### `{{name}}`
+{{#each members}}
+{{name}}
+{{/each}}
+{{/each}}
+{{/if}}
