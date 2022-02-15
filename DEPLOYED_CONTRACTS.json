@@ -31,6 +31,14 @@
     "Mechanium": {
       "address": "0x3dc6451e45dde42D3e376863F1ae4b24AFec5256",
       "date": "17/11/2021, 13:48:33"
+    },
+    "MechaniumPresaleDistribution": {
+      "address": "0x009Dd2C65c31Bc42451A809c8a085C4627E6ED85",
+      "date": "10/02/2022, 09:06:47"
+    },
+    "MechaniumPresaleRewardsDistribution": {
+      "address": "0x39975719Af6F3DBB30aE8ea478A9a2984B19caD5",
+      "date": "10/02/2022, 09:27:36"
     }
   },
   "ropsten": {
