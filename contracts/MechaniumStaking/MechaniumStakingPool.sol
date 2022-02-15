@@ -218,7 +218,7 @@ contract MechaniumStakingPool is
     {
         address account = msg.sender;
 
-        depositFor(account, amount, lockPeriod);
+        depositFor(account, amount, uint256(lockPeriod));
 
         return true;
     }
@@ -233,7 +233,7 @@ contract MechaniumStakingPool is
     function depositFor(
         address account,
         uint256 amount,
-        uint64 lockPeriod
+        uint256 lockPeriod
     ) public override returns (bool) {
         require(account != address(0), "Address must not be 0");
         require(amount > 0, "Amount must be superior to zero");
@@ -258,10 +258,12 @@ contract MechaniumStakingPool is
 
         User storage user = users[account];
 
-        uint256 weight = calculateUserWeight(amount, lockPeriod);
+        uint64 _lockPeriod = uint64(lockPeriod);
+
+        uint256 weight = calculateUserWeight(amount, _lockPeriod);
 
         uint64 lockStart = uint64(block.timestamp);
-        uint64 lockEnd = lockStart + lockPeriod;
+        uint64 lockEnd = lockStart + _lockPeriod;
 
         Deposit memory deposit = Deposit({
             amount: amount,
@@ -276,7 +278,7 @@ contract MechaniumStakingPool is
         user.deposits.push(deposit);
         _increaseUserRecords(user, amount, weight, true);
 
-        emit Stake(account, amount, lockPeriod);
+        emit Stake(account, amount, _lockPeriod);
 
         return true;
     }

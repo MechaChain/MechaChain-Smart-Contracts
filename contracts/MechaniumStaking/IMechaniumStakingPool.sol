@@ -36,7 +36,7 @@ interface IMechaniumStakingPool {
     function depositFor(
         address account,
         uint256 amount,
-        uint64 lockPeriod
+        uint256 lockPeriod
     ) external returns (bool);
 
     /**
