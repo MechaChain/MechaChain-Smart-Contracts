@@ -1,15 +1,19 @@
 # `IMechaniumCanReleaseUnintendedOwnable`
+**Documentation of `MechaniumUtils/IMechaniumCanReleaseUnintendedOwnable.sol`.**
+
 
 
 Mechanium can release unintended ( ownable ) smart contract interface
 
 
-**Table of Contents**
+## TABLE OF CONTENTS
 
-- [PUBLIC FUNCTIONS](#public-functions)
-    - [`releaseUnintended`](#IMechaniumCanReleaseUnintendedOwnable-releaseUnintended-address-address-uint256-)
+- [Public Functions](#public-functions)
+    - [`releaseUnintended`](#IMechaniumCanReleaseUnintendedOwnable-releaseUnintended-address-address-uint256-) 
 
-- [PRIVATE FUNCTIONS](#private-functions)
+- [Internal Functions](#internal-functions)
+
+
 
 
 
@@ -19,7 +23,7 @@ Mechanium can release unintended ( ownable ) smart contract interface
 
 ## PUBLIC FUNCTIONS
 
-### `releaseUnintended(address token, address account, uint256 amount) → bool` (external) <span id="IMechaniumCanReleaseUnintendedOwnable-releaseUnintended-address-address-uint256-"></span>
+### `releaseUnintended(address token, address account, uint256 amount) → bool` (external) <a name="IMechaniumCanReleaseUnintendedOwnable-releaseUnintended-address-address-uint256-" id="IMechaniumCanReleaseUnintendedOwnable-releaseUnintended-address-address-uint256-"></a>
 
 Release unintended tokens sent to smart contract ( only owner )
 This function is used to prevent unintended tokens that got sent to be stuck on the contract
@@ -30,7 +34,10 @@ This function is used to prevent unintended tokens that got sent to be stuck on 
 
 - `amount`: Amount to claim.
 
-## PRIVATE FUNCTIONS
+
+
+## INTERNAL FUNCTIONS
+
 
 
 
