@@ -1,129 +1,184 @@
 # `{{name}}`
+**Documentation of `{{file.path}}`.**
+
 {{{natspec.title}}}
 {{{natspec.userdoc}}}
 {{{natspec.devdoc}}}
 
-**Table of Contents**
-{{#if ownEvents}}
-- [EVENTS](#events)
-{{#ownEvents}}
-    - [`{{name}}`](#{{anchor}})
-{{/ownEvents}}
+## TABLE OF CONTENTS
+{{#if events}}
+- [Events](#events)
+{{#events}}
+    - [`{{name}}`](#{{anchor}}) {{#if (ne contract.name ../name)}}(inherited){{/if}}
+{{/events}}
 {{/if}}
 
-{{#if ownFunctions}}
-- [PUBLIC FUNCTIONS](#public-functions)
-{{#ownFunctions}}
+{{#if functions}}
+- [Public Functions](#public-functions)
+{{#functions}}
 {{#if (or (eq visibility "public") (eq visibility "external"))}}
+    - [`{{name}}`](#{{anchor}}) {{#if (ne contract.name ../name)}}(inherited){{/if}}
+{{/if}}
+{{/functions}}
+{{/if}}
+
+{{#if functions}}
+- [Internal Functions](#internal-functions)
+{{#functions}}
+{{#if (or (eq visibility "internal"))}}
+    - [`{{name}}`](#{{anchor}}) {{#if (ne contract.name ../name)}}(inherited){{/if}}
+{{/if}}
+{{/functions}}
+{{/if}}
+
+
+{{#if privateFunctions}}
+- [Private Functions](#private-functions)
+{{#privateFunctions}}
     - [`{{name}}`](#{{anchor}})
-{{/if}}
-{{/ownFunctions}}
-{{/if}}
-
-- [PRIVATE FUNCTIONS](#private-functions)
-{{#ownFunctions}}
-{{#if (or (eq visibility "internal") (eq visibility "private"))}}
-    - [`{{name}}`](#{{anchor}})
-{{/if}}
-{{/ownFunctions}}
-
-{{#if ownModifiers}}
-- [MODIFIERS](#modifiers)
-{{#ownModifiers}}
-    - [`{{name}}`](#{{anchor}})
-{{/ownModifiers}}
+{{/privateFunctions}}
 {{/if}}
 
-{{#if ownStructs}}
-- [STRUCTS](#structs)
-{{#ownStructs}}
-    - [`{{name}}`](#{{anchor}})
-{{/ownStructs}}
+{{#if modifiers}}
+- [Modifiers](#modifiers)
+{{#modifiers}}
+    - [`{{name}}`](#{{anchor}}) {{#if (ne contract.name ../name)}}(inherited){{/if}}
+{{/modifiers}}
 {{/if}}
 
-{{#if ownEnums}}
-- [ENUMS](#enums)
-{{#ownEnums}}
-    - [`{{name}}`](#{{anchor}})
-{{/ownEnums}}
+{{#if structs}}
+- [Structs](#structs)
+{{#structs}}
+    - [`{{name}}`](#{{anchor}}) {{#if (ne contract.name ../name)}}(inherited){{/if}}
+{{/structs}}
+{{/if}}
+
+{{#if enums}}
+- [Enums](#enums)
+{{#enums}}
+    - [`{{name}}`](#{{anchor}}) {{#if (ne contract.name ../name)}}(inherited){{/if}}
+{{/enums}}
 {{/if}}
 
 
-{{#if ownEvents}}
+{{#if events}}
 ## EVENTS
-{{#each ownEvents}}
+{{#each events}}
 
-### `{{name}}({{args}})` <span id="{{anchor}}"></span>
+### `{{name}}({{args}})` {{#if (ne contract.name ../name)}}(inherited){{/if}} <a name="{{anchor}}" id="{{anchor}}"></a>
 {{{natspec.userdoc}}}
 {{{natspec.devdoc}}}
 {{#natspec.params}}
 - `{{param}}`: {{description}}
 {{/natspec.params}}
+
+{{#if (ne contract.name ../name)}}
+_Inherited from `{{contract.file.path}}`_.
+{{/if}}
+
 {{/each}}
 {{/if}}
 
 
-{{#if ownFunctions}}
+{{#if functions}}
 ## PUBLIC FUNCTIONS
-{{#each ownFunctions}}
+{{#each functions}}
 {{#if (or (eq visibility "public") (eq visibility "external"))}}
 
-### `{{name}}({{args}}){{#if outputs}} → {{outputs}}{{/if}}` ({{visibility}}) <span id="{{anchor}}"></span>
+### `{{name}}({{args}}){{#if outputs}} → {{outputs}}{{/if}}` ({{visibility}}) {{#if (ne contract.name ../name)}}(inherited){{/if}}<a name="{{anchor}}" id="{{anchor}}"></a>
 {{{natspec.userdoc}}}
 {{{natspec.devdoc}}}
 {{#natspec.params}}
 - `{{param}}`: {{description}}
 {{/natspec.params}}
+
+{{#if (ne contract.name ../name)}}
+_Inherited from `{{contract.file.path}}`_.
+{{/if}}
+
 {{/if}}
 {{/each}}
 {{/if}}
 
-{{#if ownFunctions}}
+{{#if functions}}
+## INTERNAL FUNCTIONS
+{{#each functions}}
+{{#if (or (eq visibility "internal"))}}
+
+### `{{name}}({{args}}){{#if outputs}} → {{outputs}}{{/if}}` ({{visibility}}) {{#if (ne contract.name ../name)}}(inherited){{/if}} <a name="{{anchor}}" id="{{anchor}}"></a>
+{{{natspec.userdoc}}}
+{{{natspec.devdoc}}}
+{{#natspec.params}}
+- `{{param}}`: {{description}}
+{{/natspec.params}}
+
+{{#if (ne contract.name ../name)}}
+_Inherited from `{{contract.file.path}}`_.
+{{/if}}
+
+{{/if}}
+{{/each}}
+{{/if}}
+
+{{#if privateFunctions}}
 ## PRIVATE FUNCTIONS
-{{#each ownFunctions}}
-{{#if (or (eq visibility "internal") (eq visibility "private"))}}
-### `{{name}}({{args}}){{#if outputs}} → {{outputs}}{{/if}}` ({{visibility}}) <span id="{{anchor}}"></span>
+{{#each privateFunctions}}
+### `{{name}}({{args}}){{#if outputs}} → {{outputs}}{{/if}}` ({{visibility}}) <a name="{{anchor}}" id="{{anchor}}"></a>
 {{{natspec.userdoc}}}
 {{{natspec.devdoc}}}
 {{#natspec.params}}
 - `{{param}}`: {{description}}
 {{/natspec.params}}
-{{/if}}
 {{/each}}
 {{/if}}
 
-{{#if ownModifiers}}
+{{#if modifiers}}
 ## MODIFIERS
-{{#each ownModifiers}}
+{{#each modifiers}}
 
-### `{{name}}({{args}})` <span id="{{anchor}}"></span>
+### `{{name}}({{args}})` {{#if (ne contract.name ../name)}}(inherited){{/if}} <a name="{{anchor}}" id="{{anchor}}"></a>
 
 {{{natspec.userdoc}}}
 {{{natspec.devdoc}}}
 {{#natspec.params}}
 - `{{param}}`: {{description}}
 {{/natspec.params}}
+
+{{#if (ne contract.name ../name)}}
+_Inherited from `{{contract.file.path}}`_.
+{{/if}}
+
 {{/each}}
 {{/if}}
 
-{{#if ownStructs}}
+{{#if structs}}
 ## STRUCTS
-{{#each ownStructs}}
+{{#each structs}}
 
-### `{{name}}` <span id="{{anchor}}"></span>
+### `{{name}}` {{#if (ne contract.name ../name)}}(inherited){{/if}} <a name="{{anchor}}" id="{{anchor}}"></a>
 {{#each members}}
 - {{type}} {{name}}
 {{/each}}
+
+{{#if (ne contract.name ../name)}}
+_Inherited from `{{contract.file.path}}`_.
+{{/if}}
+
 {{/each}}
 {{/if}}
 
-{{#if ownEnums}}
+{{#if enums}}
 ## ENUMS
-{{#each ownEnums}}
+{{#each enums}}
 
-### `{{name}}` <span id="{{anchor}}"></span>
+### `{{name}}` {{#if (ne contract.name ../name)}}(inherited){{/if}} <a name="{{anchor}}" id="{{anchor}}"></a>
 {{#each members}}
 {{name}}
 {{/each}}
+
+{{#if (ne contract.name ../name)}}
+_Inherited from `{{contract.file.path}}`_.
+{{/if}}
+
 {{/each}}
 {{/if}}
