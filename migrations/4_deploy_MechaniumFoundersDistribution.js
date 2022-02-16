@@ -35,7 +35,11 @@ module.exports = async function (deployer, network, accounts) {
     "Mechanium",
     true
   ).address;
-  await deployer.deploy(mechaniumFoundersInstance, mechaniumAdress);
-  const instance = await mechaniumFoundersInstance.deployed();
-  setDeployedContract(network, "mechaniumFoundersInstance", instance.address);
+  await deployer.deploy(MechaniumFoundersDistribution, mechaniumAdress);
+  const instance = await MechaniumFoundersDistribution.deployed();
+  setDeployedContract(
+    network,
+    "MechaniumFoundersDistribution",
+    instance.address
+  );
 };

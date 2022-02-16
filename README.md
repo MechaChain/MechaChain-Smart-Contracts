@@ -4,13 +4,13 @@ All smart contracts for the play to earn [MechaChain project](https://mechachain
 
 [![Ethereum Version][ethereum-image]][ethereum-url]
 [![Solidity][solidity-image]][solidity-url]
-[![Remix Version][remix-image]][remix-url]
+[![Node Version][node-image]][node-url]
 
 <!-- Markdown link & img dfn's -->
 [ethereum-image]: https://img.shields.io/badge/Ethereum-purple?logo=Ethereum
 [ethereum-url]: https://ethereum.org/fr/
-[remix-image]: https://img.shields.io/badge/Use_with_Remix_IDE-blue
-[remix-url]: https://remix.ethereum.org/
+[node-image]: https://img.shields.io/badge/node_v16-blue
+[node-url]: https://nodejs.org/ko/blog/release/v16.13.0/
 [solidity-image]: https://img.shields.io/badge/Solidity_v0.8.7-gray?logo=Solidity
 [solidity-url]: https://nodejs.org/uk/blog/release/v12.14.1/
 
@@ -21,7 +21,7 @@ All smart contracts for the play to earn [MechaChain project](https://mechachain
     - [Deploy with Truffle](#deploy-with-truffle)
     - [Launch unit tests](#launch-unit-tests)
     - [Use on Testnets](#use-on-testnets)
-    - [Generate doc](#generate-doc)
+    - [Generate docs](#generate-docs)
     - [Verify contract](#verify-contract)
     - [Generate typescript types definition](#generate-typescript-types-definition)
   - [SMART CONTRACTS](#smart-contracts)
@@ -54,20 +54,20 @@ First, please fill the `.env` file with `INFURA_PROJECT_ID` and, for testnets, `
 ```
 truffle migrate --f <contractIndex> --to <contractIndex> --network <networkName>
 ```
-- `--f <contractIndex>` is the frist index of the migration file to run
+- `--f <contractIndex>` is the first index of the migration file to run
 - `--to <contractIndex>` is the last index of the migration file to run (can be the same as the previous one)
 - `<networkName>` can be `development` _(local network)_, `matic`, `goerli`, `ropsten`, `mumbai` or `rinkeby`.
 
 ### Launch unit tests
 
 For testing contract with [Truffle](https://www.trufflesuite.com/docs/truffle/testing/writing-tests-in-javascript): 
-  1. Install dependencies: `npm install -g truffle`
+  1. Install dependencies:
 ```
-npm install -g truffle
 npm install -g ganache-cli
+npm install -g truffle
 npm install
 ```
-  2. Run Ganache Ethereum simulator: `ganache-cli --accounts=20`
+  2. Run Ganache Ethereum simulator: `npm run ganache`
   3. Run test: `truffle test` or `truffle test ./test/<test_file_name>.js`
 
 For testing scaling on contract with [Truffle](https://www.trufflesuite.com/docs/truffle/testing/writing-tests-in-javascript): 
@@ -89,17 +89,12 @@ For get more eth on Goerli, use this link : https://app.mycrypto.com/faucet
 
 For get more tokens on Mumbai or Goerli, use this link : https://faucet.polygon.technology/
 
-### Generate doc
+### Generate docs
 
 To generate the markdown documentation, first install [solidity-docgen](https://github.com/OpenZeppelin/solidity-docgen) for solidity v0.8.2.
 
 ```
-npm install -G solc-0.8@npm:solc@^0.8.2
-```
-Then, run : 
-
-```
-npx solidity-docgen --solc-module solc-0.8 -t ./docs-templates
+npm run generate-docs
 ```
 
 

@@ -1,18 +1,35 @@
 # `IStakingPool`
+**Documentation of `MechaniumStaking/IStakingPool.sol`.**
+
 
 
 Staking pool smart contract interface
 
 
-**Table of Contents**
-- FUNCTIONS
-    - [`stakeTokensFromDistribution`](#IStakingPool-stakeTokensFromDistribution-address-uint256-)
+## TABLE OF CONTENTS
+
+- [Public Functions](#public-functions)
+    - [`depositFor`](#IStakingPool-depositFor-address-uint256-uint256-) 
+
+- [Internal Functions](#internal-functions)
 
 
-## FUNCTIONS
-### `stakeTokensFromDistribution(address to, uint256 amount) → bool` (external)
 
-Stake tokens ( only from distribution contract )
+
+
+
+
+
+
+## PUBLIC FUNCTIONS
+
+### `depositFor(address account, uint256 amount, uint256 lockPeriod) → bool` (external) <a name="IStakingPool-depositFor-address-uint256-uint256-" id="IStakingPool-depositFor-address-uint256-uint256-"></a>
+
+Stake tokens
+
+
+
+## INTERNAL FUNCTIONS
 
 
 

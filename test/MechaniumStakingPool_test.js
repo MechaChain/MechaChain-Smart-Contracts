@@ -497,7 +497,7 @@ contract("MechaniumStakingPool", (accounts) => {
       mainPool.stake(getAmount(100), mainStakingPoolData.minStakingTime, {
         from: staker1,
       }),
-      "ERC20: transfer amount exceeds allowance"
+      "ERC20: insufficient allowance"
     );
   });
 

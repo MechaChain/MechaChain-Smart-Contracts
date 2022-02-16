@@ -3,13 +3,8 @@ const MechaniumStakingPool = artifacts.require("MechaniumStakingPool");
 
 const { time } = require("@openzeppelin/test-helpers");
 
-
 // Load utils
-const {
-  getBN,
-  getAmount,
-} = require("../utils");
-
+const { getBN, getAmount } = require("../utils");
 
 module.exports = async function (deployer, network, accounts) {
   // For local development
@@ -38,4 +33,14 @@ module.exports = async function (deployer, network, accounts) {
 
     return;
   }
+
+  // For other deployments
+  const mechaniumAdress = getDeployedContract(
+    network,
+    "Mechanium",
+    true
+  ).address;
+  await deployer.deploy(MechaniumStakingPool, mechaniumAdress);
+  const instance = await MechaniumStakingPool.deployed();
+  setDeployedContract(network, "MechaniumStakingPool", instance.address);
 };

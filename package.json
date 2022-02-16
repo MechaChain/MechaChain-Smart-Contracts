@@ -1,12 +1,19 @@
 {
+  "engine": {
+    "node": "16"
+  },
   "scripts": {
     "build": "npx truffle compile",
+    "ganache": "npx ganache-cli --accounts=30",
+    "generate-docs": "npx solidity-docgen --solc-module solc-0.8 -t ./docs-templates",
     "generate-types": "typechain --target=ethers-v5 build/contracts/*.json"
   },
   "devDependencies": {
+    "ganache-cli": "^6.12.2",
     "hardhat": "^2.8.3",
     "solc-0.6": "npm:solc@^0.6.6",
-    "solc-0.8": "npm:solc@^0.8.10",
+    "solc-0.8": "npm:solc@^0.8.11",
+    "solidity-docgen": "^0.5.16",
     "truffle-plugin-verify": "^0.5.18"
   },
   "dependencies": {

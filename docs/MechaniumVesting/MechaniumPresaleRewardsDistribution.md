@@ -1,13 +1,16 @@
-# `MechaniumDevDistribution`
-**Documentation of `MechaniumVesting/MechaniumDevDistribution.sol`.**
+# `MechaniumPresaleRewardsDistribution`
+**Documentation of `MechaniumVesting/MechaniumPresaleRewardsDistribution.sol`.**
 
-MechaniumDevDistribution - Vesting and distribution smart contract for the MechaChain development team
+MechaniumPresaleRewardsDistribution - Pre-sale distribution smart contract
 
 
 
 
 ## TABLE OF CONTENTS
 - [Events](#events)
+    - [`VestingStartingTimeChanged`](#MechaniumPresaleRewardsDistribution-VestingStartingTimeChanged-uint256-) 
+    - [`TransferUnsoldToPTEPool`](#MechaniumPresaleRewardsDistribution-TransferUnsoldToPTEPool-uint256-) 
+    - [`TransferToStakingPool`](#MechaniumPresaleRewardsDistribution-TransferToStakingPool-address-uint256-uint256-) 
     - [`Allocated`](#MechaniumVesting-Allocated-address-uint256-) (inherited)
     - [`ClaimedTokens`](#MechaniumVesting-ClaimedTokens-address-address-uint256-) (inherited)
     - [`ClaimedTokensToAll`](#MechaniumVesting-ClaimedTokensToAll-address-uint256-uint256-) (inherited)
@@ -19,17 +22,23 @@ MechaniumDevDistribution - Vesting and distribution smart contract for the Mecha
     - [`RoleRevoked`](#IAccessControl-RoleRevoked-bytes32-address-address-) (inherited)
 
 - [Public Functions](#public-functions)
-    - [`constructor`](#MechaniumDevDistribution-constructor-contract-IERC20-) 
-    - [`allocateTokens`](#MechaniumTeamDistribution-allocateTokens-address-uint256-) (inherited)
-    - [`allocatedTokensOf`](#MechaniumTeamDistribution-allocatedTokensOf-address-) (inherited)
-    - [`pendingTokensOf`](#MechaniumTeamDistribution-pendingTokensOf-address-) (inherited)
-    - [`unlockableTokens`](#MechaniumTeamDistribution-unlockableTokens-address-) (inherited)
-    - [`allocationCount`](#MechaniumTeamDistribution-allocationCount--) (inherited)
-    - [`allocationTokens`](#MechaniumTeamDistribution-allocationTokens-uint256-) (inherited)
-    - [`allocationOwner`](#MechaniumTeamDistribution-allocationOwner-uint256-) (inherited)
-    - [`allocationStartingTime`](#MechaniumTeamDistribution-allocationStartingTime-uint256-) (inherited)
-    - [`allocationsOf`](#MechaniumTeamDistribution-allocationsOf-address-) (inherited)
-    - [`timeBeforeStarting`](#MechaniumTeamDistribution-timeBeforeStarting--) (inherited)
+    - [`constructor`](#MechaniumPresaleRewardsDistribution-constructor-contract-IERC20-) 
+    - [`allocateTokens`](#MechaniumPresaleRewardsDistribution-allocateTokens-address-uint256-) 
+    - [`startVesting`](#MechaniumPresaleRewardsDistribution-startVesting--) 
+    - [`startVesting`](#MechaniumPresaleRewardsDistribution-startVesting-uint256-) 
+    - [`setStakingPool`](#MechaniumPresaleRewardsDistribution-setStakingPool-address-) 
+    - [`setStakingTransferTimeLimit`](#MechaniumPresaleRewardsDistribution-setStakingTransferTimeLimit-uint256-) 
+    - [`setMinimumStakingTime`](#MechaniumPresaleRewardsDistribution-setMinimumStakingTime-uint256-) 
+    - [`transferToStakingPool`](#MechaniumPresaleRewardsDistribution-transferToStakingPool-uint256-uint256-) 
+    - [`allocatedTokensOf`](#MechaniumPresaleRewardsDistribution-allocatedTokensOf-address-) 
+    - [`pendingTokensOf`](#MechaniumPresaleRewardsDistribution-pendingTokensOf-address-) 
+    - [`unlockableTokens`](#MechaniumPresaleRewardsDistribution-unlockableTokens-address-) 
+    - [`hasVestingStarted`](#MechaniumPresaleRewardsDistribution-hasVestingStarted--) 
+    - [`vestingStartingTime`](#MechaniumPresaleRewardsDistribution-vestingStartingTime--) 
+    - [`maxVestingStartingTime`](#MechaniumPresaleRewardsDistribution-maxVestingStartingTime--) 
+    - [`getStakingPoolAddress`](#MechaniumPresaleRewardsDistribution-getStakingPoolAddress--) 
+    - [`getStrakingTransferTimeLimit`](#MechaniumPresaleRewardsDistribution-getStrakingTransferTimeLimit--) 
+    - [`getMinimumStakingTime`](#MechaniumPresaleRewardsDistribution-getMinimumStakingTime--) 
     - [`claimTokens`](#MechaniumVesting-claimTokens-address-) (inherited)
     - [`claimTokens`](#MechaniumVesting-claimTokens--) (inherited)
     - [`claimTokensForAll`](#MechaniumVesting-claimTokensForAll--) (inherited)
@@ -70,6 +79,8 @@ MechaniumDevDistribution - Vesting and distribution smart contract for the Mecha
 
 
 - [Modifiers](#modifiers)
+    - [`vestingStarted`](#MechaniumPresaleRewardsDistribution-vestingStarted--) 
+    - [`vestingNotStarted`](#MechaniumPresaleRewardsDistribution-vestingNotStarted--) 
     - [`tokensAvailable`](#MechaniumVesting-tokensAvailable-uint256-) (inherited)
     - [`onlyRole`](#AccessControl-onlyRole-bytes32-) (inherited)
 
@@ -79,6 +90,24 @@ MechaniumDevDistribution - Vesting and distribution smart contract for the Mecha
 
 
 ## EVENTS
+
+### `VestingStartingTimeChanged(uint256 vestingStartingTime)`  <a name="MechaniumPresaleRewardsDistribution-VestingStartingTimeChanged-uint256-" id="MechaniumPresaleRewardsDistribution-VestingStartingTimeChanged-uint256-"></a>
+Event emitted when the `vestingStartingTime` has changed
+
+
+
+
+### `TransferUnsoldToPTEPool(uint256 amount)`  <a name="MechaniumPresaleRewardsDistribution-TransferUnsoldToPTEPool-uint256-" id="MechaniumPresaleRewardsDistribution-TransferUnsoldToPTEPool-uint256-"></a>
+Event emitted when `amount` tokens has been transferred to the play to earn pool
+
+
+
+
+### `TransferToStakingPool(address account, uint256 amount, uint256 stakingTime)`  <a name="MechaniumPresaleRewardsDistribution-TransferToStakingPool-address-uint256-uint256-" id="MechaniumPresaleRewardsDistribution-TransferToStakingPool-address-uint256-uint256-"></a>
+Event emitted when `account` has transferred `amount` tokens to the staking pool
+
+
+
 
 ### `Allocated(address to, uint256 amount)` (inherited) <a name="MechaniumVesting-Allocated-address-uint256-" id="MechaniumVesting-Allocated-address-uint256-"></a>
 Event emitted when `amount` tokens have been allocated for `to` address
@@ -154,15 +183,15 @@ _Inherited from `../@openzeppelin/contracts/access/IAccessControl.sol`_.
 
 ## PUBLIC FUNCTIONS
 
-### `constructor(contract IERC20 token_)` (public) <a name="MechaniumDevDistribution-constructor-contract-IERC20-" id="MechaniumDevDistribution-constructor-contract-IERC20-"></a>
+### `constructor(contract IERC20 token_)` (public) <a name="MechaniumPresaleRewardsDistribution-constructor-contract-IERC20-" id="MechaniumPresaleRewardsDistribution-constructor-contract-IERC20-"></a>
 
-Contract constructor sets the configuration of the vesting schedule
+Contract constructor
 
-- `token_`: Address of the ERC20 token contract, this address cannot be changed later
+- `token_`: address of the ERC20 token contract, this address cannot be changed later
 
 
 
-### `allocateTokens(address to, uint256 amount) → bool` (public) (inherited)<a name="MechaniumTeamDistribution-allocateTokens-address-uint256-" id="MechaniumTeamDistribution-allocateTokens-address-uint256-"></a>
+### `allocateTokens(address to, uint256 amount) → bool` (public) <a name="MechaniumPresaleRewardsDistribution-allocateTokens-address-uint256-" id="MechaniumPresaleRewardsDistribution-allocateTokens-address-uint256-"></a>
 Allocate `amount` token `to` address
 
 
@@ -170,70 +199,104 @@ Allocate `amount` token `to` address
 
 - `amount`: Total token to be allocated
 
-_Inherited from `MechaniumVesting/MechaniumTeamDistribution.sol`_.
 
 
-### `allocatedTokensOf(address account) → uint256` (public) (inherited)<a name="MechaniumTeamDistribution-allocatedTokensOf-address-" id="MechaniumTeamDistribution-allocatedTokensOf-address-"></a>
+### `startVesting() → bool` (public) <a name="MechaniumPresaleRewardsDistribution-startVesting--" id="MechaniumPresaleRewardsDistribution-startVesting--"></a>
+Start the vesting immediately
+
+
+
+
+### `startVesting(uint256 startTime) → bool` (public) <a name="MechaniumPresaleRewardsDistribution-startVesting-uint256-" id="MechaniumPresaleRewardsDistribution-startVesting-uint256-"></a>
+Set the vesting start time
+
+
+- `startTime`: vesting start time
+
+
+
+### `setStakingPool(address stakingPoolAddress) → bool` (public) <a name="MechaniumPresaleRewardsDistribution-setStakingPool-address-" id="MechaniumPresaleRewardsDistribution-setStakingPool-address-"></a>
+Set staking pool address
+
+
+- `stakingPoolAddress`: The staking pool address
+
+
+
+### `setStakingTransferTimeLimit(uint256 stakingTransferTimeLimit) → bool` (public) <a name="MechaniumPresaleRewardsDistribution-setStakingTransferTimeLimit-uint256-" id="MechaniumPresaleRewardsDistribution-setStakingTransferTimeLimit-uint256-"></a>
+Set staking transfer time limit
+
+
+- `stakingTransferTimeLimit`: The staking transfer time limit
+
+
+
+### `setMinimumStakingTime(uint256 minimumStakingTime) → bool` (public) <a name="MechaniumPresaleRewardsDistribution-setMinimumStakingTime-uint256-" id="MechaniumPresaleRewardsDistribution-setMinimumStakingTime-uint256-"></a>
+Set minimum staking time
+
+
+- `minimumStakingTime`: The minimum staking time
+
+
+
+### `transferToStakingPool(uint256 amount, uint256 stakingTime) → bool` (public) <a name="MechaniumPresaleRewardsDistribution-transferToStakingPool-uint256-uint256-" id="MechaniumPresaleRewardsDistribution-transferToStakingPool-uint256-uint256-"></a>
+Transfer tokens balance ( allocated but not claimed ) to the staking pool
+
+
+
+
+### `allocatedTokensOf(address account) → uint256` (public) <a name="MechaniumPresaleRewardsDistribution-allocatedTokensOf-address-" id="MechaniumPresaleRewardsDistribution-allocatedTokensOf-address-"></a>
 
 Return the amount of allocated tokens for `account` from the beginning
 
-_Inherited from `MechaniumVesting/MechaniumTeamDistribution.sol`_.
 
 
-### `pendingTokensOf(address account) → uint256` (public) (inherited)<a name="MechaniumTeamDistribution-pendingTokensOf-address-" id="MechaniumTeamDistribution-pendingTokensOf-address-"></a>
+### `pendingTokensOf(address account) → uint256` (public) <a name="MechaniumPresaleRewardsDistribution-pendingTokensOf-address-" id="MechaniumPresaleRewardsDistribution-pendingTokensOf-address-"></a>
 
 Return the amount of tokens that the `account` can unlock in real time
 
-_Inherited from `MechaniumVesting/MechaniumTeamDistribution.sol`_.
 
 
-### `unlockableTokens(address account) → uint256` (public) (inherited)<a name="MechaniumTeamDistribution-unlockableTokens-address-" id="MechaniumTeamDistribution-unlockableTokens-address-"></a>
+### `unlockableTokens(address account) → uint256` (public) <a name="MechaniumPresaleRewardsDistribution-unlockableTokens-address-" id="MechaniumPresaleRewardsDistribution-unlockableTokens-address-"></a>
 
 Return the amount of tokens that the `account` can unlock per month
 
-_Inherited from `MechaniumVesting/MechaniumTeamDistribution.sol`_.
 
 
-### `allocationCount() → uint256` (public) (inherited)<a name="MechaniumTeamDistribution-allocationCount--" id="MechaniumTeamDistribution-allocationCount--"></a>
+### `hasVestingStarted() → bool` (public) <a name="MechaniumPresaleRewardsDistribution-hasVestingStarted--" id="MechaniumPresaleRewardsDistribution-hasVestingStarted--"></a>
 
-Return the amount of tokens of the allocation
-
-_Inherited from `MechaniumVesting/MechaniumTeamDistribution.sol`_.
+Return true if the vesting schedule has started
 
 
-### `allocationTokens(uint256 allocationId) → uint256` (public) (inherited)<a name="MechaniumTeamDistribution-allocationTokens-uint256-" id="MechaniumTeamDistribution-allocationTokens-uint256-"></a>
 
-Return the amount of tokens of the allocation
+### `vestingStartingTime() → uint256` (public) <a name="MechaniumPresaleRewardsDistribution-vestingStartingTime--" id="MechaniumPresaleRewardsDistribution-vestingStartingTime--"></a>
 
-_Inherited from `MechaniumVesting/MechaniumTeamDistribution.sol`_.
-
-
-### `allocationOwner(uint256 allocationId) → address` (public) (inherited)<a name="MechaniumTeamDistribution-allocationOwner-uint256-" id="MechaniumTeamDistribution-allocationOwner-uint256-"></a>
-
-Return the address of the allocation owner
-
-_Inherited from `MechaniumVesting/MechaniumTeamDistribution.sol`_.
+Return the starting time of the vesting schedule
 
 
-### `allocationStartingTime(uint256 allocationId) → uint256` (public) (inherited)<a name="MechaniumTeamDistribution-allocationStartingTime-uint256-" id="MechaniumTeamDistribution-allocationStartingTime-uint256-"></a>
 
-Return the starting time of the allocation
+### `maxVestingStartingTime() → uint256` (public) <a name="MechaniumPresaleRewardsDistribution-maxVestingStartingTime--" id="MechaniumPresaleRewardsDistribution-maxVestingStartingTime--"></a>
 
-_Inherited from `MechaniumVesting/MechaniumTeamDistribution.sol`_.
-
-
-### `allocationsOf(address wallet) → uint256[]` (public) (inherited)<a name="MechaniumTeamDistribution-allocationsOf-address-" id="MechaniumTeamDistribution-allocationsOf-address-"></a>
-
-Return the array of allocationId owned by `wallet`
-
-_Inherited from `MechaniumVesting/MechaniumTeamDistribution.sol`_.
+Return the unchangeable maximum vesting starting time
 
 
-### `timeBeforeStarting() → uint256` (public) (inherited)<a name="MechaniumTeamDistribution-timeBeforeStarting--" id="MechaniumTeamDistribution-timeBeforeStarting--"></a>
 
-Return the number of seconds to wait between allocation and the start of the schedule
+### `getStakingPoolAddress() → address` (public) <a name="MechaniumPresaleRewardsDistribution-getStakingPoolAddress--" id="MechaniumPresaleRewardsDistribution-getStakingPoolAddress--"></a>
 
-_Inherited from `MechaniumVesting/MechaniumTeamDistribution.sol`_.
+Return the staking pool address
+
+
+
+### `getStrakingTransferTimeLimit() → uint256` (public) <a name="MechaniumPresaleRewardsDistribution-getStrakingTransferTimeLimit--" id="MechaniumPresaleRewardsDistribution-getStrakingTransferTimeLimit--"></a>
+
+Return the staking transfer time limit
+
+
+
+### `getMinimumStakingTime() → uint256` (public) <a name="MechaniumPresaleRewardsDistribution-getMinimumStakingTime--" id="MechaniumPresaleRewardsDistribution-getMinimumStakingTime--"></a>
+
+Return the minimum staking time
+
 
 
 ### `claimTokens(address account) → bool` (public) (inherited)<a name="MechaniumVesting-claimTokens-address-" id="MechaniumVesting-claimTokens-address-"></a>
@@ -524,6 +587,20 @@ _Inherited from `../@openzeppelin/contracts/utils/Context.sol`_.
 
 
 ## MODIFIERS
+
+### `vestingStarted()`  <a name="MechaniumPresaleRewardsDistribution-vestingStarted--" id="MechaniumPresaleRewardsDistribution-vestingStarted--"></a>
+
+
+Check if the vesting has started
+
+
+
+### `vestingNotStarted()`  <a name="MechaniumPresaleRewardsDistribution-vestingNotStarted--" id="MechaniumPresaleRewardsDistribution-vestingNotStarted--"></a>
+
+
+Check if the vesting has not started
+
+
 
 ### `tokensAvailable(uint256 amount)` (inherited) <a name="MechaniumVesting-tokensAvailable-uint256-" id="MechaniumVesting-tokensAvailable-uint256-"></a>
 
