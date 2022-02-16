@@ -6,17 +6,27 @@ MechaniumBis - $MECHABIS ERC20 for MechaChain play to earn project testing
 
 
 **Table of Contents**
-- FUNCTIONS
+
+- [PUBLIC FUNCTIONS](#public-functions)
     - [`constructor`](#MechaniumBis-constructor-address-)
 
+- [PRIVATE FUNCTIONS](#private-functions)
 
-## FUNCTIONS
-### `constructor(address adminWallet)` (public)
+
+
+
+
+
+
+## PUBLIC FUNCTIONS
+
+### `constructor(address adminWallet)` (public) <span id="MechaniumBis-constructor-address-"></span>
 
 Contract constructor
 
 - `adminWallet`: address of the MechaChain admin wallet
 
+## PRIVATE FUNCTIONS
 
 
 

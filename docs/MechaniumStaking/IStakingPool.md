@@ -5,15 +5,25 @@ Staking pool smart contract interface
 
 
 **Table of Contents**
-- FUNCTIONS
-    - [`stakeTokensFromDistribution`](#IStakingPool-stakeTokensFromDistribution-address-uint256-)
+
+- [PUBLIC FUNCTIONS](#public-functions)
+    - [`depositFor`](#IStakingPool-depositFor-address-uint256-uint256-)
+
+- [PRIVATE FUNCTIONS](#private-functions)
 
 
-## FUNCTIONS
-### `stakeTokensFromDistribution(address to, uint256 amount) → bool` (external)
 
-Stake tokens ( only from distribution contract )
 
+
+
+
+## PUBLIC FUNCTIONS
+
+### `depositFor(address account, uint256 amount, uint256 lockPeriod) → bool` (external) <span id="IStakingPool-depositFor-address-uint256-uint256-"></span>
+
+Stake tokens
+
+## PRIVATE FUNCTIONS
 
 
 
