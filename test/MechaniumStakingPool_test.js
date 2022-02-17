@@ -627,9 +627,56 @@ contract("MechaniumStakingPool", (accounts) => {
     );
   });
 
+  it("In a new pool, users can start staking after the initBlock", async () => {
+    const amount = getAmount(100);
+
+    await factory.createPool(
+      ...Object.values({
+        ...mainStakingPoolData,
+        initBlock: 0,
+      })
+    );
+
+    let newPool = await factory.registeredPoolsList(1);
+    newPool = await MechaniumStakingPool.at(newPool);
+
+    assert(newPool);
+
+    await time.advanceBlock();
+    await time.advanceBlock();
+
+    const userOldBalance = await token.balanceOf(staker1);
+    const userOldPoolBalance = await newPool.balanceOf(staker1);
+    const poolOldBalance = await token.balanceOf(newPool.address);
+
+    await token.approve(newPool.address, amount, { from: staker1 });
+    await newPool.stake(amount, mainStakingPoolData.maxStakingTime, {
+      from: staker1,
+    });
+
+    const userNewBalance = await token.balanceOf(staker1);
+    const userNewPoolBalance = await newPool.balanceOf(staker1);
+    const poolNewBalance = await token.balanceOf(newPool.address);
+
+    // Balances tests
+    assert.equal(
+      userNewBalance.toString(),
+      userOldBalance.sub(amount).toString(),
+      "Incorrect user token balance"
+    );
+    assert.equal(
+      userNewPoolBalance.toString(),
+      userOldPoolBalance.add(amount).toString(),
+      "Incorrect user balance in the pool"
+    );
+    assert.equal(
+      poolNewBalance.toString(),
+      poolOldBalance.add(amount).toString(),
+      "Incorrect pool balance"
+    );
+  });
+
   it("Remaining allocated tokens takes into account the number of rewarded tokens", async () => {
-    await time.advanceBlock();
-    await time.advanceBlock();
     await time.advanceBlock();
     await time.advanceBlock();
     await time.advanceBlock();

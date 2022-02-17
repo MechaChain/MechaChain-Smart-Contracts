@@ -383,8 +383,10 @@ contract MechaniumStakingPool is
     function updateRewards() public override returns (bool) {
         require(canUpdateRewards(), "initBlock is not reached");
 
-        _rewardsPerWeight = updatedRewardsPerWeight();
-        _totalRewards = updatedTotalRewards();
+        if (totalUsersWeight > 0) {
+            _rewardsPerWeight = updatedRewardsPerWeight();
+            _totalRewards = updatedTotalRewards();
+        }
 
         lastRewardsUpdate = block.number;
 
@@ -590,7 +592,9 @@ contract MechaniumStakingPool is
 
         cumulatedRewards = cumulatedRewards.mul(WEIGHT_MULTIPLIER);
 
-        uint256 newRewardsPerWeight = cumulatedRewards.div(totalUsersWeight);
+        uint256 newRewardsPerWeight = cumulatedRewards.div(
+            totalUsersWeight > 0 ? totalUsersWeight : 1
+        );
 
         newRewardsPerWeight = newRewardsPerWeight.add(_rewardsPerWeight);
 
