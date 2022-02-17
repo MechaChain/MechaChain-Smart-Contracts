@@ -4,7 +4,7 @@ const MechaniumStakingPool = artifacts.require("MechaniumStakingPool");
 const { time } = require("@openzeppelin/test-helpers");
 
 // Load utils
-const { getBN, getAmount } = require("../utils");
+const { getBN, getAmount, getDeployedContract } = require("../utils");
 
 module.exports = async function (deployer, network, accounts) {
   // For local development
