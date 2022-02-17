@@ -5,7 +5,7 @@ const MechaniumStakingPoolFactory = artifacts.require(
 );
 
 // Load utils
-const { getAmount } = require("../utils");
+const { getAmount, getDeployedContract, setDeployedContract } = require("../utils");
 
 module.exports = async function (deployer, network, accounts) {
   // For local development

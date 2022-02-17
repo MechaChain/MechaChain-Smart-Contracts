@@ -29,16 +29,20 @@
   },
   "mumbai": {
     "Mechanium": {
-      "address": "0x3dc6451e45dde42D3e376863F1ae4b24AFec5256",
-      "date": "17/11/2021, 13:48:33"
+      "address": "0xC52437D8553a403F493bbB3ad2Dca6b8e3A43FB0",
+      "date": "17/02/2022, 17:58:48"
     },
     "MechaniumPresaleDistribution": {
-      "address": "0x009Dd2C65c31Bc42451A809c8a085C4627E6ED85",
-      "date": "10/02/2022, 09:06:47"
+      "address": "0x887e75E27f39aD15Bf1Ae933de3855Abf8c18298",
+      "date": "17/02/2022, 18:21:10"
     },
     "MechaniumPresaleRewardsDistribution": {
-      "address": "0x39975719Af6F3DBB30aE8ea478A9a2984B19caD5",
-      "date": "10/02/2022, 09:27:36"
+      "address": "0xD646Cee48f224bc57aaBB2800AABb5bE189B0C47",
+      "date": "17/02/2022, 18:22:26"
+    },
+    "MechaniumStakingPoolFactory": {
+      "address": "0xE9423019321d0CD987B5d6810d006aEE0EaC03C3",
+      "date": "17/02/2022, 17:59:52"
     }
   },
   "ropsten": {
