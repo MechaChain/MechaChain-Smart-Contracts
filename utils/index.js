@@ -56,6 +56,10 @@ const getRange = (x1, y1, x2, y2, a) => y1 + ((a - x1) * (y2 - y1)) / (x2 - x1);
 const getBNRange = (x1, y1, x2, y2, a) =>
   y1.add(a.sub(x1).mul(y2.sub(y1)).div(x2.sub(x1)));
 
+const getRandom = (min = 0, max = 100) => {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
 module.exports = {
   getAmount,
   getBN,
@@ -63,4 +67,5 @@ module.exports = {
   setDeployedContract,
   getRange,
   getBNRange,
+  getRandom,
 };
