@@ -13,6 +13,7 @@
     "hardhat": "^2.8.3",
     "solc-0.6": "npm:solc@^0.6.6",
     "solc-0.8": "npm:solc@^0.8.11",
+    "cli-progress": "^3.10.0",
     "solidity-docgen": "^0.5.16",
     "truffle-plugin-verify": "^0.5.21"
   },
