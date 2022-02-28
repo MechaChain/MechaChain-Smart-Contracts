@@ -3,11 +3,16 @@ require("dotenv").config();
 const HDWalletProvider = require("@truffle/hdwallet-provider");
 
 module.exports = {
+  mocha: {
+    enableTimeouts: false,
+    timeout: 14400000,
+  },
   networks: {
     development: {
       host: "127.0.0.1",
       port: 8545,
       network_id: "*", // Match any network id
+      gasPrice: 90000000000,
     },
     matic: {
       network_id: 137,

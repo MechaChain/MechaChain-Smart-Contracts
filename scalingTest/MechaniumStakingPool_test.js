@@ -35,15 +35,15 @@ contract("MechaniumStakingPoolFactory", (accounts) => {
     },
     stakesPerUsers: {
       min: 1,
-      max: 3,
+      max: 5,
     },
     blockAdvanceBeforeStake: {
-      min: 10,
-      max: 100,
+      min: 100,
+      max: 700,
     },
     blockAdvanceBeforeProcessRewards: {
-      min: 50,
-      max: 100,
+      min: 100,
+      max: 700,
     },
   };
 
@@ -55,7 +55,7 @@ contract("MechaniumStakingPoolFactory", (accounts) => {
     minWeightMultiplier: getBN(1),
     maxWeightMultiplier: getBN(2),
     rewardsLockingPeriod: time.duration.days(90),
-    rewardsPerBlock: getAmount(1),
+    rewardsPerBlock: getBN("250000000000000000"), // = 0.25 $MECHA
   };
 
   const WEIGHT_MULTIPLIER = getBN(1e12);
@@ -99,6 +99,7 @@ contract("MechaniumStakingPoolFactory", (accounts) => {
 
     return txData;
   }
+
   it("Smart contract should be deployed", async () => {
     instance = await MechaniumStakingPoolFactory.deployed();
     assert(instance.address !== "");
@@ -155,6 +156,16 @@ contract("MechaniumStakingPoolFactory", (accounts) => {
         const stakeTime = time.duration.days(
           getRandom(CONFIG.stakedTimeInDays.min, CONFIG.stakedTimeInDays.max)
         );
+
+        const remainingAllocatedTokens =
+          await mainPool.remainingAllocatedTokens();
+        if (remainingAllocatedTokens.toString() === "0") {
+          console.log(
+            "\n\tNo more rewards in the pool, users can no longer stake"
+          );
+          accounts.length = b === 0 ? i : i + 1; //We shorten the number of users
+          break;
+        }
         await stake(user, amount, stakeTime);
       }
 
@@ -167,7 +178,8 @@ contract("MechaniumStakingPoolFactory", (accounts) => {
 
   it("Process the rewards", async () => {
     // Advance 10 blocks
-    await Promise.all(Array(10).fill(time.advanceBlock()));
+    const latestBlock = await time.latestBlock();
+    await time.advanceBlockTo(latestBlock.add(getBN(10)));
 
     // Set progress bar
     console.log("\tWait while users process their rewards...");
@@ -254,7 +266,7 @@ contract("MechaniumStakingPoolFactory", (accounts) => {
     const progressBar = new cliProgress.SingleBar(
       {
         format:
-          "\tProcess rewards: [{bar}] {percentage}% | {value}/{total} users | ETA: {eta}s | Duration: {duration_formatted}",
+          "\tUnstake: [{bar}] {percentage}% | {value}/{total} users | ETA: {eta}s | Duration: {duration_formatted}",
       },
       cliProgress.Presets.shades_classic
     );
