@@ -18,7 +18,7 @@ contract MechaniumGrowthVestingWallet is MechaniumVestingWallet {
     constructor(IERC20 token_)
         MechaniumVestingWallet(
             token_,
-            40, // Initially unlock 40%
+            15, // Initially unlock 15%
             15, // then unlock 15%
             180 days // every 6 months
         )
