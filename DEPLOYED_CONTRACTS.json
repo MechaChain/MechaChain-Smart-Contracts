@@ -9,6 +9,38 @@
     "Mechanium": {
       "address": "0xacd4e2d936be9b16c01848a3742a34b3d5a5bdfa",
       "date": "24/11/2021, 18:39:18"
+    },
+    "MechaniumPresaleDistribution": {
+      "address": "0x5D01ac95940009FC0eA85fc6517Ea7C62FfFe877",
+      "date": "24/11/2021, 18:39:18"
+    },
+    "MechaniumPresaleRewardsDistribution": {
+      "address": "0x7a3D891Ca74b0c33F4AFda76225D7929Ee17eBd2",
+      "date": "24/11/2021, 18:39:18"
+    },
+    "MechaniumStakingPoolFactory": {
+      "address": "0x90278C771BB49E985b896A8e6BBe02078ae9fb79",
+      "date": "24/11/2021, 18:39:18"
+    },
+    "MechaniumFoundersDistribution": {
+      "address": "0xc4e4154a56f8f7bf5fb783cde83d2d26f6b3cd87",
+      "date": "24/11/2021, 18:39:18"
+    },
+    "MechaniumGrowthVestingWallet": {
+      "address": "0xbE558AF8D81fbF849Ff2604A183ecEc383726C77",
+      "date": "24/11/2021, 18:39:18"
+    },
+    "MechaniumDevDistribution": {
+      "address": "0x92D9FA83026f3A19858Aa84DAC44C2b66404Faa1",
+      "date": "24/11/2021, 18:39:18"
+    },
+    "MechaniumAdvisorsDistribution": {
+      "address": "0x5216D33351ec960c07c248910B129F46cAD737E2",
+      "date": "24/11/2021, 18:39:18"
+    },
+    "MechaniumP2EVestingWallet": {
+      "address": "0xd59513273dD71F084C54AD53B73e54527Da8a995",
+      "date": "24/11/2021, 18:39:18"
     }
   },
   "goerli-fork": {

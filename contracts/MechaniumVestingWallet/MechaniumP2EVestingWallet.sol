@@ -18,8 +18,8 @@ contract MechaniumP2EVestingWallet is MechaniumVestingWallet {
     constructor(IERC20 token_)
         MechaniumVestingWallet(
             token_,
-            0, // Initially unlock 15%
-            50, // then unlock 15%
+            0, // Initially unlock 0%
+            50, // then unlock 50%
             270 days // every 9 months
         )
     {}
