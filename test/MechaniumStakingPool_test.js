@@ -497,7 +497,7 @@ contract("MechaniumStakingPool", (accounts) => {
       mainPool.stake(getAmount(100), mainStakingPoolData.minStakingTime, {
         from: staker1,
       }),
-      "ERC20: insufficient allowance"
+      "ERC20: transfer amount exceeds allowance."
     );
   });
 
@@ -676,6 +676,53 @@ contract("MechaniumStakingPool", (accounts) => {
     );
   });
 
+  it("In a new pool, token distribution only starts after the first staking", async () => {
+    const amount = getAmount(100);
+
+    await factory.createPool(
+      ...Object.values({
+        ...mainStakingPoolData,
+        initBlock: 0,
+      })
+    );
+
+    let newPool = await factory.registeredPoolsList(2);
+    newPool = await MechaniumStakingPool.at(newPool);
+
+    assert(newPool);
+
+    const oldRemainingAllocatedTokens = await newPool.remainingAllocatedTokens();
+
+    await time.advanceBlock();
+    await time.advanceBlock();
+    await time.advanceBlock();
+    await time.advanceBlock();
+    await time.advanceBlock();
+    await newPool.updateRewards();
+
+    const newRemainingAllocatedTokens = await newPool.remainingAllocatedTokens();
+
+    assert(oldRemainingAllocatedTokens.toString() === newRemainingAllocatedTokens.toString());
+
+    await time.advanceBlock();
+    await time.advanceBlock();
+
+    await token.approve(newPool.address, amount, { from: staker1 });
+    await newPool.stake(amount, mainStakingPoolData.maxStakingTime, {
+      from: staker1,
+    });
+
+    await time.advanceBlock();
+
+    const userPendingRewards = await newPool.pendingRewards(staker1);
+
+    assert(mainStakingPoolData.rewardsPerBlock.toString() === userPendingRewards.toString());
+
+    const remainingAllocatedTokens = await newPool.remainingAllocatedTokens();
+
+    assert(mainStakingPoolData.allocatedTokens.sub(userPendingRewards).toString() === remainingAllocatedTokens.toString());
+  });
+
   it("Remaining allocated tokens takes into account the number of rewarded tokens", async () => {
     await time.advanceBlock();
     await time.advanceBlock();
@@ -713,7 +760,7 @@ contract("MechaniumStakingPool", (accounts) => {
     const weightMultiplier =
       (mainStakingPoolData.maxWeightMultiplier.toNumber() -
         mainStakingPoolData.minWeightMultiplier.toNumber()) /
-        4 +
+      4 +
       1;
 
     const userProfile = await mainPool.getUser(staker3);
