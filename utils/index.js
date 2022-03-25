@@ -67,13 +67,13 @@ let gasPrice = 0;
 const addCost = async (action, data) => {
   const tx = await web3.eth.getTransaction(data.tx);
   gasPrice = tx.gasPrice;
-  const price = data.receipt.gasUsed * Number(gasPrice);
+  const price = (data.receipt?.gasUsed || tx.gas) * Number(gasPrice);
 
   const priceETH = web3.utils.fromWei(`${price}`, "ether");
 
   const cost = {
     action,
-    gasUsed: data.receipt.gasUsed,
+    gasUsed: data.receipt?.gasUsed || tx.gas,
     gasPrice: gasPrice,
     price,
     priceETH,
