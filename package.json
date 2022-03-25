@@ -9,22 +9,22 @@
     "generate-types": "typechain --target=ethers-v5 build/contracts/*.json"
   },
   "devDependencies": {
-    "ganache-cli": "^6.12.2",
-    "hardhat": "^2.8.3",
-    "solc-0.6": "npm:solc@^0.6.6",
-    "solc-0.8": "npm:solc@^0.8.11",
     "cli-progress": "^3.10.0",
+    "ganache-cli": "^6.12.2",
+    "solc-0.6": "npm:solc@^0.6.6",
+    "solc-0.8": "npm:solc@^0.8.13",
     "solidity-docgen": "^0.5.16",
-    "truffle-plugin-verify": "^0.5.21"
+    "truffle-plugin-verify": "^0.5.24"
   },
   "dependencies": {
     "@maticnetwork/pos-portal": "^1.5.2",
-    "@openzeppelin/contracts": "^4.3.3",
+    "@openzeppelin/contracts": "^4.5.0",
+    "@openzeppelin/contracts-upgradeable": "^4.5.2",
     "@openzeppelin/test-helpers": "^0.5.15",
-    "@truffle/hdwallet-provider": "^2.0.3",
-    "@typechain/ethers-v5": "^9.0.0",
-    "dotenv": "^10.0.0",
-    "typechain": "^7.0.0",
-    "web3-utils": "^1.6.1"
+    "@truffle/hdwallet-provider": "^2.0.4",
+    "@typechain/ethers-v5": "^10.0.0",
+    "dotenv": "^16.0.0",
+    "typechain": "^8.0.0",
+    "web3-utils": "^1.7.1"
   }
 }
