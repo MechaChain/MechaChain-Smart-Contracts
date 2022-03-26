@@ -1,12 +1,13 @@
 // Load modules
 const { BN } = require("@openzeppelin/test-helpers");
+const web3Utils = require("web3-utils");
 
 const fs = require("fs");
 
 let deployedContractsList = require("../DEPLOYED_CONTRACTS.json");
 
 function getAmount(value) {
-  return new BN(`${value}`).mul(new BN(`${10 ** 18}`));
+  return getBN(web3Utils.toWei(`${value}`));
 }
 
 function getBN(value) {
@@ -60,6 +61,11 @@ const getBNRange = (x1, y1, x2, y2, a) =>
 const getRandom = (min = 0, max = 100) => {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 };
+
+function getSignature(validator_private_key, data) {
+  let message = web3.utils.soliditySha3(web3.utils.encodePacked(...data));
+  return web3.eth.accounts.sign(message, validator_private_key).signature;
+}
 
 // gasTracker;
 const costs = [];
@@ -155,6 +161,7 @@ module.exports = {
     getStats,
     consoleStats,
   },
+  getSignature,
   getAmount,
   getBN,
   getDeployedContract,
