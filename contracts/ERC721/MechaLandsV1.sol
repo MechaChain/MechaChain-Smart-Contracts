@@ -17,9 +17,16 @@ Questions :
 - Withdraw  
 - Storage gap ?
 - Airdrop ?
-- total supply
  */
 
+/**
+TODO : Add total supply (from counter)
+TODO : Counter for planet, begin with 1 (setup detect if new or updated)
+TODO : Counter for round, begin with 1 (setup detect if new or updated)
+TODO : Event for created and event for setup 
+TODO : typePerToken -> tokenType
+TODO : planetPerToken -> tokenPlanet
+ */
 contract MechaLandsV1 is
     Initializable,
     ERC721Upgradeable,
