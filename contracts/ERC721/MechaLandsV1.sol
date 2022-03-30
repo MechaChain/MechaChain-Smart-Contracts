@@ -20,9 +20,6 @@ Questions :
  */
 
 /**
-TODO : Add total supply (from counter)
-TODO : Counter for planet, begin with 1 (setup detect if new or updated)
-TODO : Counter for round, begin with 1 (setup detect if new or updated)
 TODO : Event for created and event for setup 
 TODO : typePerToken -> tokenType
 TODO : planetPerToken -> tokenPlanet
@@ -144,13 +141,19 @@ contract MechaLandsV1 is
     /// Last minted token id
     uint256 internal _tokenIdCounter;
 
+    /// Number of existing planets
+    uint256 public planetsLength;
+
+    /// Number of existing mint rounds
+    uint256 public roundsLength;
+
     /// Base extension for the end of token id
     string public baseExtension;
 
-    /// All MechaChain planets
+    /// All MechaChain planets (starts at index 1)
     mapping(uint256 => Planet) public planets;
 
-    /// Mint rounds per planets
+    /// All mint rounds (starts at index 1)
     mapping(uint256 => MintRound) public rounds;
 
     /// Land type per token
@@ -248,9 +251,9 @@ contract MechaLandsV1 is
     /**
      * @notice Create or edit a planet.
      *
-     * @dev Indexes increment is the responsibility of the owner.
-     *
      * @dev Requirements:
+     * - `planetId` must exist or increment `planetsLength` for create one.
+     * - `planetId` can be 0.
      * - The number of types cannot be lower than the previous one.
      * - `supplyPerType` and `notRevealUriPerType` must have a length of `typesNumber`.
      * - A supply can by lower than the number of mint for the same type.
@@ -266,6 +269,7 @@ contract MechaLandsV1 is
         uint32[] memory supplyPerType,
         string[] memory notRevealUriPerType
     ) public onlyOwner {
+        require(planetId > 0, "Can be 0");
         require(
             planets[planetId].typesNumber <= typesNumber,
             "Can decrease types"
@@ -277,16 +281,25 @@ contract MechaLandsV1 is
             "Incorrect length"
         );
 
+        if (planetId == planetsLength + 1) {
+            planetsLength += 1;
+        } else {
+            require(planetId <= planetsLength, "Invalid planetId");
+        }
+
         planets[planetId].typesNumber = typesNumber;
         for (uint256 i; i < typesNumber; i++) {
             require(
-                planets[planetId].totalMintedPerType[i] <= supplyPerType[i],
+                planets[planetId].totalMintedPerType[i + 1] <= supplyPerType[i],
                 "Supply lower than already minted"
             );
 
-            planets[planetId].supplyPerType[i] = supplyPerType[i];
-            planets[planetId].notRevealUriPerType[i] = notRevealUriPerType[i];
+            planets[planetId].supplyPerType[i + 1] = supplyPerType[i];
+            planets[planetId].notRevealUriPerType[i + 1] = notRevealUriPerType[
+                i
+            ];
         }
+
         emit PlanetSetup(
             planetId,
             typesNumber,
@@ -330,11 +343,12 @@ contract MechaLandsV1 is
     /**
      * @notice Create or edit a mint round for a planet
      *
-     * @dev Indexes increment is the responsibility of the owner.
      * @dev `supplyPerType` of the round can be greater than the one of the planet. In this case,
      *       it is the supply of the planet that will be taken into account.
      *
      * @dev Requirements:
+     * - `roundId` must exist or increment `roundsLength` for create one.
+     * - `roundId` can be 0.
      * - The number of types cannot be lower than the previous one.
      * - `supplyPerType` and `pricePerType` must have a length of planet's `typesNumber`.
      * - A supply can by lower than the number of round mint for the same type.
@@ -361,6 +375,14 @@ contract MechaLandsV1 is
         uint256[] memory supplyPerType,
         uint256[] memory maxMintPerType
     ) public onlyOwner {
+        require(roundId > 0, "Can be 0");
+
+        if (roundId == roundsLength + 1) {
+            roundsLength += 1;
+        } else {
+            require(roundId <= roundsLength, "Invalid roundId");
+        }
+
         MintRound storage round = rounds[roundId];
         round.startTime = startTime;
         round.duration = duration;
@@ -376,12 +398,12 @@ contract MechaLandsV1 is
 
         for (uint256 i; i < supplyPerType.length; i++) {
             require(
-                round.totalMintedPerType[i] <= supplyPerType[i],
+                round.totalMintedPerType[i + 1] <= supplyPerType[i],
                 "Supply lower than already minted"
             );
-            round.pricePerType[i] = pricePerType[i];
-            round.supplyPerType[i] = supplyPerType[i];
-            round.maxMintPerType[i] = maxMintPerType[i];
+            round.pricePerType[i + 1] = pricePerType[i];
+            round.supplyPerType[i + 1] = supplyPerType[i];
+            round.maxMintPerType[i + 1] = maxMintPerType[i];
         }
 
         emit PlanetMintRoundSetup(
