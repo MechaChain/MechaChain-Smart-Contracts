@@ -20,9 +20,6 @@ Questions :
  */
 
 /**
-TODO : Event for created and event for setup 
-TODO : typePerToken -> tokenType
-TODO : planetPerToken -> tokenPlanet
 TODO : burnable with option
 TODO : withdraw 
  */
@@ -157,10 +154,10 @@ contract MechaLandsV1 is
     mapping(uint256 => MintRound) public rounds;
 
     /// Land type per token
-    mapping(uint256 => uint256) public typePerToken;
+    mapping(uint256 => uint256) public tokenType;
 
     /// Planet per token
-    mapping(uint256 => uint256) public planetPerToken;
+    mapping(uint256 => uint256) public tokenPlanet;
 
     /**
      * ========================
@@ -447,10 +444,10 @@ contract MechaLandsV1 is
             _exists(tokenId),
             "ERC721Metadata: URI query for nonexistent token"
         );
-        uint256 planetId = planetPerToken[tokenId];
+        uint256 planetId = tokenPlanet[tokenId];
 
         if (!planets[planetId].revealed) {
-            uint256 landType = typePerToken[tokenId];
+            uint256 landType = tokenType[tokenId];
             return planets[planetId].notRevealUriPerType[landType];
         } else {
             string memory currentBaseURI = planets[planetId].baseURI;
@@ -652,8 +649,8 @@ contract MechaLandsV1 is
         for (uint256 i = 0; i < amount; i++) {
             tokenId++;
             _safeMint(wallet, tokenId);
-            typePerToken[tokenId] = landType;
-            planetPerToken[tokenId] = planetId;
+            tokenType[tokenId] = landType;
+            tokenPlanet[tokenId] = planetId;
         }
         _tokenIdCounter = tokenId;
 
