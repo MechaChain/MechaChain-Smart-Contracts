@@ -239,6 +239,8 @@ contract MechaLandsV1 is
         uint256 payloadExpiration,
         bytes memory sig
     ) external payable whenNotPaused nonReentrant {
+        require(rounds[roundId].validator != address(0), "No round validator");
+
         _checkSignature(
             msg.sender,
             payloadExpiration,

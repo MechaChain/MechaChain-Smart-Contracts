@@ -763,6 +763,7 @@ contract("MechaLandsV1", (accounts) => {
    */
   describe("\n ROUND 2 MINT", () => {
     // TODO round max
+    // TODO "No round validator" issue
   });
 
   /**
