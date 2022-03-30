@@ -62,8 +62,10 @@ contract MechaLandsV1 is
         uint64 startTime,
         uint64 duration,
         address validator,
+        bool limitedPerType,
         uint256[] pricePerType,
-        uint256[] supplyPerType
+        uint256[] supplyPerType,
+        uint256[] maxMintPerType
     );
 
     /**
@@ -102,23 +104,29 @@ contract MechaLandsV1 is
 
     /**
      * @notice Container for packing the information of a planet mint round.
+     * @member limitedPerType If the max mint limitation per wallet is defined par type or far all types.
      * @member planetId The planet index for which users can mint during the current round.
      * @member startTime The start time of the round in unix timestamp. 0 if not set.
      * @member duration The duration of the round in seconds. 0 if ends at sold out.
      * @member validator The address of the whitelist validator. Can be 'address(0)' for no whitelist.
      * @member pricePerType The price by land type of the round in wei.
      * @member supplyPerType The round supply by land type.
+     * @member maxMintPerType The maximum number of tokens that a user can mint per type during the round.
      * @member totalMintedPerType The round total minted token by land type.
+     * @member totalMintedPerUser The round total minted token by wallet.
      * @member totalMintedPerTypePerUser Number of mint per land type and per user during the round.
      */
     struct MintRound {
+        bool limitedPerType;
         uint64 planetId;
         uint64 startTime;
         uint64 duration;
         address validator;
         mapping(uint256 => uint256) pricePerType;
         mapping(uint256 => uint256) supplyPerType;
+        mapping(uint256 => uint256) maxMintPerType;
         mapping(uint256 => uint256) totalMintedPerType;
+        mapping(address => uint256) totalMintedPerUser;
         mapping(address => mapping(uint256 => uint256)) totalMintedPerTypePerUser;
     }
 
@@ -193,13 +201,14 @@ contract MechaLandsV1 is
     }
 
     /**
-     * @notice Mint the `amount` of planet land type with the signature of the round validator
+     * @notice Mint the `amount` of planet land type with the signature of the round validator.
      *
      * @dev Requirements:
-     * - Total minted for this land type for the user during this round must be less than `maxMint`
-     * - `sig` must be signed by the validator of the round and contains all information to check
-     * - `payloadExpiration` must be less than the block timestamp
-     * - View {MechaLandsV1-_roundMint} requirements
+     * - Total minted for the user during this round must be less than `maxMint`.
+     *   If round is `limitedPerType`, the condition is only for the `landType` total.
+     * - `sig` must be signed by the validator of the round and contains all information to check.
+     * - `payloadExpiration` must be less than the block timestamp.
+     * - View {MechaLandsV1-_roundMint} requirements.
      *
      * @param roundId The mint round index (verified in `sig`)
      * @param landType The type of the land (verified in `sig`)
@@ -225,12 +234,11 @@ contract MechaLandsV1 is
             sig,
             rounds[roundId].validator
         );
-        require(
-            rounds[roundId].totalMintedPerTypePerUser[msg.sender][landType] +
-                amount <=
-                maxMint,
-            "Max allowed"
-        );
+
+        uint256 totalRoundMinted = rounds[roundId].limitedPerType
+            ? rounds[roundId].totalMintedPerTypePerUser[msg.sender][landType]
+            : rounds[roundId].totalMintedPerUser[msg.sender];
+        require(totalRoundMinted + amount <= maxMint, "Validator max allowed");
 
         _roundMint(msg.sender, roundId, landType, amount);
     }
@@ -334,26 +342,33 @@ contract MechaLandsV1 is
      * @param startTime The start time of the round in unix timestamp. 0 if not set.
      * @param duration The duration of the round in seconds. 0 if ends at sold out.
      * @param validator The address of the whitelist validator. Can be 'address(0)' for no whitelist.
+     * @param limitedPerType If the max mint limitation per wallet is defined par type or far all types.
      * @param pricePerType The price by land type of the round in wei.
      * @param supplyPerType The round supply by land type.
+     * @param maxMintPerType The maximum number of tokens that a user can mint per type during the round. If `limitedPerType`, all values should be the same.
      */
+
     function setupMintRound(
         uint256 roundId,
         uint256 planetId,
         uint64 startTime,
         uint64 duration,
         address validator,
+        bool limitedPerType,
         uint256[] memory pricePerType,
-        uint256[] memory supplyPerType
+        uint256[] memory supplyPerType,
+        uint256[] memory maxMintPerType
     ) public onlyOwner {
         MintRound storage round = rounds[roundId];
         round.startTime = startTime;
         round.duration = duration;
         round.validator = validator;
+        round.limitedPerType = limitedPerType;
 
         require(
             pricePerType.length == planets[planetId].typesNumber &&
-                supplyPerType.length == planets[planetId].typesNumber,
+                pricePerType.length == planets[planetId].typesNumber &&
+                maxMintPerType.length == planets[planetId].typesNumber,
             "Incorrect length"
         );
 
@@ -364,6 +379,7 @@ contract MechaLandsV1 is
             );
             round.pricePerType[i] = pricePerType[i];
             round.supplyPerType[i] = supplyPerType[i];
+            round.maxMintPerType[i] = maxMintPerType[i];
         }
 
         emit PlanetMintRoundSetup(
@@ -372,8 +388,10 @@ contract MechaLandsV1 is
             startTime,
             duration,
             validator,
+            limitedPerType,
             pricePerType,
-            supplyPerType
+            supplyPerType,
+            maxMintPerType
         );
     }
 
@@ -552,13 +570,21 @@ contract MechaLandsV1 is
                 round.supplyPerType[landType],
             "Round supply exceeded"
         );
-        // TODO max per transaction ?
+
+        uint256 totalRoundMinted = round.limitedPerType
+            ? round.totalMintedPerTypePerUser[msg.sender][landType]
+            : round.totalMintedPerUser[msg.sender];
+        require(
+            totalRoundMinted + amount <= round.maxMintPerType[landType],
+            "Round max allowed"
+        );
 
         _safeMint(wallet, round.planetId, landType, amount);
 
         // Increase round total minted
         round.totalMintedPerType[landType] += amount;
         round.totalMintedPerTypePerUser[wallet][landType] += amount;
+        round.totalMintedPerUser[msg.sender] += amount;
     }
 
     /**
@@ -614,7 +640,7 @@ contract MechaLandsV1 is
      *
      * @param wallet The user wallet
      * @param payloadExpiration The maximum timestamp before the signature is considered invalid
-     * @param maxMint The maximum token that the user is allowed to mint in the round for this landType
+     * @param maxMint The maximum token that the user is allowed to mint in the round
      * @param landType The landType that is allowed to mint
      * @param roundId The roundId that is allowed to mint
      * @param sig The EC signature generated by the signatory
