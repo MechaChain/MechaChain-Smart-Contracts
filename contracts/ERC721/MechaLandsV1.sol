@@ -8,8 +8,8 @@ import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
-import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 // TODO : Storage gap ?
 
@@ -24,7 +24,7 @@ contract MechaLandsV1 is
 {
     using Strings for uint256;
     using ECDSA for bytes32;
-    using SafeERC20 for IERC20;
+    using SafeERC20Upgradeable for IERC20Upgradeable;
 
     /**
      * ========================
@@ -278,7 +278,7 @@ contract MechaLandsV1 is
         uint32[] memory supplyPerType,
         string[] memory notRevealUriPerType
     ) public onlyOwner {
-        require(planetId > 0, "Can be 0");
+        require(planetId > 0, "Id can be 0");
         require(
             planets[planetId].typesNumber <= typesNumber,
             "Can decrease types"
@@ -388,7 +388,7 @@ contract MechaLandsV1 is
      */
     function setupMintRound(
         uint256 roundId,
-        uint256 planetId,
+        uint64 planetId,
         uint64 startTime,
         uint64 duration,
         address validator,
@@ -397,7 +397,7 @@ contract MechaLandsV1 is
         uint256[] memory supplyPerType,
         uint256[] memory maxMintPerType
     ) public onlyOwner {
-        require(roundId > 0, "Can be 0");
+        require(roundId > 0, "Id can be 0");
 
         if (roundId == roundsLength + 1) {
             roundsLength += 1;
@@ -406,14 +406,15 @@ contract MechaLandsV1 is
         }
 
         MintRound storage round = rounds[roundId];
+        round.limitedPerType = limitedPerType;
+        round.planetId = planetId;
         round.startTime = startTime;
         round.duration = duration;
         round.validator = validator;
-        round.limitedPerType = limitedPerType;
 
         require(
             pricePerType.length == planets[planetId].typesNumber &&
-                pricePerType.length == planets[planetId].typesNumber &&
+                supplyPerType.length == planets[planetId].typesNumber &&
                 maxMintPerType.length == planets[planetId].typesNumber,
             "Incorrect length"
         );
@@ -492,7 +493,7 @@ contract MechaLandsV1 is
         address token,
         uint256 amount
     ) public onlyOwner {
-        IERC20 customToken = IERC20(token);
+        IERC20Upgradeable customToken = IERC20Upgradeable(token);
         customToken.safeTransfer(to, amount);
         emit TokenWithdrawn(to, token, amount);
     }
@@ -600,6 +601,17 @@ contract MechaLandsV1 is
     }
 
     /**
+     * @notice Return the maximum number of `landType` tokens that a user can mint for `roundId`
+     */
+    function roundMaxMintByType(uint256 roundId, uint256 landType)
+        public
+        view
+        returns (uint256)
+    {
+        return rounds[roundId].maxMintPerType[landType];
+    }
+
+    /**
      * @notice Return the total minted of `landType` for `roundId`
      */
     function roundTotalMintedByType(uint256 roundId, uint256 landType)
@@ -619,6 +631,17 @@ contract MechaLandsV1 is
         uint256 landType
     ) public view returns (uint256) {
         return rounds[roundId].totalMintedPerTypePerUser[user][landType];
+    }
+
+    /**
+     * @notice Return the total minted for `user` in `roundId` for all lands
+     */
+    function roundTotalMintedForUser(address user, uint256 roundId)
+        public
+        view
+        returns (uint256)
+    {
+        return rounds[roundId].totalMintedPerUser[user];
     }
 
     function chainid() public view returns (uint256) {
@@ -655,8 +678,9 @@ contract MechaLandsV1 is
         uint256 amount
     ) internal {
         MintRound storage round = rounds[roundId];
+        require(round.planetId > 0, "Invalid round");
         require(
-            block.timestamp > round.startTime &&
+            block.timestamp >= round.startTime &&
                 round.startTime > 0 &&
                 (round.duration == 0 ||
                     block.timestamp < round.startTime + round.duration),
@@ -710,7 +734,10 @@ contract MechaLandsV1 is
         uint256 amount
     ) internal {
         Planet storage planet = planets[planetId];
-        require(landType < planet.typesNumber, "Incorrect type");
+        require(
+            landType > 0 && landType <= planet.typesNumber,
+            "Incorrect type"
+        );
         require(amount > 0, "Zero amount");
         require(
             planet.totalMintedPerType[landType] + amount <=
@@ -786,4 +813,6 @@ contract MechaLandsV1 is
         override
         onlyOwner
     {}
+
+    receive() external payable {}
 }
