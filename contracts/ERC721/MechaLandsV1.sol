@@ -9,21 +9,10 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
-/**
-Questions : 
-- burnable ?
-- max per round or max per transaction ?
-- Name of the ERC721
-- Withdraw  
-- Storage gap ?
-- Airdrop ?
- */
+// TODO : Storage gap ?
 
-/**
-TODO : burnable with option
-TODO : withdraw 
- */
 contract MechaLandsV1 is
     Initializable,
     ERC721Upgradeable,
@@ -35,6 +24,8 @@ contract MechaLandsV1 is
 {
     using Strings for uint256;
     using ECDSA for bytes32;
+    using SafeERC20 for IERC20;
+
     /**
      * ========================
      *          Events
@@ -80,6 +71,16 @@ contract MechaLandsV1 is
      * @notice Event emitted when the burnable option of a planet has been changed
      */
     event PlanetBurnableChanged(uint256 indexed planetId, bool burnable);
+
+    /**
+     * @notice Event emitted when native coin were removed from the contract
+     */
+    event Withdrawn(address indexed to, uint256 amount);
+
+    /**
+     * @notice Event emitted when some ERC20 were removed from the contract
+     */
+    event TokenWithdrawn(address indexed to, address token, uint256 amount);
 
     /**
      * ========================
@@ -385,7 +386,6 @@ contract MechaLandsV1 is
      * @param supplyPerType The round supply by land type.
      * @param maxMintPerType The maximum number of tokens that a user can mint per type during the round. If `limitedPerType`, all values should be the same.
      */
-
     function setupMintRound(
         uint256 roundId,
         uint256 planetId,
@@ -441,10 +441,16 @@ contract MechaLandsV1 is
         );
     }
 
+    /**
+     * @notice Pause the contract : disables mints, transactions and burns until `unpause`
+     */
     function pause() public onlyOwner {
         _pause();
     }
 
+    /**
+     * @notice Unpause the contract
+     */
     function unpause() public onlyOwner {
         _unpause();
     }
@@ -456,10 +462,39 @@ contract MechaLandsV1 is
      * - The planet of `tokenId` must be burnable.
      * - The caller must own `tokenId` or be an approved operator.
      */
-    function burn(uint256 tokenId) public virtual override {
+    function burn(uint256 tokenId) public virtual override whenNotPaused {
         uint256 planetId = tokenPlanet[tokenId];
         require(planets[planetId].burnable, "Planet not burnable");
         super.burn(tokenId);
+    }
+
+    /**
+     * @notice Withdraw network native coins
+     *
+     * @param to The address of the tokens/coins receiver.
+     * @param amount Amount to claim.
+     */
+    function withdraw(address payable to, uint256 amount) public onlyOwner {
+        (bool succeed, ) = to.call{value: amount}("");
+        require(succeed, "Failed to withdraw");
+        emit Withdrawn(to, amount);
+    }
+
+    /**
+     * @notice Withdraw ERC20
+     *
+     * @param to The address of the tokens/coins receiver.
+     * @param token The address of the token contract.
+     * @param amount Amount to claim.
+     */
+    function withdrawTokens(
+        address to,
+        address token,
+        uint256 amount
+    ) public onlyOwner {
+        IERC20 customToken = IERC20(token);
+        customToken.safeTransfer(to, amount);
+        emit TokenWithdrawn(to, token, amount);
     }
 
     /*
