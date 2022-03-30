@@ -2,6 +2,7 @@
 pragma solidity ^0.8.4;
 
 import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721BurnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
@@ -26,6 +27,7 @@ TODO : withdraw
 contract MechaLandsV1 is
     Initializable,
     ERC721Upgradeable,
+    ERC721BurnableUpgradeable,
     PausableUpgradeable,
     OwnableUpgradeable,
     ReentrancyGuardUpgradeable,
@@ -75,6 +77,11 @@ contract MechaLandsV1 is
     event PlanetBaseURIChanged(uint256 indexed planetId, string baseURI);
 
     /**
+     * @notice Event emitted when the burnable option of a planet has been changed
+     */
+    event PlanetBurnableChanged(uint256 indexed planetId, bool burnable);
+
+    /**
      * ========================
      *          Struct
      * ========================
@@ -83,6 +90,7 @@ contract MechaLandsV1 is
     /**
      * @notice Container for packing the information of a planet.
      * @member revealed If the lands of the planet are revealed (add the id after token URI).
+     * @member burnable If users are authorized to burn their tokens for this planet.
      * @member baseURI The base token URI use after reveal.
      * @member typesNumber Number of land types for this planet.
      * @member supplyPerType Maximum number of land by type.
@@ -91,6 +99,7 @@ contract MechaLandsV1 is
      */
     struct Planet {
         bool revealed;
+        bool burnable;
         uint16 typesNumber;
         string baseURI;
         mapping(uint256 => uint256) supplyPerType;
@@ -173,8 +182,10 @@ contract MechaLandsV1 is
      */
     function initialize() public initializer {
         __ERC721_init("MechaLands", "ML");
+        __ERC721Burnable_init();
         __Pausable_init();
         __Ownable_init();
+        __ReentrancyGuard_init();
         __UUPSUpgradeable_init();
         baseExtension = ".json";
         version = 1;
@@ -338,6 +349,20 @@ contract MechaLandsV1 is
     }
 
     /**
+     * @notice Activate burnable option for a planet
+     *
+     * @param planetId The index of the planet.
+     * @param burnable If users are authorized to burn their tokens for this planet.
+     */
+    function setPlanetBurnable(uint256 planetId, bool burnable)
+        public
+        onlyOwner
+    {
+        planets[planetId].burnable = burnable;
+        emit PlanetBurnableChanged(planetId, burnable);
+    }
+
+    /**
      * @notice Create or edit a mint round for a planet
      *
      * @dev `supplyPerType` of the round can be greater than the one of the planet. In this case,
@@ -422,6 +447,19 @@ contract MechaLandsV1 is
 
     function unpause() public onlyOwner {
         _unpause();
+    }
+
+    /**
+     * @dev Burns `tokenId`. See {ERC721-_burn}.
+     *
+     * Requirements:
+     * - The planet of `tokenId` must be burnable.
+     * - The caller must own `tokenId` or be an approved operator.
+     */
+    function burn(uint256 tokenId) public virtual override {
+        uint256 planetId = tokenPlanet[tokenId];
+        require(planets[planetId].burnable, "Planet not burnable");
+        super.burn(tokenId);
     }
 
     /*
