@@ -444,6 +444,13 @@ contract MechaLandsV1 is
     }
 
     /**
+     * @notice Returns the total amount of tokens minted.
+     */
+    function totalSupply() public view returns (uint256) {
+        return _tokenIdCounter; // TODO remove burned tokens
+    }
+
+    /**
      * @notice Return the supply of `landType` for `planetId`
      */
     function getPlanetSupplyByType(uint256 planetId, uint256 landType)
