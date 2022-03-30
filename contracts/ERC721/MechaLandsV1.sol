@@ -26,6 +26,8 @@ TODO : Counter for round, begin with 1 (setup detect if new or updated)
 TODO : Event for created and event for setup 
 TODO : typePerToken -> tokenType
 TODO : planetPerToken -> tokenPlanet
+TODO : burnable with option
+TODO : withdraw 
  */
 contract MechaLandsV1 is
     Initializable,
@@ -453,7 +455,7 @@ contract MechaLandsV1 is
     /**
      * @notice Return the supply of `landType` for `planetId`
      */
-    function getPlanetSupplyByType(uint256 planetId, uint256 landType)
+    function planetSupplyByType(uint256 planetId, uint256 landType)
         public
         view
         returns (uint256)
@@ -464,7 +466,7 @@ contract MechaLandsV1 is
     /**
      * @notice Return the total minted of `landType` for `planetId`
      */
-    function getPlanetTotalMintedByType(uint256 planetId, uint256 landType)
+    function planetTotalMintedByType(uint256 planetId, uint256 landType)
         public
         view
         returns (uint256)
@@ -475,7 +477,7 @@ contract MechaLandsV1 is
     /**
      * @notice Return the not reveal URI of `landType` for `planetId`
      */
-    function getPlanetNotRevealUriByType(uint256 planetId, uint256 landType)
+    function planetNotRevealUriByType(uint256 planetId, uint256 landType)
         public
         view
         returns (string memory)
@@ -486,7 +488,7 @@ contract MechaLandsV1 is
     /**
      * @notice Return the supply of `landType` for `roundId`
      */
-    function getRoundSupplyByType(uint256 roundId, uint256 landType)
+    function roundSupplyByType(uint256 roundId, uint256 landType)
         public
         view
         returns (uint256)
@@ -497,7 +499,7 @@ contract MechaLandsV1 is
     /**
      * @notice Return the price of a single `landType` for `roundId`
      */
-    function getRoundPriceByType(uint256 roundId, uint256 landType)
+    function roundPriceByType(uint256 roundId, uint256 landType)
         public
         view
         returns (uint256)
@@ -508,7 +510,7 @@ contract MechaLandsV1 is
     /**
      * @notice Return the total minted of `landType` for `roundId`
      */
-    function getRoundTotalMintedByType(uint256 roundId, uint256 landType)
+    function roundTotalMintedByType(uint256 roundId, uint256 landType)
         public
         view
         returns (uint256)
@@ -519,7 +521,7 @@ contract MechaLandsV1 is
     /**
      * @notice Return the total minted of `landType` for `user` in `roundId`
      */
-    function getRoundTotalMintedByTypeForUser(
+    function roundTotalMintedByTypeForUser(
         address user,
         uint256 roundId,
         uint256 landType
