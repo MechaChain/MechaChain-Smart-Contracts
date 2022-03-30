@@ -51,6 +51,7 @@ Emitted when `value` tokens are moved from one account (`from`) to
 another (`to`).
 Note that `value` may be zero.
 
+
 _Inherited from `../@openzeppelin/contracts/token/ERC20/IERC20.sol`_.
 
 
@@ -58,6 +59,7 @@ _Inherited from `../@openzeppelin/contracts/token/ERC20/IERC20.sol`_.
 
 Emitted when the allowance of a `spender` for an `owner` is set by
 a call to {approve}. `value` is the new allowance.
+
 
 _Inherited from `../@openzeppelin/contracts/token/ERC20/IERC20.sol`_.
 
@@ -69,6 +71,8 @@ _Inherited from `../@openzeppelin/contracts/token/ERC20/IERC20.sol`_.
 
 Contract constructor
 
+
+Parameters:
 - `adminWallet`: address of the MechaChain admin wallet
 
 
@@ -77,6 +81,7 @@ Contract constructor
 
 Returns the name of the token.
 
+
 _Inherited from `../@openzeppelin/contracts/token/ERC20/ERC20.sol`_.
 
 
@@ -84,6 +89,7 @@ _Inherited from `../@openzeppelin/contracts/token/ERC20/ERC20.sol`_.
 
 Returns the symbol of the token, usually a shorter version of the
 name.
+
 
 _Inherited from `../@openzeppelin/contracts/token/ERC20/ERC20.sol`_.
 
@@ -100,6 +106,7 @@ NOTE: This information is only used for _display_ purposes: it in
 no way affects any of the arithmetic of the contract, including
 {IERC20-balanceOf} and {IERC20-transfer}.
 
+
 _Inherited from `../@openzeppelin/contracts/token/ERC20/ERC20.sol`_.
 
 
@@ -107,12 +114,14 @@ _Inherited from `../@openzeppelin/contracts/token/ERC20/ERC20.sol`_.
 
 See {IERC20-totalSupply}.
 
+
 _Inherited from `../@openzeppelin/contracts/token/ERC20/ERC20.sol`_.
 
 
 ### `balanceOf(address account) → uint256` (public) (inherited)<a name="ERC20-balanceOf-address-" id="ERC20-balanceOf-address-"></a>
 
 See {IERC20-balanceOf}.
+
 
 _Inherited from `../@openzeppelin/contracts/token/ERC20/ERC20.sol`_.
 
@@ -124,12 +133,14 @@ Requirements:
 - `to` cannot be the zero address.
 - the caller must have a balance of at least `amount`.
 
+
 _Inherited from `../@openzeppelin/contracts/token/ERC20/ERC20.sol`_.
 
 
 ### `allowance(address owner, address spender) → uint256` (public) (inherited)<a name="ERC20-allowance-address-address-" id="ERC20-allowance-address-address-"></a>
 
 See {IERC20-allowance}.
+
 
 _Inherited from `../@openzeppelin/contracts/token/ERC20/ERC20.sol`_.
 
@@ -141,6 +152,7 @@ NOTE: If `amount` is the maximum `uint256`, the allowance is not updated on
 `transferFrom`. This is semantically equivalent to an infinite approval.
 Requirements:
 - `spender` cannot be the zero address.
+
 
 _Inherited from `../@openzeppelin/contracts/token/ERC20/ERC20.sol`_.
 
@@ -158,6 +170,7 @@ Requirements:
 - the caller must have allowance for ``from``'s tokens of at least
 `amount`.
 
+
 _Inherited from `../@openzeppelin/contracts/token/ERC20/ERC20.sol`_.
 
 
@@ -169,6 +182,7 @@ problems described in {IERC20-approve}.
 Emits an {Approval} event indicating the updated allowance.
 Requirements:
 - `spender` cannot be the zero address.
+
 
 _Inherited from `../@openzeppelin/contracts/token/ERC20/ERC20.sol`_.
 
@@ -183,6 +197,7 @@ Requirements:
 - `spender` cannot be the zero address.
 - `spender` must have allowance for the caller of at least
 `subtractedValue`.
+
 
 _Inherited from `../@openzeppelin/contracts/token/ERC20/ERC20.sol`_.
 
@@ -200,6 +215,7 @@ Requirements:
 - `to` cannot be the zero address.
 - `from` must have a balance of at least `amount`.
 
+
 _Inherited from `../@openzeppelin/contracts/token/ERC20/ERC20.sol`_.
 
 
@@ -210,6 +226,7 @@ the total supply.
 Emits a {Transfer} event with `from` set to the zero address.
 Requirements:
 - `account` cannot be the zero address.
+
 
 _Inherited from `../@openzeppelin/contracts/token/ERC20/ERC20.sol`_.
 
@@ -222,6 +239,7 @@ Emits a {Transfer} event with `to` set to the zero address.
 Requirements:
 - `account` cannot be the zero address.
 - `account` must have at least `amount` tokens.
+
 
 _Inherited from `../@openzeppelin/contracts/token/ERC20/ERC20.sol`_.
 
@@ -236,6 +254,7 @@ Requirements:
 - `owner` cannot be the zero address.
 - `spender` cannot be the zero address.
 
+
 _Inherited from `../@openzeppelin/contracts/token/ERC20/ERC20.sol`_.
 
 
@@ -245,6 +264,7 @@ Spend `amount` form the allowance of `owner` toward `spender`.
 Does not update the allowance amount in case of infinite allowance.
 Revert if not enough allowance is available.
 Might emit an {Approval} event.
+
 
 _Inherited from `../@openzeppelin/contracts/token/ERC20/ERC20.sol`_.
 
@@ -261,6 +281,7 @@ will be transferred to `to`.
 - `from` and `to` are never both zero.
 To learn more about hooks, head to xref:ROOT:extending-contracts.adoc#using-hooks[Using Hooks].
 
+
 _Inherited from `../@openzeppelin/contracts/token/ERC20/ERC20.sol`_.
 
 
@@ -276,6 +297,7 @@ has been transferred to `to`.
 - `from` and `to` are never both zero.
 To learn more about hooks, head to xref:ROOT:extending-contracts.adoc#using-hooks[Using Hooks].
 
+
 _Inherited from `../@openzeppelin/contracts/token/ERC20/ERC20.sol`_.
 
 
@@ -283,10 +305,12 @@ _Inherited from `../@openzeppelin/contracts/token/ERC20/ERC20.sol`_.
 
 
 
+
 _Inherited from `../@openzeppelin/contracts/utils/Context.sol`_.
 
 
 ### `_msgData() → bytes` (internal) (inherited) <a name="Context-_msgData--" id="Context-_msgData--"></a>
+
 
 
 

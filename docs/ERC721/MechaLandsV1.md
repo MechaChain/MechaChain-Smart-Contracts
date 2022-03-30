@@ -145,8 +145,10 @@ Event emitted when a planet is created or edited
 
 
 
+
 ### `PlanetMintRoundSetup(uint256 roundId, uint256 planetId, uint64 startTime, uint64 duration, address validator, bool limitedPerType, uint256[] pricePerType, uint256[] supplyPerType, uint256[] maxMintPerType)`  <a name="MechaLandsV1-PlanetMintRoundSetup-uint256-uint256-uint64-uint64-address-bool-uint256---uint256---uint256---" id="MechaLandsV1-PlanetMintRoundSetup-uint256-uint256-uint64-uint64-address-bool-uint256---uint256---uint256---"></a>
 Event emitted when a mint round of a planet is created or edited
+
 
 
 
@@ -157,8 +159,10 @@ Event emitted when a planet has been revealed
 
 
 
+
 ### `PlanetBaseURIChanged(uint256 planetId, string baseURI)`  <a name="MechaLandsV1-PlanetBaseURIChanged-uint256-string-" id="MechaLandsV1-PlanetBaseURIChanged-uint256-string-"></a>
 Event emitted when the baseURI of all lands of a planet has been changed
+
 
 
 
@@ -169,8 +173,10 @@ Event emitted when the burnable option of a planet has been changed
 
 
 
+
 ### `Withdrawn(address to, uint256 amount)`  <a name="MechaLandsV1-Withdrawn-address-uint256-" id="MechaLandsV1-Withdrawn-address-uint256-"></a>
 Event emitted when native coin were removed from the contract
+
 
 
 
@@ -181,9 +187,11 @@ Event emitted when some ERC20 were removed from the contract
 
 
 
+
 ### `Upgraded(address implementation)` (inherited) <a name="ERC1967UpgradeUpgradeable-Upgraded-address-" id="ERC1967UpgradeUpgradeable-Upgraded-address-"></a>
 
 Emitted when the implementation is upgraded.
+
 
 _Inherited from `../@openzeppelin/contracts-upgradeable/proxy/ERC1967/ERC1967UpgradeUpgradeable.sol`_.
 
@@ -192,6 +200,7 @@ _Inherited from `../@openzeppelin/contracts-upgradeable/proxy/ERC1967/ERC1967Upg
 
 Emitted when the admin account has changed.
 
+
 _Inherited from `../@openzeppelin/contracts-upgradeable/proxy/ERC1967/ERC1967UpgradeUpgradeable.sol`_.
 
 
@@ -199,10 +208,12 @@ _Inherited from `../@openzeppelin/contracts-upgradeable/proxy/ERC1967/ERC1967Upg
 
 Emitted when the beacon is upgraded.
 
+
 _Inherited from `../@openzeppelin/contracts-upgradeable/proxy/ERC1967/ERC1967UpgradeUpgradeable.sol`_.
 
 
 ### `OwnershipTransferred(address previousOwner, address newOwner)` (inherited) <a name="OwnableUpgradeable-OwnershipTransferred-address-address-" id="OwnableUpgradeable-OwnershipTransferred-address-address-"></a>
+
 
 
 
@@ -213,12 +224,14 @@ _Inherited from `../@openzeppelin/contracts-upgradeable/access/OwnableUpgradeabl
 
 Emitted when the pause is triggered by `account`.
 
+
 _Inherited from `../@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol`_.
 
 
 ### `Unpaused(address account)` (inherited) <a name="PausableUpgradeable-Unpaused-address-" id="PausableUpgradeable-Unpaused-address-"></a>
 
 Emitted when the pause is lifted by `account`.
+
 
 _Inherited from `../@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol`_.
 
@@ -227,6 +240,7 @@ _Inherited from `../@openzeppelin/contracts-upgradeable/security/PausableUpgrade
 
 Emitted when `tokenId` token is transferred from `from` to `to`.
 
+
 _Inherited from `../@openzeppelin/contracts-upgradeable/token/ERC721/IERC721Upgradeable.sol`_.
 
 
@@ -234,12 +248,14 @@ _Inherited from `../@openzeppelin/contracts-upgradeable/token/ERC721/IERC721Upgr
 
 Emitted when `owner` enables `approved` to manage the `tokenId` token.
 
+
 _Inherited from `../@openzeppelin/contracts-upgradeable/token/ERC721/IERC721Upgradeable.sol`_.
 
 
 ### `ApprovalForAll(address owner, address operator, bool approved)` (inherited) <a name="IERC721Upgradeable-ApprovalForAll-address-address-bool-" id="IERC721Upgradeable-ApprovalForAll-address-address-bool-"></a>
 
 Emitted when `owner` enables or disables (`approved`) `operator` to manage all of its assets.
+
 
 _Inherited from `../@openzeppelin/contracts-upgradeable/token/ERC721/IERC721Upgradeable.sol`_.
 
@@ -253,8 +269,10 @@ _Inherited from `../@openzeppelin/contracts-upgradeable/token/ERC721/IERC721Upgr
 
 
 
+
 ### `initialize()` (public) <a name="MechaLandsV1-initialize--" id="MechaLandsV1-initialize--"></a>
 Initialize contract
+
 
 
 
@@ -269,6 +287,8 @@ Requirements:
 - View {MechaLandsV1-_roundMint} requirements
 
 
+
+Parameters:
 - `roundId`: The mint round index
 
 - `landType`: The type of the land
@@ -289,6 +309,8 @@ Requirements:
 - View {MechaLandsV1-_roundMint} requirements.
 
 
+
+Parameters:
 - `roundId`: The mint round index (verified in `sig`)
 
 - `landType`: The type of the land (verified in `sig`)
@@ -315,6 +337,8 @@ Requirements:
 - A supply can by lower than the number of mint for the same type.
 
 
+
+Parameters:
 - `planetId`: The index of the planet.
 
 - `typesNumber`: Number of land types for this planet.
@@ -332,6 +356,8 @@ Activate token revelation for a planet and set his base URI
 Can be called only once per planet
 
 
+
+Parameters:
 - `planetId`: The index of the planet.
 
 - `baseURI`: The baseURI for all lands on this planet.
@@ -343,6 +369,8 @@ Change the base URI of a planet
 
 
 
+
+Parameters:
 - `planetId`: The index of the planet.
 
 - `baseURI`: The baseURI for all lands on this planet.
@@ -354,6 +382,8 @@ Activate burnable option for a planet
 
 
 
+
+Parameters:
 - `planetId`: The index of the planet.
 
 - `burnable`: If users are authorized to burn their tokens for this planet.
@@ -375,6 +405,8 @@ Requirements:
 - A supply can by lower than the number of round mint for the same type.
 
 
+
+Parameters:
 - `roundId`: The index of the planet mint round.
 
 - `planetId`: The index of the planet.
@@ -401,8 +433,10 @@ Pause the contract : disables mints, transactions and burns until `unpause`
 
 
 
+
 ### `unpause()` (public) <a name="MechaLandsV1-unpause--" id="MechaLandsV1-unpause--"></a>
 Unpause the contract
+
 
 
 
@@ -417,11 +451,14 @@ Requirements:
 
 
 
+
 ### `withdraw(address payable to, uint256 amount)` (public) <a name="MechaLandsV1-withdraw-address-payable-uint256-" id="MechaLandsV1-withdraw-address-payable-uint256-"></a>
 Withdraw network native coins
 
 
 
+
+Parameters:
 - `to`: The address of the tokens/coins receiver.
 
 - `amount`: Amount to claim.
@@ -433,6 +470,8 @@ Withdraw ERC20
 
 
 
+
+Parameters:
 - `to`: The address of the tokens/coins receiver.
 
 - `token`: The address of the token contract.
@@ -447,8 +486,10 @@ Returns the URI of `tokenId` or the not revealed uri, according to its planet an
 
 
 
+
 ### `totalSupply() → uint256` (public) <a name="MechaLandsV1-totalSupply--" id="MechaLandsV1-totalSupply--"></a>
 Returns the total amount of tokens minted.
+
 
 
 
@@ -459,8 +500,10 @@ Return the supply of `landType` for `planetId`
 
 
 
+
 ### `planetTotalMintedByType(uint256 planetId, uint256 landType) → uint256` (public) <a name="MechaLandsV1-planetTotalMintedByType-uint256-uint256-" id="MechaLandsV1-planetTotalMintedByType-uint256-uint256-"></a>
 Return the total minted of `landType` for `planetId`
+
 
 
 
@@ -471,8 +514,10 @@ Return the not reveal URI of `landType` for `planetId`
 
 
 
+
 ### `roundSupplyByType(uint256 roundId, uint256 landType) → uint256` (public) <a name="MechaLandsV1-roundSupplyByType-uint256-uint256-" id="MechaLandsV1-roundSupplyByType-uint256-uint256-"></a>
 Return the supply of `landType` for `roundId`
+
 
 
 
@@ -483,8 +528,10 @@ Return the price of a single `landType` for `roundId`
 
 
 
+
 ### `roundTotalMintedByType(uint256 roundId, uint256 landType) → uint256` (public) <a name="MechaLandsV1-roundTotalMintedByType-uint256-uint256-" id="MechaLandsV1-roundTotalMintedByType-uint256-uint256-"></a>
 Return the total minted of `landType` for `roundId`
+
 
 
 
@@ -495,7 +542,9 @@ Return the total minted of `landType` for `user` in `roundId`
 
 
 
+
 ### `chainid() → uint256` (public) <a name="MechaLandsV1-chainid--" id="MechaLandsV1-chainid--"></a>
+
 
 
 
@@ -509,6 +558,7 @@ IMPORTANT: A proxy pointing at a proxiable contract should not be considered pro
 bricking a proxy that upgrades to it, by delegating to itself until out of gas. Thus it is critical that this
 function revert if invoked through a proxy. This is guaranteed by the `notDelegated` modifier.
 
+
 _Inherited from `../@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol`_.
 
 
@@ -517,6 +567,7 @@ _Inherited from `../@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradea
 Upgrade the implementation of the proxy to `newImplementation`.
 Calls {_authorizeUpgrade}.
 Emits an {Upgraded} event.
+
 
 _Inherited from `../@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol`_.
 
@@ -528,12 +579,14 @@ encoded in `data`.
 Calls {_authorizeUpgrade}.
 Emits an {Upgraded} event.
 
+
 _Inherited from `../@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol`_.
 
 
 ### `owner() → address` (public) (inherited)<a name="OwnableUpgradeable-owner--" id="OwnableUpgradeable-owner--"></a>
 
 Returns the address of the current owner.
+
 
 _Inherited from `../@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol`_.
 
@@ -545,6 +598,7 @@ Leaves the contract without owner. It will not be possible to call
 NOTE: Renouncing ownership will leave the contract without an owner,
 thereby removing any functionality that is only available to the owner.
 
+
 _Inherited from `../@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol`_.
 
 
@@ -553,12 +607,14 @@ _Inherited from `../@openzeppelin/contracts-upgradeable/access/OwnableUpgradeabl
 Transfers ownership of the contract to a new account (`newOwner`).
 Can only be called by the current owner.
 
+
 _Inherited from `../@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol`_.
 
 
 ### `paused() → bool` (public) (inherited)<a name="PausableUpgradeable-paused--" id="PausableUpgradeable-paused--"></a>
 
 Returns true if the contract is paused, and false otherwise.
+
 
 _Inherited from `../@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol`_.
 
@@ -567,12 +623,14 @@ _Inherited from `../@openzeppelin/contracts-upgradeable/security/PausableUpgrade
 
 See {IERC165-supportsInterface}.
 
+
 _Inherited from `../@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol`_.
 
 
 ### `balanceOf(address owner) → uint256` (public) (inherited)<a name="ERC721Upgradeable-balanceOf-address-" id="ERC721Upgradeable-balanceOf-address-"></a>
 
 See {IERC721-balanceOf}.
+
 
 _Inherited from `../@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol`_.
 
@@ -581,12 +639,14 @@ _Inherited from `../@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgra
 
 See {IERC721-ownerOf}.
 
+
 _Inherited from `../@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol`_.
 
 
 ### `name() → string` (public) (inherited)<a name="ERC721Upgradeable-name--" id="ERC721Upgradeable-name--"></a>
 
 See {IERC721Metadata-name}.
+
 
 _Inherited from `../@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol`_.
 
@@ -595,12 +655,14 @@ _Inherited from `../@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgra
 
 See {IERC721Metadata-symbol}.
 
+
 _Inherited from `../@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol`_.
 
 
 ### `approve(address to, uint256 tokenId)` (public) (inherited)<a name="ERC721Upgradeable-approve-address-uint256-" id="ERC721Upgradeable-approve-address-uint256-"></a>
 
 See {IERC721-approve}.
+
 
 _Inherited from `../@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol`_.
 
@@ -609,12 +671,14 @@ _Inherited from `../@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgra
 
 See {IERC721-getApproved}.
 
+
 _Inherited from `../@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol`_.
 
 
 ### `setApprovalForAll(address operator, bool approved)` (public) (inherited)<a name="ERC721Upgradeable-setApprovalForAll-address-bool-" id="ERC721Upgradeable-setApprovalForAll-address-bool-"></a>
 
 See {IERC721-setApprovalForAll}.
+
 
 _Inherited from `../@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol`_.
 
@@ -623,12 +687,14 @@ _Inherited from `../@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgra
 
 See {IERC721-isApprovedForAll}.
 
+
 _Inherited from `../@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol`_.
 
 
 ### `transferFrom(address from, address to, uint256 tokenId)` (public) (inherited)<a name="ERC721Upgradeable-transferFrom-address-address-uint256-" id="ERC721Upgradeable-transferFrom-address-address-uint256-"></a>
 
 See {IERC721-transferFrom}.
+
 
 _Inherited from `../@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol`_.
 
@@ -637,12 +703,14 @@ _Inherited from `../@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgra
 
 See {IERC721-safeTransferFrom}.
 
+
 _Inherited from `../@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol`_.
 
 
 ### `safeTransferFrom(address from, address to, uint256 tokenId, bytes _data)` (public) (inherited)<a name="ERC721Upgradeable-safeTransferFrom-address-address-uint256-bytes-" id="ERC721Upgradeable-safeTransferFrom-address-address-uint256-bytes-"></a>
 
 See {IERC721-safeTransferFrom}.
+
 
 _Inherited from `../@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol`_.
 
@@ -663,6 +731,8 @@ Requirements:
 Increase `totalMintedPerType` and `totalMintedPerTypePerUser` of the round
 
 
+
+Parameters:
 - `wallet`: The wallet to transfer new tokens
 
 - `roundId`: The mint round index
@@ -685,6 +755,8 @@ Requirements:
 Increase `totalMintedPerType` of the planet
 
 
+
+Parameters:
 - `wallet`: The wallet to transfer new tokens
 
 - `planetId`: The planet index
@@ -705,6 +777,8 @@ Requirements:
 - `sig` must be signed by `signer`
 
 
+
+Parameters:
 - `wallet`: The user wallet
 
 - `payloadExpiration`: The maximum timestamp before the signature is considered invalid
@@ -727,13 +801,16 @@ Requirements:
 
 
 
+
 ### `_authorizeUpgrade(address newImplementation)` (internal)  <a name="MechaLandsV1-_authorizeUpgrade-address-" id="MechaLandsV1-_authorizeUpgrade-address-"></a>
 
 
 
 
 
+
 ### `__UUPSUpgradeable_init()` (internal) (inherited) <a name="UUPSUpgradeable-__UUPSUpgradeable_init--" id="UUPSUpgradeable-__UUPSUpgradeable_init--"></a>
+
 
 
 
@@ -744,10 +821,12 @@ _Inherited from `../@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradea
 
 
 
+
 _Inherited from `../@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol`_.
 
 
 ### `__ERC1967Upgrade_init()` (internal) (inherited) <a name="ERC1967UpgradeUpgradeable-__ERC1967Upgrade_init--" id="ERC1967UpgradeUpgradeable-__ERC1967Upgrade_init--"></a>
+
 
 
 
@@ -758,12 +837,14 @@ _Inherited from `../@openzeppelin/contracts-upgradeable/proxy/ERC1967/ERC1967Upg
 
 
 
+
 _Inherited from `../@openzeppelin/contracts-upgradeable/proxy/ERC1967/ERC1967UpgradeUpgradeable.sol`_.
 
 
 ### `_getImplementation() → address` (internal) (inherited) <a name="ERC1967UpgradeUpgradeable-_getImplementation--" id="ERC1967UpgradeUpgradeable-_getImplementation--"></a>
 
 Returns the current implementation address.
+
 
 _Inherited from `../@openzeppelin/contracts-upgradeable/proxy/ERC1967/ERC1967UpgradeUpgradeable.sol`_.
 
@@ -773,6 +854,7 @@ _Inherited from `../@openzeppelin/contracts-upgradeable/proxy/ERC1967/ERC1967Upg
 Perform implementation upgrade
 Emits an {Upgraded} event.
 
+
 _Inherited from `../@openzeppelin/contracts-upgradeable/proxy/ERC1967/ERC1967UpgradeUpgradeable.sol`_.
 
 
@@ -780,6 +862,7 @@ _Inherited from `../@openzeppelin/contracts-upgradeable/proxy/ERC1967/ERC1967Upg
 
 Perform implementation upgrade with additional setup call.
 Emits an {Upgraded} event.
+
 
 _Inherited from `../@openzeppelin/contracts-upgradeable/proxy/ERC1967/ERC1967UpgradeUpgradeable.sol`_.
 
@@ -789,12 +872,14 @@ _Inherited from `../@openzeppelin/contracts-upgradeable/proxy/ERC1967/ERC1967Upg
 Perform implementation upgrade with security checks for UUPS proxies, and additional setup call.
 Emits an {Upgraded} event.
 
+
 _Inherited from `../@openzeppelin/contracts-upgradeable/proxy/ERC1967/ERC1967UpgradeUpgradeable.sol`_.
 
 
 ### `_getAdmin() → address` (internal) (inherited) <a name="ERC1967UpgradeUpgradeable-_getAdmin--" id="ERC1967UpgradeUpgradeable-_getAdmin--"></a>
 
 Returns the current admin.
+
 
 _Inherited from `../@openzeppelin/contracts-upgradeable/proxy/ERC1967/ERC1967UpgradeUpgradeable.sol`_.
 
@@ -804,12 +889,14 @@ _Inherited from `../@openzeppelin/contracts-upgradeable/proxy/ERC1967/ERC1967Upg
 Changes the admin of the proxy.
 Emits an {AdminChanged} event.
 
+
 _Inherited from `../@openzeppelin/contracts-upgradeable/proxy/ERC1967/ERC1967UpgradeUpgradeable.sol`_.
 
 
 ### `_getBeacon() → address` (internal) (inherited) <a name="ERC1967UpgradeUpgradeable-_getBeacon--" id="ERC1967UpgradeUpgradeable-_getBeacon--"></a>
 
 Returns the current beacon.
+
 
 _Inherited from `../@openzeppelin/contracts-upgradeable/proxy/ERC1967/ERC1967UpgradeUpgradeable.sol`_.
 
@@ -820,10 +907,12 @@ Perform beacon upgrade with additional setup call. Note: This upgrades the addre
 not upgrade the implementation contained in the beacon (see {UpgradeableBeacon-_setImplementation} for that).
 Emits a {BeaconUpgraded} event.
 
+
 _Inherited from `../@openzeppelin/contracts-upgradeable/proxy/ERC1967/ERC1967UpgradeUpgradeable.sol`_.
 
 
 ### `__ReentrancyGuard_init()` (internal) (inherited) <a name="ReentrancyGuardUpgradeable-__ReentrancyGuard_init--" id="ReentrancyGuardUpgradeable-__ReentrancyGuard_init--"></a>
+
 
 
 
@@ -834,6 +923,7 @@ _Inherited from `../@openzeppelin/contracts-upgradeable/security/ReentrancyGuard
 
 
 
+
 _Inherited from `../@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol`_.
 
 
@@ -841,10 +931,12 @@ _Inherited from `../@openzeppelin/contracts-upgradeable/security/ReentrancyGuard
 
 Initializes the contract setting the deployer as the initial owner.
 
+
 _Inherited from `../@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol`_.
 
 
 ### `__Ownable_init_unchained()` (internal) (inherited) <a name="OwnableUpgradeable-__Ownable_init_unchained--" id="OwnableUpgradeable-__Ownable_init_unchained--"></a>
+
 
 
 
@@ -856,6 +948,7 @@ _Inherited from `../@openzeppelin/contracts-upgradeable/access/OwnableUpgradeabl
 Transfers ownership of the contract to a new account (`newOwner`).
 Internal function without access restriction.
 
+
 _Inherited from `../@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol`_.
 
 
@@ -863,10 +956,12 @@ _Inherited from `../@openzeppelin/contracts-upgradeable/access/OwnableUpgradeabl
 
 Initializes the contract in unpaused state.
 
+
 _Inherited from `../@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol`_.
 
 
 ### `__Pausable_init_unchained()` (internal) (inherited) <a name="PausableUpgradeable-__Pausable_init_unchained--" id="PausableUpgradeable-__Pausable_init_unchained--"></a>
+
 
 
 
@@ -879,6 +974,7 @@ Triggers stopped state.
 Requirements:
 - The contract must not be paused.
 
+
 _Inherited from `../@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol`_.
 
 
@@ -888,10 +984,12 @@ Returns to normal state.
 Requirements:
 - The contract must be paused.
 
+
 _Inherited from `../@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol`_.
 
 
 ### `__ERC721Burnable_init()` (internal) (inherited) <a name="ERC721BurnableUpgradeable-__ERC721Burnable_init--" id="ERC721BurnableUpgradeable-__ERC721Burnable_init--"></a>
+
 
 
 
@@ -902,6 +1000,7 @@ _Inherited from `../@openzeppelin/contracts-upgradeable/token/ERC721/extensions/
 
 
 
+
 _Inherited from `../@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721BurnableUpgradeable.sol`_.
 
 
@@ -909,10 +1008,12 @@ _Inherited from `../@openzeppelin/contracts-upgradeable/token/ERC721/extensions/
 
 Initializes the contract by setting a `name` and a `symbol` to the token collection.
 
+
 _Inherited from `../@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol`_.
 
 
 ### `__ERC721_init_unchained(string name_, string symbol_)` (internal) (inherited) <a name="ERC721Upgradeable-__ERC721_init_unchained-string-string-" id="ERC721Upgradeable-__ERC721_init_unchained-string-string-"></a>
+
 
 
 
@@ -924,6 +1025,7 @@ _Inherited from `../@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgra
 Base URI for computing {tokenURI}. If set, the resulting URI for each
 token will be the concatenation of the `baseURI` and the `tokenId`. Empty
 by default, can be overriden in child contracts.
+
 
 _Inherited from `../@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol`_.
 
@@ -942,6 +1044,7 @@ Requirements:
 - If `to` refers to a smart contract, it must implement {IERC721Receiver-onERC721Received}, which is called upon a safe transfer.
 Emits a {Transfer} event.
 
+
 _Inherited from `../@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol`_.
 
 
@@ -952,6 +1055,7 @@ Tokens can be managed by their owner or approved accounts via {approve} or {setA
 Tokens start existing when they are minted (`_mint`),
 and stop existing when they are burned (`_burn`).
 
+
 _Inherited from `../@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol`_.
 
 
@@ -960,6 +1064,7 @@ _Inherited from `../@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgra
 Returns whether `spender` is allowed to manage `tokenId`.
 Requirements:
 - `tokenId` must exist.
+
 
 _Inherited from `../@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol`_.
 
@@ -972,6 +1077,7 @@ Requirements:
 - If `to` refers to a smart contract, it must implement {IERC721Receiver-onERC721Received}, which is called upon a safe transfer.
 Emits a {Transfer} event.
 
+
 _Inherited from `../@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol`_.
 
 
@@ -979,6 +1085,7 @@ _Inherited from `../@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgra
 
 Same as {xref-ERC721-_safeMint-address-uint256-}[`_safeMint`], with an additional `data` parameter which is
 forwarded in {IERC721Receiver-onERC721Received} to contract recipients.
+
 
 _Inherited from `../@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol`_.
 
@@ -992,6 +1099,7 @@ Requirements:
 - `to` cannot be the zero address.
 Emits a {Transfer} event.
 
+
 _Inherited from `../@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol`_.
 
 
@@ -1002,6 +1110,7 @@ The approval is cleared when the token is burned.
 Requirements:
 - `tokenId` must exist.
 Emits a {Transfer} event.
+
 
 _Inherited from `../@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol`_.
 
@@ -1015,6 +1124,7 @@ Requirements:
 - `tokenId` token must be owned by `from`.
 Emits a {Transfer} event.
 
+
 _Inherited from `../@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol`_.
 
 
@@ -1023,6 +1133,7 @@ _Inherited from `../@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgra
 Approve `to` to operate on `tokenId`
 Emits a {Approval} event.
 
+
 _Inherited from `../@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol`_.
 
 
@@ -1030,6 +1141,7 @@ _Inherited from `../@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgra
 
 Approve `operator` to operate on all of `owner` tokens
 Emits a {ApprovalForAll} event.
+
 
 _Inherited from `../@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol`_.
 
@@ -1043,10 +1155,12 @@ Calling conditions:
 - `from` and `to` are never both zero.
 To learn more about hooks, head to xref:ROOT:extending-contracts.adoc#using-hooks[Using Hooks].
 
+
 _Inherited from `../@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol`_.
 
 
 ### `__ERC165_init()` (internal) (inherited) <a name="ERC165Upgradeable-__ERC165_init--" id="ERC165Upgradeable-__ERC165_init--"></a>
+
 
 
 
@@ -1057,10 +1171,12 @@ _Inherited from `../@openzeppelin/contracts-upgradeable/utils/introspection/ERC1
 
 
 
+
 _Inherited from `../@openzeppelin/contracts-upgradeable/utils/introspection/ERC165Upgradeable.sol`_.
 
 
 ### `__Context_init()` (internal) (inherited) <a name="ContextUpgradeable-__Context_init--" id="ContextUpgradeable-__Context_init--"></a>
+
 
 
 
@@ -1071,6 +1187,7 @@ _Inherited from `../@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable
 
 
 
+
 _Inherited from `../@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol`_.
 
 
@@ -1078,10 +1195,12 @@ _Inherited from `../@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable
 
 
 
+
 _Inherited from `../@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol`_.
 
 
 ### `_msgData() → bytes` (internal) (inherited) <a name="ContextUpgradeable-_msgData--" id="ContextUpgradeable-_msgData--"></a>
+
 
 
 
@@ -1100,6 +1219,7 @@ for UUPS and transparent proxies that are using the current contract as their im
 function through ERC1167 minimal proxies (clones) would not normally pass this test, but is not guaranteed to
 fail.
 
+
 _Inherited from `../@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol`_.
 
 
@@ -1108,6 +1228,7 @@ _Inherited from `../@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradea
 
 Check that the execution is not being performed through a delegate call. This allows a function to be
 callable on the implementing contract but not through proxies.
+
 
 _Inherited from `../@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol`_.
 
@@ -1121,6 +1242,7 @@ function is not supported. It is possible to prevent this from happening
 by making the `nonReentrant` function external, and making it call a
 `private` function that does the actual work.
 
+
 _Inherited from `../@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol`_.
 
 
@@ -1128,6 +1250,7 @@ _Inherited from `../@openzeppelin/contracts-upgradeable/security/ReentrancyGuard
 
 
 Throws if called by any account other than the owner.
+
 
 _Inherited from `../@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol`_.
 
@@ -1139,6 +1262,7 @@ Modifier to make a function callable only when the contract is not paused.
 Requirements:
 - The contract must not be paused.
 
+
 _Inherited from `../@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol`_.
 
 
@@ -1149,6 +1273,7 @@ Modifier to make a function callable only when the contract is paused.
 Requirements:
 - The contract must be paused.
 
+
 _Inherited from `../@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol`_.
 
 
@@ -1156,6 +1281,7 @@ _Inherited from `../@openzeppelin/contracts-upgradeable/security/PausableUpgrade
 
 
 Modifier to protect an initializer function from being invoked twice.
+
 
 _Inherited from `../@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol`_.
 
@@ -1165,6 +1291,7 @@ _Inherited from `../@openzeppelin/contracts-upgradeable/proxy/utils/Initializabl
 
 Modifier to protect an initialization function so that it can only be invoked by functions with the
 {initializer} modifier, directly or indirectly.
+
 
 _Inherited from `../@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol`_.
 

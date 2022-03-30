@@ -28,6 +28,8 @@ Mechanium can release unintended ( ownable ) smart contract interface
 Release unintended tokens sent to smart contract ( only owner )
 This function is used to prevent unintended tokens that got sent to be stuck on the contract
 
+
+Parameters:
 - `token`: The address of the token contract (zero address for claiming native coins).
 
 - `account`: The address of the tokens/coins receiver.
