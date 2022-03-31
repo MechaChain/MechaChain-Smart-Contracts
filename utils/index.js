@@ -133,8 +133,6 @@ const getStats = () => {
     .reduce((r, k) => ((r[k] = stats[k]), r), {}); // sort stats by index
 };
 const consoleStats = () => {
-  console.log("\n\t================== GAS STATS ==================");
-
   console.log(
     `\t=> Network Gas Price = ${web3.utils.fromWei(
       getBN(gasPrice),

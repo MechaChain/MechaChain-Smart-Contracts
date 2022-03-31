@@ -15,6 +15,8 @@ const {
 
 contract("MechaLandsV1", (accounts) => {
   const [owner, ...users] = accounts;
+
+  const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
   let instance, testStartTime, chainid;
 
   const planets = [
@@ -22,12 +24,23 @@ contract("MechaLandsV1", (accounts) => {
     {
       planetId: 1,
       typesNumber: 4,
-      supplyPerType: [500, 250, 150, 99], // supply = 999
+      supplyPerType: [20, 10, 10, 10],
       notRevealUriPerType: [
-        "http://planet-0/land-0.json",
-        "http://planet-0/land-1.json",
-        "http://planet-0/land-2.json",
-        "http://planet-0/land-3.json",
+        "http://planet-1/land-1.json",
+        "http://planet-1/land-1.json",
+        "http://planet-1/land-2.json",
+        "http://planet-1/land-3.json",
+      ],
+    },
+    {
+      planetId: 2,
+      typesNumber: 4,
+      supplyPerType: [5, 5, 5, 5],
+      notRevealUriPerType: [
+        "http://planet-2/land-1.json",
+        "http://planet-2/land-1.json",
+        "http://planet-2/land-2.json",
+        "http://planet-2/land-3.json",
       ],
     },
   ];
@@ -43,10 +56,10 @@ contract("MechaLandsV1", (accounts) => {
       validator_private_key:
         "0xfeae30926cea7dfa8fb803c348aef7f06941b9af7770e6b62c0dcb543d3391a7",
       pricePerType: [
-        getAmount(0.1),
-        getAmount(0.2),
-        getAmount(0.5),
-        getAmount(0.8),
+        getAmount(0.01),
+        getAmount(0.02),
+        getAmount(0.05),
+        getAmount(0.08),
       ],
       supplyPerType: [15, 15, 15, 15],
       limitedPerType: false,
@@ -56,19 +69,21 @@ contract("MechaLandsV1", (accounts) => {
       roundId: 2,
       planetId: 1,
       startTime: time.duration.days(2), // to add to `testStartTime`
-      duration: time.duration.days(1),
+      duration: 0,
       // no validator
       pricePerType: [
-        getAmount(0.15),
-        getAmount(0.3),
-        getAmount(0.75),
-        getAmount(1),
+        getAmount(0.015),
+        getAmount(0.03),
+        getAmount(0.075),
+        getAmount(0.1),
       ],
       supplyPerType: [999, 999, 999, 999], // incoherent supply for use planet supply
       limitedPerType: true,
-      maxMintPerType: [5, 5, 5, 5],
+      maxMintPerType: [3, 3, 3, 3],
     },
   ];
+
+  const planetsBaseURI = "http://planets/";
 
   const otherPrivateKey =
     "0x253d7333eba154ef8fc973ee4ae2e5f35d4cc8da5db8a9e6aaa51417902c2501";
@@ -138,6 +153,8 @@ contract("MechaLandsV1", (accounts) => {
     },
     from = owner
   ) => {
+    validator = validator || ZERO_ADDRESS;
+
     const tx = await instance.setupMintRound(
       roundId,
       planetId,
@@ -151,7 +168,6 @@ contract("MechaLandsV1", (accounts) => {
       { from: from }
     );
     await gasTracker.addCost("Setup Mint Round", tx);
-
     const round = await instance.rounds(roundId);
     assert.equal(
       round.planetId.toString(),
@@ -186,16 +202,27 @@ contract("MechaLandsV1", (accounts) => {
         "Bad supplyPerType"
       );
       assert.equal(
-        (await instance.roundPriceByType(planetId, i + 1)).toString(),
+        (await instance.roundPriceByType(roundId, i + 1)).toString(),
         pricePerType[i].toString(),
-        "Bad supplyPerType"
+        "Bad pricePerType"
       );
       assert.equal(
-        (await instance.roundMaxMintByType(planetId, i + 1)).toString(),
+        (await instance.roundMaxMintByType(roundId, i + 1)).toString(),
         maxMintPerType[i].toString(),
-        "Bad supplyPerType"
+        "Bad maxMintPerType"
       );
     }
+  };
+
+  const getTokensFromTransferEvent = (txData) => {
+    let tokens = [];
+    txData.logs.map((log) => {
+      if (log.event === "Transfer") {
+        const { to, from, tokenId } = log.args;
+        tokens.push(tokenId.toNumber());
+      }
+    });
+    return tokens;
   };
 
   const mint = async (
@@ -210,27 +237,24 @@ contract("MechaLandsV1", (accounts) => {
       landType
     );
     const oldRoundTotalMinted = await instance.roundTotalMintedByType(
-      round.planetId,
+      roundId,
       landType
     );
     const oldUserRoundTotalMinted =
-      await instance.roundTotalMintedByTypeForUser(
-        user,
-        round.planetId,
-        landType
-      );
+      await instance.roundTotalMintedByTypeForUser(user, roundId, landType);
     const oldTotalSupply = await instance.totalSupply();
 
     const price =
       overrideData?.price ||
       (await instance.roundPriceByType(roundId, landType));
-    if (round.validator === "0x0000000000000000000000000000000000000000") {
+    let tx;
+    if (round.validator === ZERO_ADDRESS) {
       // mint without validator
-      const tx = await instance.mint(roundId, landType, amount, {
+      tx = await instance.mint(roundId, landType, amount, {
         from: user,
         value: price.mul(getBN(amount)),
       });
-      gasTracker.addCost(`Public mint ${amount}`, tx);
+      gasTracker.addCost(`Public mint x${amount}`, tx);
     } else {
       // mint with validator
       const latestTime = await time.latest();
@@ -252,7 +276,7 @@ contract("MechaLandsV1", (accounts) => {
           chainid,
         ]
       );
-      const tx = await instance.mintWithValidation(
+      tx = await instance.mintWithValidation(
         roundId,
         landType,
         amount,
@@ -264,24 +288,21 @@ contract("MechaLandsV1", (accounts) => {
           value: price.mul(getBN(amount)),
         }
       );
-      gasTracker.addCost(`Whitelist mint ${amount}`, tx);
+      gasTracker.addCost(`Whitelist mint x${amount}`, tx);
     }
 
+    // Balances tests
     const newBalance = await instance.balanceOf(user);
     const newPlanetTotalMinted = await instance.planetTotalMintedByType(
       round.planetId,
       landType
     );
     const newRoundTotalMinted = await instance.roundTotalMintedByType(
-      round.planetId,
+      roundId,
       landType
     );
     const newUserRoundTotalMinted =
-      await instance.roundTotalMintedByTypeForUser(
-        user,
-        round.planetId,
-        landType
-      );
+      await instance.roundTotalMintedByTypeForUser(user, roundId, landType);
     const newTotalSupply = await instance.totalSupply();
 
     assert.equal(
@@ -313,6 +334,80 @@ contract("MechaLandsV1", (accounts) => {
       oldTotalSupply.add(getBN(amount)).toString(),
       "Total supply not valid"
     );
+
+    // Token test
+    const mintedTokens = getTokensFromTransferEvent(tx);
+    for (tokenId of mintedTokens) {
+      const tokenType = await instance.tokenType(tokenId);
+      const tokenPlanet = await instance.tokenPlanet(tokenId);
+      assert.equal(
+        tokenType.toString(),
+        landType.toString(),
+        "landType not valid"
+      );
+      assert.equal(
+        tokenPlanet.toString(),
+        round.planetId.toString(),
+        "planetId not valid"
+      );
+    }
+  };
+
+  const airdrop = async ({ planetId, landType, amount }, user) => {
+    const oldBalance = await instance.balanceOf(user);
+    const oldPlanetTotalMinted = await instance.planetTotalMintedByType(
+      planetId,
+      landType
+    );
+    const oldTotalSupply = await instance.totalSupply();
+
+    const tx = await instance.airdrop(user, planetId, landType, amount, {
+      from: owner,
+    });
+    gasTracker.addCost(`Airdrop x${amount}`, tx);
+
+    // Balances tests
+    const newBalance = await instance.balanceOf(user);
+    const newPlanetTotalMinted = await instance.planetTotalMintedByType(
+      planetId,
+      landType
+    );
+    const newTotalSupply = await instance.totalSupply();
+
+    assert.equal(
+      newBalance.toString(),
+      oldBalance.add(getBN(amount)).toString(),
+      "User balance not valid"
+    );
+
+    assert.equal(
+      newPlanetTotalMinted.toString(),
+      oldPlanetTotalMinted.add(getBN(amount)).toString(),
+      "Planet total minted not valid"
+    );
+
+    assert.equal(
+      newTotalSupply.toString(),
+      oldTotalSupply.add(getBN(amount)).toString(),
+      "Total supply not valid"
+    );
+
+    // Token test
+    const mintedTokens = getTokensFromTransferEvent(tx);
+    for (tokenId of mintedTokens) {
+      const tokenType = await instance.tokenType(tokenId);
+      const tokenPlanet = await instance.tokenPlanet(tokenId);
+      assert.equal(
+        tokenType.toString(),
+        landType.toString(),
+        "landType not valid"
+      );
+      assert.equal(
+        tokenPlanet.toString(),
+        planetId.toString(),
+        "planetId not valid"
+      );
+    }
   };
 
   /**
@@ -321,7 +416,7 @@ contract("MechaLandsV1", (accounts) => {
    * ========================
    */
 
-  it("MechaLandsV1 should be deployed", async () => {
+  it(`MechaLandsV1 should be deployed`, async () => {
     testStartTime = await time.latest();
 
     instance = await MechaLandsV1.deployed();
@@ -337,17 +432,17 @@ contract("MechaLandsV1", (accounts) => {
    * PLANET CREATION
    */
   describe("\n PLANET CREATION", () => {
-    it("Owner can't create a planet (Reason: Incorrect length of supply and uri)", async () => {
+    it(`Owner can't create a planet (Reason: Incorrect length of supply and uri)`, async () => {
       await expectRevert(
         setupPlanet({
           planetId: 1,
           typesNumber: 4,
           supplyPerType: [500, 250, 150], // Incorrect length here
           notRevealUriPerType: [
-            "http://planet-0/land-0.json",
-            "http://planet-0/land-1.json",
-            "http://planet-0/land-2.json",
-            "http://planet-0/land-3.json",
+            "http://planet-1/land-1.json",
+            "http://planet-1/land-1.json",
+            "http://planet-1/land-2.json",
+            "http://planet-1/land-3.json",
           ],
         }),
         `Incorrect length`
@@ -359,9 +454,9 @@ contract("MechaLandsV1", (accounts) => {
           typesNumber: 4,
           supplyPerType: [500, 250, 150, 99],
           notRevealUriPerType: [
-            "http://planet-0/land-0.json",
-            "http://planet-0/land-1.json",
-            "http://planet-0/land-2.json", // Incorrect length here
+            "http://planet-1/land-1.json",
+            "http://planet-1/land-1.json",
+            "http://planet-1/land-2.json", // Incorrect length here
           ],
         }),
         `Incorrect length`
@@ -373,59 +468,63 @@ contract("MechaLandsV1", (accounts) => {
           typesNumber: 3,
           supplyPerType: [500, 250, 150, 99], // Incorrect length here
           notRevealUriPerType: [
-            "http://planet-0/land-0.json",
-            "http://planet-0/land-1.json",
-            "http://planet-0/land-2.json",
-            "http://planet-0/land-3.json", // Incorrect length here
+            "http://planet-1/land-1.json",
+            "http://planet-1/land-1.json",
+            "http://planet-1/land-2.json",
+            "http://planet-1/land-3.json", // Incorrect length here
           ],
         }),
         `Incorrect length`
       );
     });
 
-    it("Owner can't create a planet (Reason: Id can be 0)", async () => {
+    it(`Owner can't create a planet (Reason: Id can be 0)`, async () => {
       await expectRevert(
         setupPlanet({
           planetId: 0,
           typesNumber: 4,
           supplyPerType: [500, 250, 150, 200],
           notRevealUriPerType: [
-            "http://planet-0/land-0.json",
-            "http://planet-0/land-1.json",
-            "http://planet-0/land-2.json",
-            "http://planet-0/land-3.json",
+            "http://planet-1/land-1.json",
+            "http://planet-1/land-1.json",
+            "http://planet-1/land-2.json",
+            "http://planet-1/land-3.json",
           ],
         }),
         `Id can be 0`
       );
     });
 
-    it("Owner can't create the first planet at id 2 (Reason: Invalid planetId)", async () => {
+    it(`Owner can't create the first planet at id 2 (Reason: Invalid planetId)`, async () => {
       await expectRevert(
         setupPlanet({
           planetId: 2,
           typesNumber: 4,
           supplyPerType: [500, 250, 150, 200],
           notRevealUriPerType: [
-            "http://planet-0/land-0.json",
-            "http://planet-0/land-1.json",
-            "http://planet-0/land-2.json",
-            "http://planet-0/land-3.json",
+            "http://planet-1/land-1.json",
+            "http://planet-1/land-1.json",
+            "http://planet-1/land-2.json",
+            "http://planet-1/land-3.json",
           ],
         }),
         `Invalid planetId`
       );
     });
 
-    it("User can't create planet (Reason: caller is not the owner)", async () => {
+    it(`User can't create planet (Reason: caller is not the owner)`, async () => {
       await expectRevert(
         setupPlanet(planets[1], users[0]),
         `Ownable: caller is not the owner`
       );
     });
 
-    it("Owner can create planet 1", async () => {
+    it(`Owner can create planet 1`, async () => {
       await setupPlanet(planets[1]);
+    });
+
+    it(`Owner can create planet 2`, async () => {
+      await setupPlanet(planets[2]);
     });
   });
 
@@ -433,7 +532,7 @@ contract("MechaLandsV1", (accounts) => {
    * ROUND CREATION
    */
   describe("\n ROUND CREATION", () => {
-    it("Owner can't create a mint round (Reason: Incorrect length of supply and price)", async () => {
+    it(`Owner can't create a mint round (Reason: Incorrect length of supply and price)`, async () => {
       await expectRevert(
         setupMintRound({
           roundId: 1,
@@ -510,7 +609,7 @@ contract("MechaLandsV1", (accounts) => {
       );
     });
 
-    it("Owner can't create a mint round (Reason: Id can be 0)", async () => {
+    it(`Owner can't create a mint round (Reason: Id can be 0)`, async () => {
       await expectRevert(
         setupMintRound({
           roundId: 0,
@@ -532,15 +631,89 @@ contract("MechaLandsV1", (accounts) => {
       );
     });
 
-    it("User can't create a mint round (Reason: caller is not the owner)", async () => {
+    it(`Owner can't create the first round at id 2 (Reason: Invalid roundId)`, async () => {
+      await expectRevert(
+        setupMintRound({
+          roundId: 2,
+          planetId: 1,
+          startTime: time.duration.days(1),
+          duration: time.duration.days(1),
+          validator: "0x6F76846f7C90EcEC371e1d96cA93bfE9d36eEb83",
+          pricePerType: [
+            getAmount(0.1),
+            getAmount(0.2),
+            getAmount(0.5),
+            getAmount(0.5),
+          ],
+          supplyPerType: [250, 125, 75, 50],
+          limitedPerType: false,
+          maxMintPerType: [250, 125, 75, 50],
+        }),
+        `Invalid roundId`
+      );
+    });
+
+    it(`User can't create a mint round (Reason: caller is not the owner)`, async () => {
       await expectRevert(
         setupMintRound(rounds[1], users[0]),
         `Ownable: caller is not the owner`
       );
     });
 
-    it("Owner can create round 1", async () => {
+    it(`Owner can't create a round for a non-existent planet (Reason: Invalid planetId)`, async () => {
+      await expectRevert(
+        setupMintRound({
+          roundId: 1,
+          planetId: 4,
+          startTime: time.duration.days(1),
+          duration: time.duration.days(1),
+          validator: "0x6F76846f7C90EcEC371e1d96cA93bfE9d36eEb83",
+          pricePerType: [
+            getAmount(0.1),
+            getAmount(0.2),
+            getAmount(0.5),
+            getAmount(0.5),
+          ],
+          supplyPerType: [250, 125, 75, 50],
+          limitedPerType: false,
+          maxMintPerType: [250, 125, 75, 50],
+        }),
+        `Invalid planetId`
+      );
+    });
+
+    it(`Owner can create round 1`, async () => {
       await setupMintRound(rounds[1]);
+    });
+
+    it(`Owner can create round 2`, async () => {
+      await setupMintRound(rounds[2]);
+    });
+  });
+
+  /**
+   * BEFORE ROUNDS
+   */
+  describe("\n BEFORE ROUNDS", () => {
+    it(`User can't mint in round 1 if not started (Reason: Round not in progress)`, async () => {
+      await expectRevert(
+        mint({ roundId: 1, landType: 1, amount: 1, maxMint: 5 }, users[0]),
+        `Round not in progress`
+      );
+    });
+
+    it(`User can't mint in a non existing round (Reason: Invalid round)`, async () => {
+      await expectRevert(
+        mint({ roundId: 10, landType: 1, amount: 1, maxMint: 5 }, users[0]),
+        `Invalid round`
+      );
+    });
+
+    it(`User can't mint in round 0 (Reason: Invalid round)`, async () => {
+      await expectRevert(
+        mint({ roundId: 0, landType: 1, amount: 1, maxMint: 5 }, users[0]),
+        `Invalid round`
+      );
     });
   });
 
@@ -548,28 +721,7 @@ contract("MechaLandsV1", (accounts) => {
    * ROUND 1 MINT
    */
   describe("\n ROUND 1 MINT", () => {
-    it("User can't mint in round 1 if not started (Reason: Round not in progress)", async () => {
-      await expectRevert(
-        mint({ roundId: 1, landType: 1, amount: 1, maxMint: 5 }, users[0]),
-        `Round not in progress`
-      );
-    });
-
-    it("User can't mint in a non existing round (Reason: Invalid round)", async () => {
-      await expectRevert(
-        mint({ roundId: 10, landType: 1, amount: 1, maxMint: 5 }, users[0]),
-        `Invalid round`
-      );
-    });
-
-    it("User can't mint in round 0 (Reason: Invalid round)", async () => {
-      await expectRevert(
-        mint({ roundId: 0, landType: 1, amount: 1, maxMint: 5 }, users[0]),
-        `Invalid round`
-      );
-    });
-
-    it("Round 1 started", async () => {
+    it(`Round 1 started`, async () => {
       await time.increaseTo(testStartTime.add(rounds[1].startTime));
       const latestTime = await time.latest();
       const round = await instance.rounds(1);
@@ -580,7 +732,7 @@ contract("MechaLandsV1", (accounts) => {
       );
     });
 
-    it("User can't mint in round 1 after payload (Reason: Signature expired)", async () => {
+    it(`User can't mint in round 1 after payload (Reason: Signature expired)`, async () => {
       const latestTime = await time.latest();
       await expectRevert(
         mint({ roundId: 1, landType: 1, amount: 1, maxMint: 5 }, users[0], {
@@ -590,7 +742,7 @@ contract("MechaLandsV1", (accounts) => {
       );
     });
 
-    it("User can't mint in round 1 with an other validator (Reason: Invalid signature)", async () => {
+    it(`User can't mint in round 1 with an other validator (Reason: Invalid signature)`, async () => {
       await expectRevert(
         mint({ roundId: 1, landType: 1, amount: 1, maxMint: 5 }, users[0], {
           validator_private_key: otherPrivateKey,
@@ -599,7 +751,7 @@ contract("MechaLandsV1", (accounts) => {
       );
     });
 
-    it("User can't mint in round 1 without validator (Reason: Need a sig)", async () => {
+    it(`User can't mint in round 1 without validator (Reason: Need a sig)`, async () => {
       await expectRevert(
         instance.mint(1, 1, 1, {
           from: users[0],
@@ -608,14 +760,14 @@ contract("MechaLandsV1", (accounts) => {
       );
     });
 
-    it("User can't mint more tokens than maximum authorized by the validator (Reason: Validator max allowed)", async () => {
+    it(`User can't mint more tokens than maximum authorized by the validator (Reason: Validator max allowed)`, async () => {
       await expectRevert(
         mint({ roundId: 1, landType: 1, amount: 5, maxMint: 4 }, users[0]),
         `Validator max allowed`
       );
     });
 
-    it("User can't mint more tokens than maximum authorized by the round (Reason: Round max allowed)", async () => {
+    it(`User can't mint more tokens than maximum authorized by the round (Reason: Round max allowed)`, async () => {
       await expectRevert(
         mint(
           {
@@ -630,7 +782,7 @@ contract("MechaLandsV1", (accounts) => {
       );
     });
 
-    it("User can't mint a tokens of type 0 or 5 (Reason: Round supply exceeded or Incorrect type)", async () => {
+    it(`User can't mint a tokens of type 0 or 5 (Reason: Round supply exceeded or Incorrect type)`, async () => {
       await expectRevert(
         mint({ roundId: 1, landType: 0, amount: 1, maxMint: 4 }, users[0]),
         `Round supply exceeded`
@@ -641,7 +793,7 @@ contract("MechaLandsV1", (accounts) => {
       );
     });
 
-    it("User can't mint (Reason: Wrong price)", async () => {
+    it(`User can't mint (Reason: Wrong price)`, async () => {
       await expectRevert(
         mint({ roundId: 1, landType: 2, amount: 2, maxMint: 2 }, users[0], {
           price: rounds[1].pricePerType[0],
@@ -650,11 +802,11 @@ contract("MechaLandsV1", (accounts) => {
       );
     });
 
-    it("User1 can mint a token in round 1 !", async () => {
+    it(`User1 can mint a token in round 1 !`, async () => {
       await mint({ roundId: 1, landType: 1, amount: 2, maxMint: 2 }, users[0]);
     });
 
-    it("User1 can't mint more tokens in round 1, no matter what type (Reason: Validator max allowed)", async () => {
+    it(`User1 can't mint more tokens in round 1, no matter what type (Reason: Validator max allowed)`, async () => {
       await expectRevert(
         mint({ roundId: 1, landType: 1, amount: 1, maxMint: 2 }, users[0]),
         `Validator max allowed`
@@ -673,18 +825,18 @@ contract("MechaLandsV1", (accounts) => {
       );
     });
 
-    it("User1 can mint tokens again in round 1 (validator's choice , like new pilot pass) !", async () => {
+    it(`User1 can mint tokens again in round 1 (validator's choice , like new pilot pass) !`, async () => {
       await mint({ roundId: 1, landType: 1, amount: 3, maxMint: 5 }, users[0]);
     });
 
-    it("User2 can mint various types of tokens in round 1 !", async () => {
+    it(`User2 can mint various types of tokens in round 1 !`, async () => {
       await mint({ roundId: 1, landType: 1, amount: 2, maxMint: 6 }, users[1]);
       await mint({ roundId: 1, landType: 2, amount: 1, maxMint: 6 }, users[1]);
       await mint({ roundId: 1, landType: 3, amount: 1, maxMint: 6 }, users[1]);
       await mint({ roundId: 1, landType: 4, amount: 2, maxMint: 6 }, users[1]);
     });
 
-    it("User2 can't mint more tokens in round 1, no matter what type (Reason: Validator max allowed)", async () => {
+    it(`User2 can't mint more tokens in round 1, no matter what type (Reason: Validator max allowed)`, async () => {
       await expectRevert(
         mint({ roundId: 1, landType: 1, amount: 1, maxMint: 6 }, users[1]),
         `Validator max allowed`
@@ -713,7 +865,7 @@ contract("MechaLandsV1", (accounts) => {
       );
     });
 
-    it("Round 1 is now sold out for type 1", async () => {
+    it(`Round 1 is now sold out for type 1`, async () => {
       const type1Supply = await instance.roundSupplyByType(1, 1);
       const type1TotalMinted = await instance.roundTotalMintedByType(1, 1);
 
@@ -735,14 +887,14 @@ contract("MechaLandsV1", (accounts) => {
       );
     });
 
-    it("Users can't mint more tokens of type 1 (Reason: Round supply exceeded)", async () => {
+    it(`Users can't mint more tokens of type 1 (Reason: Round supply exceeded)`, async () => {
       await expectRevert(
         mint({ roundId: 1, landType: 1, amount: 1, maxMint: 100 }, users[3]),
         `Round supply exceeded`
       );
     });
 
-    it("Round 1 ended, users can't mint anymore (Reason: Round not in progress)", async () => {
+    it(`Round 1 ended, users can't mint anymore (Reason: Round not in progress)`, async () => {
       const roundEndTime = testStartTime
         .add(rounds[1].startTime)
         .add(rounds[1].duration);
@@ -762,37 +914,397 @@ contract("MechaLandsV1", (accounts) => {
    * ROUND 2 MINT
    */
   describe("\n ROUND 2 MINT", () => {
-    // TODO round max
-    // TODO "No round validator" issue
+    it(`Round 2 started`, async () => {
+      await time.increaseTo(testStartTime.add(rounds[2].startTime));
+      const latestTime = await time.latest();
+      const round = await instance.rounds(2);
+      assert.equal(
+        round.startTime.gte(latestTime),
+        true,
+        "Start time not correct"
+      );
+    });
+
+    it(`User can't mint in round 2 with validator (Reason: No round validator)`, async () => {
+      const user = users[0];
+      const maxMint = 10;
+      const landType = 1;
+      const roundId = 2;
+      const amount = 2;
+      const price = rounds[1].pricePerType[0];
+      const latestTime = await time.latest();
+      const payloadExpiration = latestTime.add(time.duration.minutes(30));
+      const signature = getSignature(rounds[1].validator_private_key, [
+        user,
+        payloadExpiration,
+        maxMint,
+        landType,
+        roundId,
+        instance.address,
+        chainid,
+      ]);
+
+      await expectRevert(
+        instance.mintWithValidation(
+          roundId,
+          landType,
+          amount,
+          maxMint,
+          payloadExpiration,
+          signature,
+          {
+            from: user,
+            value: price.mul(getBN(amount)),
+          }
+        ),
+        `No round validator`
+      );
+    });
+
+    it(`User can't mint more tokens than maximum authorized by the round (Reason: Round max allowed)`, async () => {
+      await expectRevert(
+        mint(
+          {
+            roundId: 2,
+            landType: 1,
+            amount: rounds[2].maxMintPerType[0] + 1,
+          },
+          users[0]
+        ),
+        `Round max allowed`
+      );
+    });
+
+    it(`User can't mint a tokens of type 0 or 5 (Reason: Round supply exceeded or Incorrect type)`, async () => {
+      await expectRevert(
+        mint({ roundId: 2, landType: 0, amount: 1 }, users[0]),
+        `Round supply exceeded`
+      );
+      await expectRevert(
+        mint({ roundId: 2, landType: 5, amount: 1 }, users[0]),
+        `Round supply exceeded`
+      );
+    });
+
+    it(`User can't mint (Reason: Wrong price)`, async () => {
+      await expectRevert(
+        mint({ roundId: 2, landType: 1, amount: 1 }, users[0], {
+          price: rounds[1].pricePerType[0],
+        }),
+        `Wrong price`
+      );
+    });
+
+    // Tests each land type supply
+    for (let landType = 1; landType <= planets[1].typesNumber; landType++) {
+      it(`User1 can mint his maximum of tokens for type ${landType} (in one or more transactions)`, async () => {
+        const maxMint = rounds[2].maxMintPerType[landType - 1];
+        const firstMintAmount = (landType % maxMint) + 1;
+        const lastMintAmount = maxMint - firstMintAmount;
+
+        // first mint
+        await mint({ roundId: 2, landType, amount: firstMintAmount }, users[0]);
+
+        // last mint
+        if (lastMintAmount > 0) {
+          await mint(
+            {
+              roundId: 2,
+              landType,
+              amount: lastMintAmount,
+            },
+            users[0]
+          );
+        }
+      });
+
+      it(`User1 can't mint more tokens for type ${landType} (Reason: Round max allowed)`, async () => {
+        await expectRevert(
+          mint({ roundId: 2, landType, amount: 1 }, users[0]),
+          `Round max allowed`
+        );
+      });
+    }
+
+    it(`Round 2 duration is infinite: user2 can mint 1 days later`, async () => {
+      await time.increase(time.duration.days(1));
+
+      await mint(
+        {
+          roundId: 2,
+          landType: 1,
+          amount: 1,
+        },
+        users[1]
+      );
+    });
+
+    it(`Users can mint each lands until sold out`, async () => {
+      await time.increase(time.duration.days(1));
+
+      for (let landType = 1; landType <= planets[1].typesNumber; landType++) {
+        const supply = await instance.planetSupplyByType(1, landType);
+        const maxMint = rounds[2].maxMintPerType[landType - 1];
+        let remainingTokens = 1;
+        let i = 0;
+        do {
+          const user = users[i++];
+          const totalMinted = await instance.planetTotalMintedByType(
+            1,
+            landType
+          );
+          remainingTokens = supply.sub(totalMinted).toNumber();
+          const userMintedInRound =
+            await instance.roundTotalMintedByTypeForUser(user, 2, landType);
+          const userRemaining = maxMint - userMintedInRound;
+          const amount =
+            userRemaining < remainingTokens ? userRemaining : remainingTokens;
+          if (amount > 0) {
+            await mint(
+              {
+                roundId: 2,
+                landType,
+                amount,
+              },
+              user
+            );
+          }
+        } while (remainingTokens > 0);
+
+        // Now landType must be sold out for this planet
+        const totalMinted = await instance.planetTotalMintedByType(1, landType);
+        remainingTokens = supply.sub(totalMinted).toNumber();
+        assert.equal(remainingTokens, 0, `Land ${landType} not sold out`);
+      }
+    });
+
+    it(`Planet 1 is now sold out, users can't mint anymore (Reason: Planet supply exceeded)`, async () => {
+      const user = users[users.length - 1]; // last user (should not have exceeded his limit)
+      for (let landType = 1; landType <= planets[1].typesNumber; landType++) {
+        await expectRevert(
+          mint({ roundId: 2, landType, amount: 1 }, user),
+          `Planet supply exceeded`
+        );
+      }
+    });
   });
 
   /**
    * TOKEN DATA AND REVEAL
    */
-  describe("\n TOKEN DATA AND REVEAL", () => {});
+  describe("\n TOKEN DATA AND REVEAL", () => {
+    it(`tokenURI refers to the correct not reveal data (land type and planet)`, async () => {
+      // Try for 10 tokens
+      for (let tokenId = 1; tokenId <= 10; tokenId++) {
+        const tokenType = await instance.tokenType(tokenId);
+        const tokenPlanet = await instance.tokenPlanet(tokenId);
 
-  /**
-   * ROUND EDITION
-   */
-  describe("\n ROUND EDITION", () => {
-    // TODO Owner can't edit a planet (Reason: Supply lower than already minted)
-    // TODO Owner can edit a round with a new supply and price
+        const expectedUri =
+          planets[tokenPlanet.toNumber()].notRevealUriPerType[
+            tokenType.toNumber() - 1
+          ];
+        const tokenURI = await instance.tokenURI(tokenId);
+
+        assert.equal(tokenURI, expectedUri, "Invalid not reveal URI");
+      }
+    });
+
+    it(`User can't activate the reveal for a planet (Reason: caller is not the owner)`, async () => {
+      await expectRevert(
+        instance.revealPlanet(1, "http://tests/", { from: users[1] }),
+        `Ownable: caller is not the owner`
+      );
+    });
+
+    it(`Admin should be able to activate the reveal`, async () => {
+      await instance.revealPlanet(1, "http://tests/", { from: owner });
+      planets[1].revealed = true;
+    });
+
+    it(`User can't change the base URI of a planet a planet (Reason: caller is not the owner)`, async () => {
+      await expectRevert(
+        instance.setPlanetBaseURI(1, "http://tests/", { from: users[1] }),
+        `Ownable: caller is not the owner`
+      );
+    });
+
+    it(`Admin should be able to change the base URI of a planet`, async () => {
+      await instance.setPlanetBaseURI(1, planetsBaseURI, {
+        from: owner,
+      });
+      planets[1].baseURI = planetsBaseURI;
+    });
+
+    it(`tokenURI refers to the correct revealed URI`, async () => {
+      // Try for 10 tokens
+      for (let tokenId = 1; tokenId <= 10; tokenId++) {
+        const tokenURI = await instance.tokenURI(tokenId);
+        assert.equal(tokenURI, planetsBaseURI + tokenId + ".json");
+      }
+    });
   });
 
   /**
    * PLANET EDITION
    */
   describe("\n PLANET EDITION", () => {
-    // TODO Owner can't edit a planet (Reason: Can decrease types)
-    // TODO Owner can't edit a planet (Reason: Supply lower than already minted)
-    // TODO Owner can edit a planet with a new types and a new supply
+    it(`User can't update a planet (Reason: caller is not the owner)`, async () => {
+      await expectRevert(
+        setupPlanet(planets[1], users[0]),
+        `Ownable: caller is not the owner`
+      );
+    });
+
+    it(`Owner can't update a planet for remove a type (Reason: Can decrease types)`, async () => {
+      await expectRevert(
+        setupPlanet({ ...planets[1], typesNumber: 3 }),
+        `Can decrease types`
+      );
+    });
+
+    it(`Owner can't update a planet for decrease supply for lower than already minted`, async () => {
+      await expectRevert(
+        setupPlanet({ ...planets[1], supplyPerType: [5, 5, 5, 5] }),
+        `Supply lower than already minted`
+      );
+    });
+
+    it(`Owner can increase supply of planet 1 (+10 for each)`, async () => {
+      planets[1].supplyPerType = planets[1].supplyPerType.map((x) => x + 10);
+      await setupPlanet(planets[1]);
+    });
+
+    it(`Owner can create a new type of land for planet 5 (supply of 10)`, async () => {
+      planets[1].supplyPerType[4] = 10;
+      planets[1].notRevealUriPerType[4] = "http://planet-1/land-5.json";
+      planets[1].typesNumber = 5;
+      await setupPlanet(planets[1]);
+    });
+  });
+
+  /**
+   * ROUND EDITION
+   */
+  describe("\n ROUND EDITION", () => {
+    it(`User can't update a round (Reason: caller is not the owner)`, async () => {
+      await expectRevert(
+        setupMintRound(rounds[2], users[0]),
+        `Ownable: caller is not the owner`
+      );
+    });
+
+    it(`Owner can't update a round for decrease supply lower than already minted`, async () => {
+      const newData = {
+        supplyPerType: [5, 5, 5, 5, 5],
+        pricePerType: [
+          getAmount(0.01),
+          getAmount(0.02),
+          getAmount(0.05),
+          getAmount(0.08),
+          getAmount(0.08),
+        ],
+        maxMintPerType: [8, 8, 8, 8, 5],
+      };
+      await expectRevert(
+        setupMintRound({ ...rounds[2], ...newData }),
+        `Supply lower than already minted`
+      );
+    });
+
+    it(`Owner can't update a round for change the planet (Reason: Can't change planetId)`, async () => {
+      const newData = {
+        planetId: 2,
+        supplyPerType: [5, 5, 5, 5, 5],
+        pricePerType: [
+          getAmount(0.01),
+          getAmount(0.02),
+          getAmount(0.05),
+          getAmount(0.08),
+          getAmount(0.08),
+        ],
+        maxMintPerType: [8, 8, 8, 8, 5],
+      };
+      await expectRevert(
+        setupMintRound({ ...rounds[2], ...newData }),
+        `Can't change planetId`
+      );
+    });
+
+    it(`Owner can increase supply of round 2`, async () => {
+      rounds[2].supplyPerType[4] = 9999;
+      rounds[2].pricePerType[4] = getAmount(0.08);
+      rounds[2].maxMintPerType[4] = 3;
+      await setupMintRound(rounds[2]);
+    });
+
+    it(`Users can mint new tokens for all the 5 lands type`, async () => {
+      const user = users[users.length - 1]; // last user (should not have exceeded his limit)
+      for (let landType = 1; landType <= planets[1].typesNumber; landType++) {
+        await mint({ roundId: 2, landType, amount: 1 }, user);
+      }
+    });
+  });
+
+  /**
+   * AIRDROPS
+   */
+  describe("\n AIRDROPS", () => {
+    it(`Users can't airdrop tokens (Reason: caller is not the owner)`, async () => {
+      await expectRevert(
+        instance.airdrop(users[0], 1, 1, 1, { from: users[1] }),
+        `Ownable: caller is not the owner`
+      );
+    });
+
+    it(`Owner can't airdrop tokens of type 0 or 6 (Reason: Incorrect type)`, async () => {
+      await expectRevert(
+        instance.airdrop(users[0], 1, 0, 1, { from: owner }),
+        `Incorrect type`
+      );
+      await expectRevert(
+        instance.airdrop(users[0], 1, 6, 1, { from: owner }),
+        `Incorrect type`
+      );
+    });
+
+    it(`Owner can't airdrop more tokens than planet supply (Reason: Planet supply exceeded)`, async () => {
+      for (let landType = 1; landType <= planets[1].typesNumber; landType++) {
+        const supply = await instance.planetSupplyByType(1, landType);
+        const totalMinted = await instance.planetTotalMintedByType(1, landType);
+        const amount = supply.sub(totalMinted).toNumber();
+        await expectRevert(
+          instance.airdrop(users[0], 1, landType, amount + 1, { from: owner }),
+          `Planet supply exceeded`
+        );
+      }
+    });
+
+    it(`Owner can't airdrop tokens of type 0 or 6 (Reason: Incorrect type)`, async () => {
+      await expectRevert(
+        airdrop({ planetId: 1, landType: 0, amount: 1 }, users[0]),
+        `Incorrect type`
+      );
+      await expectRevert(
+        airdrop({ planetId: 1, landType: 6, amount: 1 }, users[0]),
+        `Incorrect type`
+      );
+    });
+
+    it(`Owner do severals airdrops`, async () => {
+      await airdrop({ planetId: 1, landType: 1, amount: 1 }, users[1]);
+      await airdrop({ planetId: 1, landType: 2, amount: 2 }, users[1]);
+      await airdrop({ planetId: 1, landType: 3, amount: 3 }, users[1]);
+      await airdrop({ planetId: 1, landType: 4, amount: 4 }, users[1]);
+      await airdrop({ planetId: 1, landType: 5, amount: 5 }, users[1]);
+    });
   });
 
   // TODO burn
+  // TODO verify eth in contract
   // TODO withdraw
 
   describe("\n GAS STATS", () => {
-    it("Get stats on gas", async () => {
+    it(`Get stats on gas`, async () => {
       // Get deployment cost
       const newInstance = await MechaLandsV1.new();
       await gasTracker.addCost("Deployment", {
