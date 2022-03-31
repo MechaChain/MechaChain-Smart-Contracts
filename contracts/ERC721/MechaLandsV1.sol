@@ -377,6 +377,7 @@ contract MechaLandsV1 is
      * - The number of types cannot be lower than the previous one.
      * - `supplyPerType` and `pricePerType` must have a length of planet's `typesNumber`.
      * - A supply can by lower than the number of round mint for the same type.
+     * - If `roundId` already exist, we can't change the `planetId` to avoid forgotten minted count mapping.
      *
      * @param roundId The index of the planet mint round.
      * @param planetId The index of the planet.
@@ -400,11 +401,19 @@ contract MechaLandsV1 is
         uint256[] memory maxMintPerType
     ) public onlyOwner {
         require(roundId > 0, "Id can be 0");
+        require(planetId > 0, "Id can be 0");
+        require(planetId <= planetsLength, "Invalid planetId");
 
         if (roundId == roundsLength + 1) {
+            // Create a new round
             roundsLength += 1;
         } else {
+            // Update an existing round
             require(roundId <= roundsLength, "Invalid roundId");
+            require(
+                rounds[roundId].planetId == planetId,
+                "Can't change planetId"
+            );
         }
 
         MintRound storage round = rounds[roundId];
