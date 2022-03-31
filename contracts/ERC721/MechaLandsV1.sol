@@ -260,6 +260,28 @@ contract MechaLandsV1 is
     }
 
     /**
+     * @notice Mint the `amount` of planet land type and transfers it to `wallet`.
+     *
+     * @dev Call {MechaLandsV1-_safeMint}.
+     * @dev Requirements:
+     * - Only owner.
+     * - View {MechaLandsV1-_safeMint} requirements.
+     *
+     * @param wallet The wallet to transfer new tokens
+     * @param planetId The planet index
+     * @param landType The type of the land
+     * @param amount The number of lands to mint
+     */
+    function airdrop(
+        address wallet,
+        uint256 planetId,
+        uint256 landType,
+        uint256 amount
+    ) external onlyOwner {
+        _safeMint(wallet, planetId, landType, amount);
+    }
+
+    /**
      * @notice Create or edit a planet.
      *
      * @dev Requirements:
