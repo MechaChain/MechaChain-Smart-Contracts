@@ -46,9 +46,11 @@ Allocate an amount of tokens to an address ( only allocator role )
 
 
 
+
 ### `claimTokens(address account) → bool` (external) <a name="IMechaniumVesting-claimTokens-address-" id="IMechaniumVesting-claimTokens-address-"></a>
 
 Transfers the allocated tokens to an address ( once the distribution has started )
+
 
 
 
@@ -58,9 +60,11 @@ Transfers the allocated tokens to the sender ( once the distribution has started
 
 
 
+
 ### `claimTokensForAll() → bool` (external) <a name="IMechaniumVesting-claimTokensForAll--" id="IMechaniumVesting-claimTokensForAll--"></a>
 
 Transfers the all the allocated tokens to the respective addresses ( once the distribution has started and only by DEFAULT_ADMIN_ROLE)
+
 
 
 
@@ -70,9 +74,11 @@ Get balance of allocated tokens of an address
 
 
 
+
 ### `allocatedTokensOf(address account) → uint256` (external) <a name="IMechaniumVesting-allocatedTokensOf-address-" id="IMechaniumVesting-allocatedTokensOf-address-"></a>
 
 Return the amount of allocated tokens for `account` from the beginning
+
 
 
 
@@ -82,9 +88,11 @@ Get pending tokens of an account ( amont / time )
 
 
 
+
 ### `unlockableTokens(address account) → uint256` (external) <a name="IMechaniumVesting-unlockableTokens-address-" id="IMechaniumVesting-unlockableTokens-address-"></a>
 
 Get unlockable tokens of an address
+
 
 
 
@@ -94,9 +102,11 @@ Get released tokens of an address
 
 
 
+
 ### `token() → address` (external) <a name="IMechaniumVesting-token--" id="IMechaniumVesting-token--"></a>
 
 Return the token IERC20
+
 
 
 
@@ -106,9 +116,11 @@ Return the total token hold by the contract
 
 
 
+
 ### `totalSupply() → uint256` (external) <a name="IMechaniumVesting-totalSupply--" id="IMechaniumVesting-totalSupply--"></a>
 
 Get total tokens supply
+
 
 
 
@@ -118,9 +130,11 @@ Get total unallocated tokens
 
 
 
+
 ### `totalAllocatedTokens() → uint256` (external) <a name="IMechaniumVesting-totalAllocatedTokens--" id="IMechaniumVesting-totalAllocatedTokens--"></a>
 
 Return the total allocated tokens for all the addresses
+
 
 
 
@@ -130,9 +144,11 @@ Return the total tokens that have been transferred among all the addresses
 
 
 
+
 ### `vestingPerClock() → uint256` (external) <a name="IMechaniumVesting-vestingPerClock--" id="IMechaniumVesting-vestingPerClock--"></a>
 
 Return the percentage of unlocked tokens per `vestingClockTime()` once the vesting schedule has started
+
 
 
 
@@ -142,9 +158,11 @@ Return the number of seconds between two `vestingPerClock()`
 
 
 
+
 ### `isSoldOut() → bool` (external) <a name="IMechaniumVesting-isSoldOut--" id="IMechaniumVesting-isSoldOut--"></a>
 
 Return true if all tokens have been allocated
+
 
 
 

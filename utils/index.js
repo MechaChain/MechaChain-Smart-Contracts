@@ -1,12 +1,13 @@
 // Load modules
 const { BN } = require("@openzeppelin/test-helpers");
+const web3Utils = require("web3-utils");
 
 const fs = require("fs");
 
 let deployedContractsList = require("../DEPLOYED_CONTRACTS.json");
 
 function getAmount(value) {
-  return new BN(`${value}`).mul(new BN(`${10 ** 18}`));
+  return getBN(web3Utils.toWei(`${value}`));
 }
 
 function getBN(value) {
@@ -61,24 +62,30 @@ const getRandom = (min = 0, max = 100) => {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 };
 
+function getSignature(validator_private_key, data) {
+  let message = web3.utils.soliditySha3(web3.utils.encodePacked(...data));
+  return web3.eth.accounts.sign(message, validator_private_key).signature;
+}
+
 // gasTracker;
 const costs = [];
 let gasPrice = 0;
 const addCost = async (action, data) => {
   const tx = await web3.eth.getTransaction(data.tx);
   gasPrice = tx.gasPrice;
-  const price = data.receipt.gasUsed * Number(gasPrice);
+  const price = (data.receipt?.gasUsed || tx.gas) * Number(gasPrice);
 
   const priceETH = web3.utils.fromWei(`${price}`, "ether");
 
   const cost = {
     action,
-    gasUsed: data.receipt.gasUsed,
+    gasUsed: data.receipt?.gasUsed || tx.gas,
     gasPrice: gasPrice,
     price,
     priceETH,
   };
   costs.push(cost);
+  return cost;
 };
 const getStats = () => {
   const stats = costs.reduce((prev, curr) => {
@@ -127,8 +134,6 @@ const getStats = () => {
     .reduce((r, k) => ((r[k] = stats[k]), r), {}); // sort stats by index
 };
 const consoleStats = () => {
-  console.log("\n\t================== GAS STATS ==================");
-
   console.log(
     `\t=> Network Gas Price = ${web3.utils.fromWei(
       getBN(gasPrice),
@@ -155,6 +160,7 @@ module.exports = {
     getStats,
     consoleStats,
   },
+  getSignature,
   getAmount,
   getBN,
   getDeployedContract,

@@ -42,7 +42,9 @@ Event emitted when release unintended `amount` of `token` for `account` address
 
 
 
+
 ### `OwnershipTransferred(address previousOwner, address newOwner)` (inherited) <a name="Ownable-OwnershipTransferred-address-address-" id="Ownable-OwnershipTransferred-address-address-"></a>
+
 
 
 
@@ -58,8 +60,10 @@ fallback payable function ( used to receive ETH in tests )
 
 
 
+
 ### `receive()` (external) <a name="MechaniumCanReleaseUnintendedOwnable-receive--" id="MechaniumCanReleaseUnintendedOwnable-receive--"></a>
 receive payable function ( used to receive ETH in tests )
+
 
 
 
@@ -69,6 +73,8 @@ Release an `amount` of `token` to an `account`
 This function is used to prevent unintended tokens that got sent to be stuck on the contract
 
 
+
+Parameters:
 - `token`: The address of the token contract (zero address for claiming native coins).
 
 - `account`: The address of the tokens/coins receiver.
@@ -81,6 +87,7 @@ This function is used to prevent unintended tokens that got sent to be stuck on 
 
 Returns the address of the current owner.
 
+
 _Inherited from `../@openzeppelin/contracts/access/Ownable.sol`_.
 
 
@@ -91,6 +98,7 @@ Leaves the contract without owner. It will not be possible to call
 NOTE: Renouncing ownership will leave the contract without an owner,
 thereby removing any functionality that is only available to the owner.
 
+
 _Inherited from `../@openzeppelin/contracts/access/Ownable.sol`_.
 
 
@@ -98,6 +106,7 @@ _Inherited from `../@openzeppelin/contracts/access/Ownable.sol`_.
 
 Transfers ownership of the contract to a new account (`newOwner`).
 Can only be called by the current owner.
+
 
 _Inherited from `../@openzeppelin/contracts/access/Ownable.sol`_.
 
@@ -110,9 +119,11 @@ Add a locked `token_` ( can't be released )
 
 
 
+
 ### `constructor()` (internal) (inherited) <a name="Ownable-constructor--" id="Ownable-constructor--"></a>
 
 Initializes the contract setting the deployer as the initial owner.
+
 
 _Inherited from `../@openzeppelin/contracts/access/Ownable.sol`_.
 
@@ -122,6 +133,7 @@ _Inherited from `../@openzeppelin/contracts/access/Ownable.sol`_.
 Transfers ownership of the contract to a new account (`newOwner`).
 Internal function without access restriction.
 
+
 _Inherited from `../@openzeppelin/contracts/access/Ownable.sol`_.
 
 
@@ -129,10 +141,12 @@ _Inherited from `../@openzeppelin/contracts/access/Ownable.sol`_.
 
 
 
+
 _Inherited from `../@openzeppelin/contracts/utils/Context.sol`_.
 
 
 ### `_msgData() → bytes` (internal) (inherited) <a name="Context-_msgData--" id="Context-_msgData--"></a>
+
 
 
 
@@ -146,6 +160,7 @@ _Inherited from `../@openzeppelin/contracts/utils/Context.sol`_.
 
 
 Throws if called by any account other than the owner.
+
 
 _Inherited from `../@openzeppelin/contracts/access/Ownable.sol`_.
 
