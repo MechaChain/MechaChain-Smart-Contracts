@@ -1,6 +1,7 @@
 # `MechaLandsV1`
 **Documentation of `ERC721/MechaLandsV1.sol`.**
 
+MechaLandsV1 - TODO
 
 
 
@@ -9,8 +10,8 @@
 - [Events](#events)
     - [`PlanetSetup`](#MechaLandsV1-PlanetSetup-uint256-uint16-uint32---string---) 
     - [`PlanetMintRoundSetup`](#MechaLandsV1-PlanetMintRoundSetup-uint256-uint256-uint64-uint64-address-bool-uint256---uint256---uint256---) 
-    - [`PlanetRevealed`](#MechaLandsV1-PlanetRevealed-uint256-string-) 
-    - [`PlanetBaseURIChanged`](#MechaLandsV1-PlanetBaseURIChanged-uint256-string-) 
+    - [`PlanetRevealed`](#MechaLandsV1-PlanetRevealed-uint256-string-string-) 
+    - [`PlanetBaseURIChanged`](#MechaLandsV1-PlanetBaseURIChanged-uint256-string-string-) 
     - [`PlanetBurnableChanged`](#MechaLandsV1-PlanetBurnableChanged-uint256-bool-) 
     - [`Withdrawn`](#MechaLandsV1-Withdrawn-address-uint256-) 
     - [`TokenWithdrawn`](#MechaLandsV1-TokenWithdrawn-address-address-uint256-) 
@@ -29,11 +30,13 @@
     - [`initialize`](#MechaLandsV1-initialize--) 
     - [`mint`](#MechaLandsV1-mint-uint256-uint256-uint256-) 
     - [`mintWithValidation`](#MechaLandsV1-mintWithValidation-uint256-uint256-uint256-uint256-uint256-bytes-) 
+    - [`airdrop`](#MechaLandsV1-airdrop-address-uint256-uint256-uint256-) 
     - [`setupPlanet`](#MechaLandsV1-setupPlanet-uint256-uint16-uint32---string---) 
-    - [`revealPlanet`](#MechaLandsV1-revealPlanet-uint256-string-) 
-    - [`setPlanetBaseURI`](#MechaLandsV1-setPlanetBaseURI-uint256-string-) 
+    - [`revealPlanet`](#MechaLandsV1-revealPlanet-uint256-string-string-) 
+    - [`setPlanetBaseURI`](#MechaLandsV1-setPlanetBaseURI-uint256-string-string-) 
     - [`setPlanetBurnable`](#MechaLandsV1-setPlanetBurnable-uint256-bool-) 
-    - [`setupMintRound`](#MechaLandsV1-setupMintRound-uint256-uint256-uint64-uint64-address-bool-uint256---uint256---uint256---) 
+    - [`setPlanetDistributor`](#MechaLandsV1-setPlanetDistributor-uint256-address-) 
+    - [`setupMintRound`](#MechaLandsV1-setupMintRound-uint256-uint64-uint64-uint64-address-bool-uint256---uint256---uint256---) 
     - [`pause`](#MechaLandsV1-pause--) 
     - [`unpause`](#MechaLandsV1-unpause--) 
     - [`burn`](#MechaLandsV1-burn-uint256-) 
@@ -46,9 +49,12 @@
     - [`planetNotRevealUriByType`](#MechaLandsV1-planetNotRevealUriByType-uint256-uint256-) 
     - [`roundSupplyByType`](#MechaLandsV1-roundSupplyByType-uint256-uint256-) 
     - [`roundPriceByType`](#MechaLandsV1-roundPriceByType-uint256-uint256-) 
+    - [`roundMaxMintByType`](#MechaLandsV1-roundMaxMintByType-uint256-uint256-) 
     - [`roundTotalMintedByType`](#MechaLandsV1-roundTotalMintedByType-uint256-uint256-) 
     - [`roundTotalMintedByTypeForUser`](#MechaLandsV1-roundTotalMintedByTypeForUser-address-uint256-uint256-) 
+    - [`roundTotalMintedForUser`](#MechaLandsV1-roundTotalMintedForUser-address-uint256-) 
     - [`chainid`](#MechaLandsV1-chainid--) 
+    - [`receive`](#MechaLandsV1-receive--) 
     - [`proxiableUUID`](#UUPSUpgradeable-proxiableUUID--) (inherited)
     - [`upgradeTo`](#UUPSUpgradeable-upgradeTo-address-) (inherited)
     - [`upgradeToAndCall`](#UUPSUpgradeable-upgradeToAndCall-address-bytes-) (inherited)
@@ -153,14 +159,14 @@ Event emitted when a mint round of a planet is created or edited
 
 
 
-### `PlanetRevealed(uint256 planetId, string baseURI)`  <a name="MechaLandsV1-PlanetRevealed-uint256-string-" id="MechaLandsV1-PlanetRevealed-uint256-string-"></a>
+### `PlanetRevealed(uint256 planetId, string baseURI, string baseExtension)`  <a name="MechaLandsV1-PlanetRevealed-uint256-string-string-" id="MechaLandsV1-PlanetRevealed-uint256-string-string-"></a>
 Event emitted when a planet has been revealed
 
 
 
 
 
-### `PlanetBaseURIChanged(uint256 planetId, string baseURI)`  <a name="MechaLandsV1-PlanetBaseURIChanged-uint256-string-" id="MechaLandsV1-PlanetBaseURIChanged-uint256-string-"></a>
+### `PlanetBaseURIChanged(uint256 planetId, string baseURI, string baseExtension)`  <a name="MechaLandsV1-PlanetBaseURIChanged-uint256-string-string-" id="MechaLandsV1-PlanetBaseURIChanged-uint256-string-string-"></a>
 Event emitted when the baseURI of all lands of a planet has been changed
 
 
@@ -325,6 +331,28 @@ Parameters:
 
 
 
+### `airdrop(address wallet, uint256 planetId, uint256 landType, uint256 amount)` (external) <a name="MechaLandsV1-airdrop-address-uint256-uint256-uint256-" id="MechaLandsV1-airdrop-address-uint256-uint256-uint256-"></a>
+Mint the `amount` of planet land type and transfers it to `wallet`.
+
+
+Call {MechaLandsV1-_safeMint}.
+Requirements:
+- Only owner or the `distributor` of the planet.
+- View {MechaLandsV1-_safeMint} requirements.
+
+
+
+Parameters:
+- `wallet`: The wallet to transfer new tokens
+
+- `planetId`: The planet index
+
+- `landType`: The type of the land
+
+- `amount`: The number of lands to mint
+
+
+
 ### `setupPlanet(uint256 planetId, uint16 typesNumber, uint32[] supplyPerType, string[] notRevealUriPerType)` (public) <a name="MechaLandsV1-setupPlanet-uint256-uint16-uint32---string---" id="MechaLandsV1-setupPlanet-uint256-uint16-uint32---string---"></a>
 Create or edit a planet.
 
@@ -349,7 +377,7 @@ Parameters:
 
 
 
-### `revealPlanet(uint256 planetId, string baseURI)` (public) <a name="MechaLandsV1-revealPlanet-uint256-string-" id="MechaLandsV1-revealPlanet-uint256-string-"></a>
+### `revealPlanet(uint256 planetId, string baseURI, string baseExtension)` (public) <a name="MechaLandsV1-revealPlanet-uint256-string-string-" id="MechaLandsV1-revealPlanet-uint256-string-string-"></a>
 Activate token revelation for a planet and set his base URI
 
 
@@ -362,10 +390,12 @@ Parameters:
 
 - `baseURI`: The baseURI for all lands on this planet.
 
+- `baseExtension`: The base extension for the end of token id.
 
 
-### `setPlanetBaseURI(uint256 planetId, string baseURI)` (public) <a name="MechaLandsV1-setPlanetBaseURI-uint256-string-" id="MechaLandsV1-setPlanetBaseURI-uint256-string-"></a>
-Change the base URI of a planet
+
+### `setPlanetBaseURI(uint256 planetId, string baseURI, string baseExtension)` (public) <a name="MechaLandsV1-setPlanetBaseURI-uint256-string-string-" id="MechaLandsV1-setPlanetBaseURI-uint256-string-string-"></a>
+Change the base URI and extension of a planet
 
 
 
@@ -374,6 +404,8 @@ Parameters:
 - `planetId`: The index of the planet.
 
 - `baseURI`: The baseURI for all lands on this planet.
+
+- `baseExtension`: The base extension for the end of token id.
 
 
 
@@ -390,7 +422,20 @@ Parameters:
 
 
 
-### `setupMintRound(uint256 roundId, uint256 planetId, uint64 startTime, uint64 duration, address validator, bool limitedPerType, uint256[] pricePerType, uint256[] supplyPerType, uint256[] maxMintPerType)` (public) <a name="MechaLandsV1-setupMintRound-uint256-uint256-uint64-uint64-address-bool-uint256---uint256---uint256---" id="MechaLandsV1-setupMintRound-uint256-uint256-uint64-uint64-address-bool-uint256---uint256---uint256---"></a>
+### `setPlanetDistributor(uint256 planetId, address distributor)` (public) <a name="MechaLandsV1-setPlanetDistributor-uint256-address-" id="MechaLandsV1-setPlanetDistributor-uint256-address-"></a>
+Set a distributor that has the right to perform airdrops for this planet.
+
+
+
+
+Parameters:
+- `planetId`: The index of the planet.
+
+- `distributor`: The distributor address.
+
+
+
+### `setupMintRound(uint256 roundId, uint64 planetId, uint64 startTime, uint64 duration, address validator, bool limitedPerType, uint256[] pricePerType, uint256[] supplyPerType, uint256[] maxMintPerType)` (public) <a name="MechaLandsV1-setupMintRound-uint256-uint64-uint64-uint64-address-bool-uint256---uint256---uint256---" id="MechaLandsV1-setupMintRound-uint256-uint64-uint64-uint64-address-bool-uint256---uint256---uint256---"></a>
 Create or edit a mint round for a planet
 
 
@@ -403,6 +448,7 @@ Requirements:
 - The number of types cannot be lower than the previous one.
 - `supplyPerType` and `pricePerType` must have a length of planet's `typesNumber`.
 - A supply can by lower than the number of round mint for the same type.
+- If `roundId` already exist, we can't change the `planetId` to avoid forgotten minted count mapping.
 
 
 
@@ -411,7 +457,7 @@ Parameters:
 
 - `planetId`: The index of the planet.
 
-- `startTime`: The start time of the round in unix timestamp. 0 if not set.
+- `startTime`: The start time of the round in unix seconds timestamp. 0 if not set.
 
 - `duration`: The duration of the round in seconds. 0 if ends at sold out.
 
@@ -529,6 +575,13 @@ Return the price of a single `landType` for `roundId`
 
 
 
+### `roundMaxMintByType(uint256 roundId, uint256 landType) → uint256` (public) <a name="MechaLandsV1-roundMaxMintByType-uint256-uint256-" id="MechaLandsV1-roundMaxMintByType-uint256-uint256-"></a>
+Return the maximum number of `landType` tokens that a user can mint for `roundId`
+
+
+
+
+
 ### `roundTotalMintedByType(uint256 roundId, uint256 landType) → uint256` (public) <a name="MechaLandsV1-roundTotalMintedByType-uint256-uint256-" id="MechaLandsV1-roundTotalMintedByType-uint256-uint256-"></a>
 Return the total minted of `landType` for `roundId`
 
@@ -543,7 +596,21 @@ Return the total minted of `landType` for `user` in `roundId`
 
 
 
+### `roundTotalMintedForUser(address user, uint256 roundId) → uint256` (public) <a name="MechaLandsV1-roundTotalMintedForUser-address-uint256-" id="MechaLandsV1-roundTotalMintedForUser-address-uint256-"></a>
+Return the total minted for `user` in `roundId` for all lands
+
+
+
+
+
 ### `chainid() → uint256` (public) <a name="MechaLandsV1-chainid--" id="MechaLandsV1-chainid--"></a>
+
+
+
+
+
+
+### `receive()` (external) <a name="MechaLandsV1-receive--" id="MechaLandsV1-receive--"></a>
 
 
 
@@ -1303,6 +1370,8 @@ _Inherited from `../@openzeppelin/contracts-upgradeable/proxy/utils/Initializabl
 - bool burnable
 - uint16 typesNumber
 - string baseURI
+- string baseExtension
+- address distributor
 - mapping(uint256 => uint256) supplyPerType
 - mapping(uint256 => uint256) totalMintedPerType
 - mapping(uint256 => string) notRevealUriPerType
