@@ -52,12 +52,14 @@ Event emitted when release unintented `amount` of `token` for `account` address
 
 
 
+
 ### `RoleAdminChanged(bytes32 role, bytes32 previousAdminRole, bytes32 newAdminRole)` (inherited) <a name="IAccessControl-RoleAdminChanged-bytes32-bytes32-bytes32-" id="IAccessControl-RoleAdminChanged-bytes32-bytes32-bytes32-"></a>
 
 Emitted when `newAdminRole` is set as ``role``'s admin role, replacing `previousAdminRole`
 `DEFAULT_ADMIN_ROLE` is the starting admin for all roles, despite
 {RoleAdminChanged} not being emitted signaling this.
 _Available since v3.1._
+
 
 _Inherited from `../@openzeppelin/contracts/access/IAccessControl.sol`_.
 
@@ -68,6 +70,7 @@ Emitted when `account` is granted `role`.
 `sender` is the account that originated the contract call, an admin role
 bearer except when using {AccessControl-_setupRole}.
 
+
 _Inherited from `../@openzeppelin/contracts/access/IAccessControl.sol`_.
 
 
@@ -77,6 +80,7 @@ Emitted when `account` is revoked `role`.
 `sender` is the account that originated the contract call:
   - if using `revokeRole`, it is the admin role bearer
   - if using `renounceRole`, it is the role bearer (i.e. `account`)
+
 
 _Inherited from `../@openzeppelin/contracts/access/IAccessControl.sol`_.
 
@@ -90,8 +94,10 @@ fallback payable function ( used to receive ETH in tests )
 
 
 
+
 ### `receive()` (external) <a name="MechaniumCanReleaseUnintented-receive--" id="MechaniumCanReleaseUnintented-receive--"></a>
 receive payable function ( used to receive ETH in tests )
+
 
 
 
@@ -101,6 +107,8 @@ Release an `amount` of `token` to an `account`
 This function is used to prevent unintented tokens that got sent to be stuck on the contract
 
 
+
+Parameters:
 - `token`: The address of the token contract (zero address for claiming native coins).
 
 - `account`: The address of the tokens/coins receiver.
@@ -113,12 +121,14 @@ This function is used to prevent unintented tokens that got sent to be stuck on 
 
 See {IERC165-supportsInterface}.
 
+
 _Inherited from `../@openzeppelin/contracts/access/AccessControl.sol`_.
 
 
 ### `hasRole(bytes32 role, address account) → bool` (public) (inherited)<a name="AccessControl-hasRole-bytes32-address-" id="AccessControl-hasRole-bytes32-address-"></a>
 
 Returns `true` if `account` has been granted `role`.
+
 
 _Inherited from `../@openzeppelin/contracts/access/AccessControl.sol`_.
 
@@ -128,6 +138,7 @@ _Inherited from `../@openzeppelin/contracts/access/AccessControl.sol`_.
 Returns the admin role that controls `role`. See {grantRole} and
 {revokeRole}.
 To change a role's admin, use {_setRoleAdmin}.
+
 
 _Inherited from `../@openzeppelin/contracts/access/AccessControl.sol`_.
 
@@ -140,6 +151,7 @@ event.
 Requirements:
 - the caller must have ``role``'s admin role.
 
+
 _Inherited from `../@openzeppelin/contracts/access/AccessControl.sol`_.
 
 
@@ -149,6 +161,7 @@ Revokes `role` from `account`.
 If `account` had been granted `role`, emits a {RoleRevoked} event.
 Requirements:
 - the caller must have ``role``'s admin role.
+
 
 _Inherited from `../@openzeppelin/contracts/access/AccessControl.sol`_.
 
@@ -164,6 +177,7 @@ event.
 Requirements:
 - the caller must be `account`.
 
+
 _Inherited from `../@openzeppelin/contracts/access/AccessControl.sol`_.
 
 
@@ -175,11 +189,13 @@ Add a locked `token_` ( can't be released )
 
 
 
+
 ### `_checkRole(bytes32 role, address account)` (internal) (inherited) <a name="AccessControl-_checkRole-bytes32-address-" id="AccessControl-_checkRole-bytes32-address-"></a>
 
 Revert with a standard message if `account` is missing `role`.
 The format of the revert reason is given by the following regular expression:
  /^AccessControl: account (0x[0-9a-f]{40}) is missing role (0x[0-9a-f]{64})$/
+
 
 _Inherited from `../@openzeppelin/contracts/access/AccessControl.sol`_.
 
@@ -199,6 +215,7 @@ system imposed by {AccessControl}.
 ====
 NOTE: This function is deprecated in favor of {_grantRole}.
 
+
 _Inherited from `../@openzeppelin/contracts/access/AccessControl.sol`_.
 
 
@@ -206,6 +223,7 @@ _Inherited from `../@openzeppelin/contracts/access/AccessControl.sol`_.
 
 Sets `adminRole` as ``role``'s admin role.
 Emits a {RoleAdminChanged} event.
+
 
 _Inherited from `../@openzeppelin/contracts/access/AccessControl.sol`_.
 
@@ -215,6 +233,7 @@ _Inherited from `../@openzeppelin/contracts/access/AccessControl.sol`_.
 Grants `role` to `account`.
 Internal function without access restriction.
 
+
 _Inherited from `../@openzeppelin/contracts/access/AccessControl.sol`_.
 
 
@@ -223,6 +242,7 @@ _Inherited from `../@openzeppelin/contracts/access/AccessControl.sol`_.
 Revokes `role` from `account`.
 Internal function without access restriction.
 
+
 _Inherited from `../@openzeppelin/contracts/access/AccessControl.sol`_.
 
 
@@ -230,10 +250,12 @@ _Inherited from `../@openzeppelin/contracts/access/AccessControl.sol`_.
 
 
 
+
 _Inherited from `../@openzeppelin/contracts/utils/Context.sol`_.
 
 
 ### `_msgData() → bytes` (internal) (inherited) <a name="Context-_msgData--" id="Context-_msgData--"></a>
+
 
 
 
@@ -251,6 +273,7 @@ with a standardized message including the required role.
 The format of the revert reason is given by the following regular expression:
  /^AccessControl: account (0x[0-9a-f]{40}) is missing role (0x[0-9a-f]{64})$/
 _Available since v4.1._
+
 
 _Inherited from `../@openzeppelin/contracts/access/AccessControl.sol`_.
 

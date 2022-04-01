@@ -68,9 +68,13 @@
 ### `{{name}}({{args}})` {{#if (ne contract.name ../name)}}(inherited){{/if}} <a name="{{anchor}}" id="{{anchor}}"></a>
 {{{natspec.userdoc}}}
 {{{natspec.devdoc}}}
+
+{{#if natspec.params}}
+Parameters:
 {{#natspec.params}}
 - `{{param}}`: {{description}}
 {{/natspec.params}}
+{{/if}}
 
 {{#if (ne contract.name ../name)}}
 _Inherited from `{{contract.file.path}}`_.
@@ -88,9 +92,13 @@ _Inherited from `{{contract.file.path}}`_.
 ### `{{name}}({{args}}){{#if outputs}} → {{outputs}}{{/if}}` ({{visibility}}) {{#if (ne contract.name ../name)}}(inherited){{/if}}<a name="{{anchor}}" id="{{anchor}}"></a>
 {{{natspec.userdoc}}}
 {{{natspec.devdoc}}}
+
+{{#if natspec.params}}
+Parameters:
 {{#natspec.params}}
 - `{{param}}`: {{description}}
 {{/natspec.params}}
+{{/if}}
 
 {{#if (ne contract.name ../name)}}
 _Inherited from `{{contract.file.path}}`_.
@@ -108,9 +116,13 @@ _Inherited from `{{contract.file.path}}`_.
 ### `{{name}}({{args}}){{#if outputs}} → {{outputs}}{{/if}}` ({{visibility}}) {{#if (ne contract.name ../name)}}(inherited){{/if}} <a name="{{anchor}}" id="{{anchor}}"></a>
 {{{natspec.userdoc}}}
 {{{natspec.devdoc}}}
+
+{{#if natspec.params}}
+Parameters:
 {{#natspec.params}}
 - `{{param}}`: {{description}}
 {{/natspec.params}}
+{{/if}}
 
 {{#if (ne contract.name ../name)}}
 _Inherited from `{{contract.file.path}}`_.
@@ -126,9 +138,14 @@ _Inherited from `{{contract.file.path}}`_.
 ### `{{name}}({{args}}){{#if outputs}} → {{outputs}}{{/if}}` ({{visibility}}) <a name="{{anchor}}" id="{{anchor}}"></a>
 {{{natspec.userdoc}}}
 {{{natspec.devdoc}}}
+
+{{#if natspec.params}}
+Parameters:
 {{#natspec.params}}
 - `{{param}}`: {{description}}
 {{/natspec.params}}
+{{/if}}
+
 {{/each}}
 {{/if}}
 
@@ -140,9 +157,13 @@ _Inherited from `{{contract.file.path}}`_.
 
 {{{natspec.userdoc}}}
 {{{natspec.devdoc}}}
+
+{{#if natspec.params}}
+Parameters:
 {{#natspec.params}}
 - `{{param}}`: {{description}}
 {{/natspec.params}}
+{{/if}}
 
 {{#if (ne contract.name ../name)}}
 _Inherited from `{{contract.file.path}}`_.

@@ -38,9 +38,11 @@ Transfer `amount` unlocked tokens `to` address
 
 
 
+
 ### `unlockableTokens() → uint256` (external) <a name="IMechaniumVestingWallet-unlockableTokens--" id="IMechaniumVestingWallet-unlockableTokens--"></a>
 
 Return the number of tokens that can be unlock
+
 
 
 
@@ -50,9 +52,11 @@ Return the token IERC20
 
 
 
+
 ### `tokenBalance() → uint256` (external) <a name="IMechaniumVestingWallet-tokenBalance--" id="IMechaniumVestingWallet-tokenBalance--"></a>
 
 Return the total token hold by the contract
+
 
 
 
@@ -62,9 +66,11 @@ Get total tokens supply
 
 
 
+
 ### `totalReleasedTokens() → uint256` (external) <a name="IMechaniumVestingWallet-totalReleasedTokens--" id="IMechaniumVestingWallet-totalReleasedTokens--"></a>
 
 Return the total tokens that have been transferred
+
 
 
 
@@ -74,9 +80,11 @@ Return the percentage of unlocked tokens per `vestingClockTime()` once the vesti
 
 
 
+
 ### `vestingClockTime() → uint256` (external) <a name="IMechaniumVestingWallet-vestingClockTime--" id="IMechaniumVestingWallet-vestingClockTime--"></a>
 
 Return the number of seconds between two `vestingPerClock()`
+
 
 
 
@@ -86,9 +94,11 @@ Return the percentage of unlocked tokens at the beginning of the vesting schedul
 
 
 
+
 ### `startTime() → uint256` (external) <a name="IMechaniumVestingWallet-startTime--" id="IMechaniumVestingWallet-startTime--"></a>
 
 Return vesting schedule start time
+
 
 
 

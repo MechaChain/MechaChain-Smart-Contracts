@@ -76,8 +76,10 @@ Event emitted when an `account` stakes `amount` for `lockPeriod`
 
 
 
+
 ### `Unstake(address account, uint256 amount, uint256 depositId)`  <a name="MechaniumStakingPool-Unstake-address-uint256-uint256-" id="MechaniumStakingPool-Unstake-address-uint256-uint256-"></a>
 Event emitted when an `account` unstaked a deposit (`depositId`)
+
 
 
 
@@ -88,8 +90,10 @@ Event emitted when an `account` unstaked several deposits (`depositIds`)
 
 
 
+
 ### `StakeLockUpdated(address account, uint256 depositId, uint64 lockPeriod)`  <a name="MechaniumStakingPool-StakeLockUpdated-address-uint256-uint64-" id="MechaniumStakingPool-StakeLockUpdated-address-uint256-uint64-"></a>
 Event emitted when an `account` updated stake `lockPeriod` for a `depositId`
+
 
 
 
@@ -100,8 +104,10 @@ Event emitted when an `rewardsPerBlock` is updated
 
 
 
+
 ### `ProcessRewards(address account, uint256 rewards)`  <a name="MechaniumStakingPool-ProcessRewards-address-uint256-" id="MechaniumStakingPool-ProcessRewards-address-uint256-"></a>
 Event emitted when `rewards` are processed for an `account`
+
 
 
 
@@ -112,14 +118,17 @@ Event emitted when `_rewardsPerWeight` is updated
 
 
 
+
 ### `ReleaseUintentedTokens(address token, address account, uint256 amount)` (inherited) <a name="MechaniumCanReleaseUnintendedOwnable-ReleaseUintentedTokens-address-address-uint256-" id="MechaniumCanReleaseUnintendedOwnable-ReleaseUintentedTokens-address-address-uint256-"></a>
 Event emitted when release unintended `amount` of `token` for `account` address
+
 
 
 _Inherited from `MechaniumUtils/MechaniumCanReleaseUnintendedOwnable.sol`_.
 
 
 ### `OwnershipTransferred(address previousOwner, address newOwner)` (inherited) <a name="Ownable-OwnershipTransferred-address-address-" id="Ownable-OwnershipTransferred-address-address-"></a>
+
 
 
 
@@ -133,6 +142,8 @@ _Inherited from `../@openzeppelin/contracts/access/Ownable.sol`_.
 Contract constructor sets the configuration of the staking pool
 
 
+
+Parameters:
 - `stakedToken_`: The token to be staked ( can be same as rewardToken if not flash pool )
 
 - `rewardToken_`:  The token to be rewarded
@@ -158,6 +169,8 @@ Used to stake an `amount` of tokens for a `lockPeriod` for the `msg.sender`
 
 Uses the `depositFor` function
 
+
+Parameters:
 - `amount`: The amount of tokens to stake
 
 - `lockPeriod`: The locking period ( in seconds )
@@ -169,6 +182,8 @@ Used to stake an `amount` of tokens for a `lockPeriod` for an `account`
 
 Will make a safe transfer from the `account` and calculate the weight and create a deposit
 
+
+Parameters:
 - `account`: The account that we will stake the tokens for
 
 - `amount`: The amount of tokens to stake
@@ -190,6 +205,7 @@ If `rewardsLockingPeriod` is set, rewards are staked in a new deposit,
 
 
 
+
 ### `unstake(uint256[] depositIds) → bool` (public) <a name="MechaniumStakingPool-unstake-uint256---" id="MechaniumStakingPool-unstake-uint256---"></a>
 Used to unstake several deposits for the `msg.sender`
 
@@ -198,6 +214,8 @@ ProcessRewards and transfer all deposits to the user
 Revert if the `lockedUntil` of a deposit has not passed
 
 
+
+Parameters:
 - `depositIds`: Array of deposit id that will be unstaked
 
 
@@ -210,6 +228,8 @@ ProcessRewards and transfer all the deposit to the user
 Revert if the `lockedUntil` of the deposit has not passed
 
 
+
+Parameters:
 - `depositId`: The deposit id that will be unstaked
 
 
@@ -218,6 +238,7 @@ Revert if the `lockedUntil` of the deposit has not passed
 Used to update the rewards per weight and the total rewards
 
 Must be called before each total weight change
+
 
 
 
@@ -230,6 +251,8 @@ Can only by call by owner (the factory if deployed by it)
 Revert if the new rewards per block is less than the previous one
 
 
+
+Parameters:
 - `rewardsPerBlock_`: the new value for rewardsPerBlock ( must be superior to old value )
 
 
@@ -240,10 +263,13 @@ Used to get the remaining allocated tokens
 
 
 
+
 ### `pendingRewards(address account) → uint256` (public) <a name="MechaniumStakingPool-pendingRewards-address-" id="MechaniumStakingPool-pendingRewards-address-"></a>
 Used to get the pending rewards for an `account`
 
 
+
+Parameters:
 - `account`: The account to calculate the pending rewards for
 
 
@@ -255,10 +281,13 @@ Can we call the rewards update function or is it useless and will cause an error
 
 
 
+
 ### `balanceOf(address account) → uint256` (public) <a name="MechaniumStakingPool-balanceOf-address-" id="MechaniumStakingPool-balanceOf-address-"></a>
 Used to get the balance for an `account`
 
 
+
+Parameters:
 - `account`: The account to get the balance for
 
 
@@ -267,6 +296,8 @@ Used to get the balance for an `account`
 Used to get the deposit (`depositId`) for an `account`
 
 
+
+Parameters:
 - `account`: The account to get the balance for
 
 - `depositId`: The deposit id the get
@@ -277,6 +308,8 @@ Used to get the deposit (`depositId`) for an `account`
 Used to get the length of deposits for an `account`
 
 
+
+Parameters:
 - `account`: The account to get the balance for
 
 
@@ -285,6 +318,8 @@ Used to get the length of deposits for an `account`
 Used to get the User data for an `account`
 
 
+
+Parameters:
 - `account`: The account address
 
 
@@ -296,10 +331,12 @@ Used to calculate the rewards for last period ( in blocks ) without updating the
 
 
 
+
 ### `updatedTotalRewards() → uint256` (public) <a name="MechaniumStakingPool-updatedTotalRewards--" id="MechaniumStakingPool-updatedTotalRewards--"></a>
 Get the total updated rewards
 
 Used to calculate the rewards from the init block without updating them
+
 
 
 
@@ -310,10 +347,13 @@ Used to calculate `_rewardsPerWeight` without updating them
 
 
 
+
 ### `calculateUserWeight(uint256 amount, uint64 stakingTime) → uint256` (public) <a name="MechaniumStakingPool-calculateUserWeight-uint256-uint64-" id="MechaniumStakingPool-calculateUserWeight-uint256-uint64-"></a>
 Calculate the weight based on `amount` and `stakingTime`
 
 
+
+Parameters:
 - `amount`: The staking amount
 
 - `stakingTime`: The staking time
@@ -325,6 +365,8 @@ Calculate the weight based on `amount` and `stakingTime`
 Converts stake weight to reward value, applying the division on weight
 
 
+
+Parameters:
 - `weight_`: stake weight
 
 - `rewardsPerWeight_`: reward per weight
@@ -336,11 +378,13 @@ Converts stake weight to reward value, applying the division on weight
 fallback payable function ( used to receive ETH in tests )
 
 
+
 _Inherited from `MechaniumUtils/MechaniumCanReleaseUnintendedOwnable.sol`_.
 
 
 ### `receive()` (external) (inherited)<a name="MechaniumCanReleaseUnintendedOwnable-receive--" id="MechaniumCanReleaseUnintendedOwnable-receive--"></a>
 receive payable function ( used to receive ETH in tests )
+
 
 
 _Inherited from `MechaniumUtils/MechaniumCanReleaseUnintendedOwnable.sol`_.
@@ -351,6 +395,8 @@ Release an `amount` of `token` to an `account`
 This function is used to prevent unintended tokens that got sent to be stuck on the contract
 
 
+
+Parameters:
 - `token`: The address of the token contract (zero address for claiming native coins).
 
 - `account`: The address of the tokens/coins receiver.
@@ -364,6 +410,7 @@ _Inherited from `MechaniumUtils/MechaniumCanReleaseUnintendedOwnable.sol`_.
 
 Returns the address of the current owner.
 
+
 _Inherited from `../@openzeppelin/contracts/access/Ownable.sol`_.
 
 
@@ -374,6 +421,7 @@ Leaves the contract without owner. It will not be possible to call
 NOTE: Renouncing ownership will leave the contract without an owner,
 thereby removing any functionality that is only available to the owner.
 
+
 _Inherited from `../@openzeppelin/contracts/access/Ownable.sol`_.
 
 
@@ -381,6 +429,7 @@ _Inherited from `../@openzeppelin/contracts/access/Ownable.sol`_.
 
 Transfers ownership of the contract to a new account (`newOwner`).
 Can only be called by the current owner.
+
 
 _Inherited from `../@openzeppelin/contracts/access/Ownable.sol`_.
 
@@ -396,6 +445,8 @@ Increase `totalUsersWeight` and `totalTokensStaked`
 Rewards MUST be updated before and processed for this users
 
 
+
+Parameters:
 - `user`: The user to update
 
 - `amount`: The amount to increase
@@ -414,6 +465,8 @@ Rewards MUST be updated before and processed for this users
 If `updateMissingRewards` is false, `missingRewards` rewards MUST be updated after
 
 
+
+Parameters:
 - `user`: The user to update
 
 - `amount`: The amount to decrease
@@ -435,6 +488,8 @@ Does not update records : rewards MUST be updated before and
      user's profile and total record MUST be updated after
 
 
+
+Parameters:
 - `user`: The user who owns the deposit
 
 - `depositId`: The deposit id that will be drain
@@ -453,6 +508,8 @@ If `_withUpdate` is false, rewards MUST be updated before and user's missing rew
 Executed internally in `unstake`, `depositFor`, `updateStakeLock` and `processRewards` functions
 
 
+
+Parameters:
 - `_staker`: Staker address
 
 - `_withUpdate`: If we need to update rewards and user's missing rewards in this function
@@ -465,6 +522,8 @@ Executed internally in `unstake`, `depositFor`, `updateStakeLock` and `processRe
 Used to get the range for the staking time
 
 
+
+Parameters:
 - `x1`: The minimum staking time
 
 - `y1`: The minimum weight time
@@ -481,6 +540,7 @@ Used to get the range for the staking time
 Add a locked `token_` ( can't be released )
 
 
+
 _Inherited from `MechaniumUtils/MechaniumCanReleaseUnintendedOwnable.sol`_.
 
 
@@ -489,6 +549,7 @@ _Inherited from `MechaniumUtils/MechaniumCanReleaseUnintendedOwnable.sol`_.
 Transfers ownership of the contract to a new account (`newOwner`).
 Internal function without access restriction.
 
+
 _Inherited from `../@openzeppelin/contracts/access/Ownable.sol`_.
 
 
@@ -496,10 +557,12 @@ _Inherited from `../@openzeppelin/contracts/access/Ownable.sol`_.
 
 
 
+
 _Inherited from `../@openzeppelin/contracts/utils/Context.sol`_.
 
 
 ### `_msgData() → bytes` (internal) (inherited) <a name="Context-_msgData--" id="Context-_msgData--"></a>
+
 
 
 
@@ -513,6 +576,7 @@ _Inherited from `../@openzeppelin/contracts/utils/Context.sol`_.
 
 
 Throws if called by any account other than the owner.
+
 
 _Inherited from `../@openzeppelin/contracts/access/Ownable.sol`_.
 

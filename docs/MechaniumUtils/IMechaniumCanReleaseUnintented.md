@@ -28,6 +28,8 @@ Mechanim can release unintented smart contract interface
 Release unintented tokens sent to smart contract ( only admin role )
 This function is used to prevent unintented tokens that got sent to be stuck on the contract
 
+
+Parameters:
 - `token`: The address of the token contract (zero address for claiming native coins).
 
 - `account`: The address of the tokens/coins receiver.

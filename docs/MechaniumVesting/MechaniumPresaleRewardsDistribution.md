@@ -97,8 +97,10 @@ Event emitted when the `vestingStartingTime` has changed
 
 
 
+
 ### `TransferUnsoldToPTEPool(uint256 amount)`  <a name="MechaniumPresaleRewardsDistribution-TransferUnsoldToPTEPool-uint256-" id="MechaniumPresaleRewardsDistribution-TransferUnsoldToPTEPool-uint256-"></a>
 Event emitted when `amount` tokens has been transferred to the play to earn pool
+
 
 
 
@@ -109,8 +111,10 @@ Event emitted when `account` has transferred `amount` tokens to the staking pool
 
 
 
+
 ### `Allocated(address to, uint256 amount)` (inherited) <a name="MechaniumVesting-Allocated-address-uint256-" id="MechaniumVesting-Allocated-address-uint256-"></a>
 Event emitted when `amount` tokens have been allocated for `to` address
+
 
 
 _Inherited from `MechaniumVesting/MechaniumVesting.sol`_.
@@ -120,11 +124,13 @@ _Inherited from `MechaniumVesting/MechaniumVesting.sol`_.
 Event emitted when `caller` claimed `amount` tokens for `to` address
 
 
+
 _Inherited from `MechaniumVesting/MechaniumVesting.sol`_.
 
 
 ### `ClaimedTokensToAll(address caller, uint256 beneficiariesNb, uint256 tokensUnlockNb)` (inherited) <a name="MechaniumVesting-ClaimedTokensToAll-address-uint256-uint256-" id="MechaniumVesting-ClaimedTokensToAll-address-uint256-uint256-"></a>
 Event emitted when `caller` claimed the tokens for all beneficiary address
+
 
 
 _Inherited from `MechaniumVesting/MechaniumVesting.sol`_.
@@ -134,6 +140,7 @@ _Inherited from `MechaniumVesting/MechaniumVesting.sol`_.
 Event emitted when all tokens have been allocated
 
 
+
 _Inherited from `MechaniumVesting/MechaniumVesting.sol`_.
 
 
@@ -141,11 +148,13 @@ _Inherited from `MechaniumVesting/MechaniumVesting.sol`_.
 Event emitted when the last tokens have been claimed
 
 
+
 _Inherited from `MechaniumVesting/MechaniumVesting.sol`_.
 
 
 ### `ReleaseUintentedTokens(address token, address account, uint256 amount)` (inherited) <a name="MechaniumCanReleaseUnintented-ReleaseUintentedTokens-address-address-uint256-" id="MechaniumCanReleaseUnintented-ReleaseUintentedTokens-address-address-uint256-"></a>
 Event emitted when release unintented `amount` of `token` for `account` address
+
 
 
 _Inherited from `MechaniumUtils/MechaniumCanReleaseUnintented.sol`_.
@@ -158,6 +167,7 @@ Emitted when `newAdminRole` is set as ``role``'s admin role, replacing `previous
 {RoleAdminChanged} not being emitted signaling this.
 _Available since v3.1._
 
+
 _Inherited from `../@openzeppelin/contracts/access/IAccessControl.sol`_.
 
 
@@ -166,6 +176,7 @@ _Inherited from `../@openzeppelin/contracts/access/IAccessControl.sol`_.
 Emitted when `account` is granted `role`.
 `sender` is the account that originated the contract call, an admin role
 bearer except when using {AccessControl-_setupRole}.
+
 
 _Inherited from `../@openzeppelin/contracts/access/IAccessControl.sol`_.
 
@@ -177,6 +188,7 @@ Emitted when `account` is revoked `role`.
   - if using `revokeRole`, it is the admin role bearer
   - if using `renounceRole`, it is the role bearer (i.e. `account`)
 
+
 _Inherited from `../@openzeppelin/contracts/access/IAccessControl.sol`_.
 
 
@@ -187,6 +199,8 @@ _Inherited from `../@openzeppelin/contracts/access/IAccessControl.sol`_.
 
 Contract constructor
 
+
+Parameters:
 - `token_`: address of the ERC20 token contract, this address cannot be changed later
 
 
@@ -195,6 +209,8 @@ Contract constructor
 Allocate `amount` token `to` address
 
 
+
+Parameters:
 - `to`: Address of the beneficiary
 
 - `amount`: Total token to be allocated
@@ -207,10 +223,13 @@ Start the vesting immediately
 
 
 
+
 ### `startVesting(uint256 startTime) → bool` (public) <a name="MechaniumPresaleRewardsDistribution-startVesting-uint256-" id="MechaniumPresaleRewardsDistribution-startVesting-uint256-"></a>
 Set the vesting start time
 
 
+
+Parameters:
 - `startTime`: vesting start time
 
 
@@ -219,6 +238,8 @@ Set the vesting start time
 Set staking pool address
 
 
+
+Parameters:
 - `stakingPoolAddress`: The staking pool address
 
 
@@ -227,6 +248,8 @@ Set staking pool address
 Set staking transfer time limit
 
 
+
+Parameters:
 - `stakingTransferTimeLimit`: The staking transfer time limit
 
 
@@ -235,6 +258,8 @@ Set staking transfer time limit
 Set minimum staking time
 
 
+
+Parameters:
 - `minimumStakingTime`: The minimum staking time
 
 
@@ -245,9 +270,11 @@ Transfer tokens balance ( allocated but not claimed ) to the staking pool
 
 
 
+
 ### `allocatedTokensOf(address account) → uint256` (public) <a name="MechaniumPresaleRewardsDistribution-allocatedTokensOf-address-" id="MechaniumPresaleRewardsDistribution-allocatedTokensOf-address-"></a>
 
 Return the amount of allocated tokens for `account` from the beginning
+
 
 
 
@@ -257,9 +284,11 @@ Return the amount of tokens that the `account` can unlock in real time
 
 
 
+
 ### `unlockableTokens(address account) → uint256` (public) <a name="MechaniumPresaleRewardsDistribution-unlockableTokens-address-" id="MechaniumPresaleRewardsDistribution-unlockableTokens-address-"></a>
 
 Return the amount of tokens that the `account` can unlock per month
+
 
 
 
@@ -269,9 +298,11 @@ Return true if the vesting schedule has started
 
 
 
+
 ### `vestingStartingTime() → uint256` (public) <a name="MechaniumPresaleRewardsDistribution-vestingStartingTime--" id="MechaniumPresaleRewardsDistribution-vestingStartingTime--"></a>
 
 Return the starting time of the vesting schedule
+
 
 
 
@@ -281,9 +312,11 @@ Return the unchangeable maximum vesting starting time
 
 
 
+
 ### `getStakingPoolAddress() → address` (public) <a name="MechaniumPresaleRewardsDistribution-getStakingPoolAddress--" id="MechaniumPresaleRewardsDistribution-getStakingPoolAddress--"></a>
 
 Return the staking pool address
+
 
 
 
@@ -293,9 +326,11 @@ Return the staking transfer time limit
 
 
 
+
 ### `getMinimumStakingTime() → uint256` (public) <a name="MechaniumPresaleRewardsDistribution-getMinimumStakingTime--" id="MechaniumPresaleRewardsDistribution-getMinimumStakingTime--"></a>
 
 Return the minimum staking time
+
 
 
 
@@ -303,6 +338,8 @@ Return the minimum staking time
 Claim the account's token
 
 
+
+Parameters:
 - `account`: the account to claim tokens
 
 _Inherited from `MechaniumVesting/MechaniumVesting.sol`_.
@@ -312,11 +349,13 @@ _Inherited from `MechaniumVesting/MechaniumVesting.sol`_.
 Claim the account's token
 
 
+
 _Inherited from `MechaniumVesting/MechaniumVesting.sol`_.
 
 
 ### `claimTokensForAll() → bool` (public) (inherited)<a name="MechaniumVesting-claimTokensForAll--" id="MechaniumVesting-claimTokensForAll--"></a>
 Claim all the accounts tokens (Only by DEFAULT_ADMIN_ROLE)
+
 
 
 _Inherited from `MechaniumVesting/MechaniumVesting.sol`_.
@@ -326,12 +365,14 @@ _Inherited from `MechaniumVesting/MechaniumVesting.sol`_.
 
 Return the amount of tokens locked for `account`
 
+
 _Inherited from `MechaniumVesting/MechaniumVesting.sol`_.
 
 
 ### `releasedTokensOf(address account) → uint256` (public) (inherited)<a name="MechaniumVesting-releasedTokensOf-address-" id="MechaniumVesting-releasedTokensOf-address-"></a>
 
 Get released tokens of an address
+
 
 _Inherited from `MechaniumVesting/MechaniumVesting.sol`_.
 
@@ -340,12 +381,14 @@ _Inherited from `MechaniumVesting/MechaniumVesting.sol`_.
 
 Return the token IERC20
 
+
 _Inherited from `MechaniumVesting/MechaniumVesting.sol`_.
 
 
 ### `tokenBalance() → uint256` (public) (inherited)<a name="MechaniumVesting-tokenBalance--" id="MechaniumVesting-tokenBalance--"></a>
 
 Return the total token hold by the contract
+
 
 _Inherited from `MechaniumVesting/MechaniumVesting.sol`_.
 
@@ -354,12 +397,14 @@ _Inherited from `MechaniumVesting/MechaniumVesting.sol`_.
 
 Return the total supply of tokens
 
+
 _Inherited from `MechaniumVesting/MechaniumVesting.sol`_.
 
 
 ### `totalUnallocatedTokens() → uint256` (public) (inherited)<a name="MechaniumVesting-totalUnallocatedTokens--" id="MechaniumVesting-totalUnallocatedTokens--"></a>
 
 Return the total token unallocated by the contract
+
 
 _Inherited from `MechaniumVesting/MechaniumVesting.sol`_.
 
@@ -368,12 +413,14 @@ _Inherited from `MechaniumVesting/MechaniumVesting.sol`_.
 
 Return the total allocated tokens for all the addresses
 
+
 _Inherited from `MechaniumVesting/MechaniumVesting.sol`_.
 
 
 ### `totalReleasedTokens() → uint256` (public) (inherited)<a name="MechaniumVesting-totalReleasedTokens--" id="MechaniumVesting-totalReleasedTokens--"></a>
 
 Return the total tokens that have been transferred among all the addresses
+
 
 _Inherited from `MechaniumVesting/MechaniumVesting.sol`_.
 
@@ -382,12 +429,14 @@ _Inherited from `MechaniumVesting/MechaniumVesting.sol`_.
 
 Return the percentage of unlocked tokens per `vestingClockTime()` once the vesting schedule has started
 
+
 _Inherited from `MechaniumVesting/MechaniumVesting.sol`_.
 
 
 ### `vestingClockTime() → uint256` (public) (inherited)<a name="MechaniumVesting-vestingClockTime--" id="MechaniumVesting-vestingClockTime--"></a>
 
 Return the number of seconds between two `vestingPerClock()`
+
 
 _Inherited from `MechaniumVesting/MechaniumVesting.sol`_.
 
@@ -396,6 +445,7 @@ _Inherited from `MechaniumVesting/MechaniumVesting.sol`_.
 
 Return true if all tokens have been allocated
 
+
 _Inherited from `MechaniumVesting/MechaniumVesting.sol`_.
 
 
@@ -403,11 +453,13 @@ _Inherited from `MechaniumVesting/MechaniumVesting.sol`_.
 fallback payable function ( used to receive ETH in tests )
 
 
+
 _Inherited from `MechaniumUtils/MechaniumCanReleaseUnintented.sol`_.
 
 
 ### `receive()` (external) (inherited)<a name="MechaniumCanReleaseUnintented-receive--" id="MechaniumCanReleaseUnintented-receive--"></a>
 receive payable function ( used to receive ETH in tests )
+
 
 
 _Inherited from `MechaniumUtils/MechaniumCanReleaseUnintented.sol`_.
@@ -418,6 +470,8 @@ Release an `amount` of `token` to an `account`
 This function is used to prevent unintented tokens that got sent to be stuck on the contract
 
 
+
+Parameters:
 - `token`: The address of the token contract (zero address for claiming native coins).
 
 - `account`: The address of the tokens/coins receiver.
@@ -431,12 +485,14 @@ _Inherited from `MechaniumUtils/MechaniumCanReleaseUnintented.sol`_.
 
 See {IERC165-supportsInterface}.
 
+
 _Inherited from `../@openzeppelin/contracts/access/AccessControl.sol`_.
 
 
 ### `hasRole(bytes32 role, address account) → bool` (public) (inherited)<a name="AccessControl-hasRole-bytes32-address-" id="AccessControl-hasRole-bytes32-address-"></a>
 
 Returns `true` if `account` has been granted `role`.
+
 
 _Inherited from `../@openzeppelin/contracts/access/AccessControl.sol`_.
 
@@ -446,6 +502,7 @@ _Inherited from `../@openzeppelin/contracts/access/AccessControl.sol`_.
 Returns the admin role that controls `role`. See {grantRole} and
 {revokeRole}.
 To change a role's admin, use {_setRoleAdmin}.
+
 
 _Inherited from `../@openzeppelin/contracts/access/AccessControl.sol`_.
 
@@ -458,6 +515,7 @@ event.
 Requirements:
 - the caller must have ``role``'s admin role.
 
+
 _Inherited from `../@openzeppelin/contracts/access/AccessControl.sol`_.
 
 
@@ -467,6 +525,7 @@ Revokes `role` from `account`.
 If `account` had been granted `role`, emits a {RoleRevoked} event.
 Requirements:
 - the caller must have ``role``'s admin role.
+
 
 _Inherited from `../@openzeppelin/contracts/access/AccessControl.sol`_.
 
@@ -482,6 +541,7 @@ event.
 Requirements:
 - the caller must be `account`.
 
+
 _Inherited from `../@openzeppelin/contracts/access/AccessControl.sol`_.
 
 
@@ -492,6 +552,8 @@ Send `amount` token `to` address
 
 `amount` must imperatively be less or equal to the number of allocated tokens, throw an assert (loss of transaction fees)
 
+
+Parameters:
 - `to`: Address of the beneficiary
 
 - `amount`: Total token to send
@@ -503,6 +565,7 @@ _Inherited from `MechaniumVesting/MechaniumVesting.sol`_.
 
 Return the number of tokens that can be unlock since startTime
 
+
 _Inherited from `MechaniumVesting/MechaniumVesting.sol`_.
 
 
@@ -510,11 +573,13 @@ _Inherited from `MechaniumVesting/MechaniumVesting.sol`_.
 
 Return the number of tokens that can be unlock in real time since startTime
 
+
 _Inherited from `MechaniumVesting/MechaniumVesting.sol`_.
 
 
 ### `_addLockedToken(address token_)` (internal) (inherited) <a name="MechaniumCanReleaseUnintented-_addLockedToken-address-" id="MechaniumCanReleaseUnintented-_addLockedToken-address-"></a>
 Add a locked `token_` ( can't be released )
+
 
 
 _Inherited from `MechaniumUtils/MechaniumCanReleaseUnintented.sol`_.
@@ -525,6 +590,7 @@ _Inherited from `MechaniumUtils/MechaniumCanReleaseUnintented.sol`_.
 Revert with a standard message if `account` is missing `role`.
 The format of the revert reason is given by the following regular expression:
  /^AccessControl: account (0x[0-9a-f]{40}) is missing role (0x[0-9a-f]{64})$/
+
 
 _Inherited from `../@openzeppelin/contracts/access/AccessControl.sol`_.
 
@@ -544,6 +610,7 @@ system imposed by {AccessControl}.
 ====
 NOTE: This function is deprecated in favor of {_grantRole}.
 
+
 _Inherited from `../@openzeppelin/contracts/access/AccessControl.sol`_.
 
 
@@ -551,6 +618,7 @@ _Inherited from `../@openzeppelin/contracts/access/AccessControl.sol`_.
 
 Sets `adminRole` as ``role``'s admin role.
 Emits a {RoleAdminChanged} event.
+
 
 _Inherited from `../@openzeppelin/contracts/access/AccessControl.sol`_.
 
@@ -560,6 +628,7 @@ _Inherited from `../@openzeppelin/contracts/access/AccessControl.sol`_.
 Grants `role` to `account`.
 Internal function without access restriction.
 
+
 _Inherited from `../@openzeppelin/contracts/access/AccessControl.sol`_.
 
 
@@ -568,6 +637,7 @@ _Inherited from `../@openzeppelin/contracts/access/AccessControl.sol`_.
 Revokes `role` from `account`.
 Internal function without access restriction.
 
+
 _Inherited from `../@openzeppelin/contracts/access/AccessControl.sol`_.
 
 
@@ -575,10 +645,12 @@ _Inherited from `../@openzeppelin/contracts/access/AccessControl.sol`_.
 
 
 
+
 _Inherited from `../@openzeppelin/contracts/utils/Context.sol`_.
 
 
 ### `_msgData() → bytes` (internal) (inherited) <a name="Context-_msgData--" id="Context-_msgData--"></a>
+
 
 
 
@@ -595,10 +667,12 @@ Check if the vesting has started
 
 
 
+
 ### `vestingNotStarted()`  <a name="MechaniumPresaleRewardsDistribution-vestingNotStarted--" id="MechaniumPresaleRewardsDistribution-vestingNotStarted--"></a>
 
 
 Check if the vesting has not started
+
 
 
 
@@ -607,6 +681,8 @@ Check if the vesting has not started
 
 Check if the contract has the amount of tokens to allocate
 
+
+Parameters:
 - `amount`: The amount of tokens to allocate
 
 _Inherited from `MechaniumVesting/MechaniumVesting.sol`_.
@@ -620,6 +696,7 @@ with a standardized message including the required role.
 The format of the revert reason is given by the following regular expression:
  /^AccessControl: account (0x[0-9a-f]{40}) is missing role (0x[0-9a-f]{64})$/
 _Available since v4.1._
+
 
 _Inherited from `../@openzeppelin/contracts/access/AccessControl.sol`_.
 
