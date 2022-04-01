@@ -85,6 +85,7 @@ const addCost = async (action, data) => {
     priceETH,
   };
   costs.push(cost);
+  return cost;
 };
 const getStats = () => {
   const stats = costs.reduce((prev, curr) => {

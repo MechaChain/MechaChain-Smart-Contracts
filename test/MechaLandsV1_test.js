@@ -14,10 +14,11 @@ const {
 } = require("../utils");
 
 contract("MechaLandsV1", (accounts) => {
-  const [owner, ...users] = accounts;
+  const [owner, distributor, ...users] = accounts;
 
   const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
   let instance, testStartTime, chainid;
+  let contractBalance = getAmount(0);
 
   const planets = [
     {}, // 0 not possible
@@ -84,6 +85,7 @@ contract("MechaLandsV1", (accounts) => {
   ];
 
   const planetsBaseURI = "http://planets/";
+  const planetsBaseExtension = ".json";
 
   const otherPrivateKey =
     "0x253d7333eba154ef8fc973ee4ae2e5f35d4cc8da5db8a9e6aaa51417902c2501";
@@ -102,6 +104,7 @@ contract("MechaLandsV1", (accounts) => {
       notRevealUriPerType,
       revealed,
       baseURI,
+      baseExtension,
       burnable,
     },
     from = owner
@@ -137,6 +140,11 @@ contract("MechaLandsV1", (accounts) => {
     assert.equal(planet.revealed, revealed || false, "Bad revealed");
     assert.equal(planet.burnable, burnable || false, "Bad burnable");
     assert.equal(planet.baseURI, baseURI || "", "Bad baseURI");
+    assert.equal(
+      planet.baseExtension,
+      baseExtension || "",
+      "Bad baseExtension"
+    );
   };
 
   const setupMintRound = async (
@@ -244,17 +252,16 @@ contract("MechaLandsV1", (accounts) => {
       await instance.roundTotalMintedByTypeForUser(user, roundId, landType);
     const oldTotalSupply = await instance.totalSupply();
 
-    const price =
-      overrideData?.price ||
-      (await instance.roundPriceByType(roundId, landType));
+    const unitPrice = await instance.roundPriceByType(roundId, landType);
+    const price = overrideData?.price || unitPrice.mul(getBN(amount));
     let tx;
     if (round.validator === ZERO_ADDRESS) {
       // mint without validator
       tx = await instance.mint(roundId, landType, amount, {
         from: user,
-        value: price.mul(getBN(amount)),
+        value: price,
       });
-      gasTracker.addCost(`Public mint x${amount}`, tx);
+      await gasTracker.addCost(`Public mint x${amount}`, tx);
     } else {
       // mint with validator
       const latestTime = await time.latest();
@@ -285,11 +292,14 @@ contract("MechaLandsV1", (accounts) => {
         signature,
         {
           from: user,
-          value: price.mul(getBN(amount)),
+          value: price,
         }
       );
-      gasTracker.addCost(`Whitelist mint x${amount}`, tx);
+      await gasTracker.addCost(`Whitelist mint x${amount}`, tx);
     }
+
+    // Increase contractBalance
+    contractBalance = contractBalance.add(price);
 
     // Balances tests
     const newBalance = await instance.balanceOf(user);
@@ -339,21 +349,33 @@ contract("MechaLandsV1", (accounts) => {
     const mintedTokens = getTokensFromTransferEvent(tx);
     for (tokenId of mintedTokens) {
       const tokenType = await instance.tokenType(tokenId);
-      const tokenPlanet = await instance.tokenPlanet(tokenId);
       assert.equal(
         tokenType.toString(),
         landType.toString(),
         "landType not valid"
       );
+
+      const tokenPlanet = await instance.tokenPlanet(tokenId);
       assert.equal(
         tokenPlanet.toString(),
         round.planetId.toString(),
         "planetId not valid"
       );
+
+      const tokenOwner = await instance.ownerOf(tokenId);
+      assert.equal(
+        tokenOwner.toString(),
+        user.toString(),
+        "User is not owner of the new token"
+      );
     }
   };
 
-  const airdrop = async ({ planetId, landType, amount }, user) => {
+  const airdrop = async (
+    { planetId, landType, amount },
+    user,
+    { from } = {}
+  ) => {
     const oldBalance = await instance.balanceOf(user);
     const oldPlanetTotalMinted = await instance.planetTotalMintedByType(
       planetId,
@@ -362,9 +384,9 @@ contract("MechaLandsV1", (accounts) => {
     const oldTotalSupply = await instance.totalSupply();
 
     const tx = await instance.airdrop(user, planetId, landType, amount, {
-      from: owner,
+      from: from || owner,
     });
-    gasTracker.addCost(`Airdrop x${amount}`, tx);
+    await gasTracker.addCost(`Airdrop x${amount}`, tx);
 
     // Balances tests
     const newBalance = await instance.balanceOf(user);
@@ -396,16 +418,24 @@ contract("MechaLandsV1", (accounts) => {
     const mintedTokens = getTokensFromTransferEvent(tx);
     for (tokenId of mintedTokens) {
       const tokenType = await instance.tokenType(tokenId);
-      const tokenPlanet = await instance.tokenPlanet(tokenId);
       assert.equal(
         tokenType.toString(),
         landType.toString(),
         "landType not valid"
       );
+
+      const tokenPlanet = await instance.tokenPlanet(tokenId);
       assert.equal(
         tokenPlanet.toString(),
         planetId.toString(),
         "planetId not valid"
+      );
+
+      const tokenOwner = await instance.ownerOf(tokenId);
+      assert.equal(
+        tokenOwner.toString(),
+        user.toString(),
+        "User is not owner of the new token"
       );
     }
   };
@@ -1111,35 +1141,48 @@ contract("MechaLandsV1", (accounts) => {
 
     it(`User can't activate the reveal for a planet (Reason: caller is not the owner)`, async () => {
       await expectRevert(
-        instance.revealPlanet(1, "http://tests/", { from: users[1] }),
+        instance.revealPlanet(1, "http://tests/", planetsBaseExtension, {
+          from: users[1],
+        }),
         `Ownable: caller is not the owner`
       );
     });
 
     it(`Admin should be able to activate the reveal`, async () => {
-      await instance.revealPlanet(1, "http://tests/", { from: owner });
+      const tx = await instance.revealPlanet(
+        1,
+        "http://tests/",
+        planetsBaseExtension,
+        {
+          from: owner,
+        }
+      );
+      await gasTracker.addCost(`revealPlanet`, tx);
       planets[1].revealed = true;
     });
 
-    it(`User can't change the base URI of a planet a planet (Reason: caller is not the owner)`, async () => {
+    it(`User can't change the base URI and base extension of a planet a planet (Reason: caller is not the owner)`, async () => {
       await expectRevert(
-        instance.setPlanetBaseURI(1, "http://tests/", { from: users[1] }),
+        instance.setPlanetBaseURI(1, "http://tests/", planetsBaseExtension, {
+          from: users[1],
+        }),
         `Ownable: caller is not the owner`
       );
     });
 
-    it(`Admin should be able to change the base URI of a planet`, async () => {
-      await instance.setPlanetBaseURI(1, planetsBaseURI, {
+    it(`Admin should be able to change the base URI and the base extension of a planet`, async () => {
+      await instance.setPlanetBaseURI(1, planetsBaseURI, planetsBaseExtension, {
         from: owner,
       });
       planets[1].baseURI = planetsBaseURI;
+      planets[1].baseExtension = planetsBaseExtension;
     });
 
     it(`tokenURI refers to the correct revealed URI`, async () => {
       // Try for 10 tokens
       for (let tokenId = 1; tokenId <= 10; tokenId++) {
         const tokenURI = await instance.tokenURI(tokenId);
-        assert.equal(tokenURI, planetsBaseURI + tokenId + ".json");
+        assert.equal(tokenURI, planetsBaseURI + tokenId + planetsBaseExtension);
       }
     });
   });
@@ -1249,10 +1292,12 @@ contract("MechaLandsV1", (accounts) => {
    * AIRDROPS
    */
   describe("\n AIRDROPS", () => {
-    it(`Users can't airdrop tokens (Reason: caller is not the owner)`, async () => {
+    it(`Users can't airdrop tokens (Reason: caller is not owner nor planet distributor)`, async () => {
       await expectRevert(
-        instance.airdrop(users[0], 1, 1, 1, { from: users[1] }),
-        `Ownable: caller is not the owner`
+        airdrop({ planetId: 1, landType: 1, amount: 5 }, users[0], {
+          from: users[1],
+        }),
+        `Caller is not owner nor planet distributor`
       );
     });
 
@@ -1297,11 +1342,165 @@ contract("MechaLandsV1", (accounts) => {
       await airdrop({ planetId: 1, landType: 4, amount: 4 }, users[1]);
       await airdrop({ planetId: 1, landType: 5, amount: 5 }, users[1]);
     });
+
+    it(`Users can't change the distributor of a planet for airdrop tokens (Reason: caller is not the owner)`, async () => {
+      await expectRevert(
+        instance.setPlanetDistributor(1, distributor, { from: users[1] }),
+        `Ownable: caller is not the owner`
+      );
+    });
+
+    it(`Owner can change the distributor of a planet for airdrop tokens`, async () => {
+      const tx = await instance.setPlanetDistributor(1, distributor, {
+        from: owner,
+      });
+
+      await gasTracker.addCost(`setPlanetDistributor`, tx);
+
+      const planet = await instance.planets(1);
+      assert.equal(
+        planet.distributor,
+        distributor,
+        "Invalid distributor address"
+      );
+    });
+
+    it(`Distributor do severals airdrops`, async () => {
+      await airdrop({ planetId: 1, landType: 1, amount: 5 }, users[1], {
+        from: distributor,
+      });
+      await airdrop({ planetId: 1, landType: 2, amount: 4 }, users[1], {
+        from: distributor,
+      });
+      await airdrop({ planetId: 1, landType: 3, amount: 3 }, users[1], {
+        from: distributor,
+      });
+      await airdrop({ planetId: 1, landType: 4, amount: 2 }, users[1], {
+        from: distributor,
+      });
+      await airdrop({ planetId: 1, landType: 5, amount: 1 }, users[1], {
+        from: distributor,
+      });
+    });
   });
 
-  // TODO burn
-  // TODO verify eth in contract
-  // TODO withdraw
+  /**
+   * BURNS
+   */
+  describe("\n BURNS", () => {
+    it(`Users can't burn tokens (Reason: Planet not burnable)`, async () => {
+      await expectRevert(
+        instance.burn(1, {
+          from: users[0],
+        }),
+        `Planet not burnable`
+      );
+    });
+
+    it(`Owner can enabled the burn function for Planet 1`, async () => {
+      const tx = await instance.setPlanetBurnable(1, true, {
+        from: owner,
+      });
+      await gasTracker.addCost(`setPlanetBurnable`, tx);
+
+      planets[1].burnable = true;
+      const planet = await instance.planets(1);
+      assert.equal(planet.burnable, true, "Burnable not activated");
+    });
+
+    it(`User1 can burn tokens !`, async () => {
+      const tx = await instance.burn(1, {
+        from: users[0],
+      });
+      await gasTracker.addCost(`Burn x1`, tx);
+
+      // Token not exist anymore
+      await expectRevert(
+        instance.ownerOf(1),
+        "ERC721: owner query for nonexistent token"
+      );
+    });
+
+    it(`Owner can't burn a token of an user (Reason: not owner nor approved)`, async () => {
+      await expectRevert(
+        instance.burn(3, {
+          from: owner,
+        }),
+        `ERC721Burnable: caller is not owner nor approved`
+      );
+    });
+  });
+
+  /**
+   * WITHDRAW ETH
+   */
+  describe("\n WITHDRAW ETH", () => {
+    it(`Contract has the correct eth amount according to the mints`, async () => {
+      const balance = await web3.eth.getBalance(instance.address);
+      assert.equal(
+        balance.toString(),
+        contractBalance.toString(),
+        "Incorrect ETH balance"
+      );
+    });
+
+    it(`Users can't withdraw contract eth (Reason: caller is not the owner)`, async () => {
+      await expectRevert(
+        instance.withdraw(users[0], contractBalance, {
+          from: users[0],
+        }),
+        `Ownable: caller is not the owner`
+      );
+    });
+
+    it(`Owner can send 5% of the balance to a random address`, async () => {
+      const to = users[3];
+      const amount = contractBalance.mul(getBN(5)).div(getBN(100));
+      const oldUserBalance = getBN(await web3.eth.getBalance(to));
+
+      const tx = await instance.withdraw(to, amount, {
+        from: owner,
+      });
+      await gasTracker.addCost(`Withdraw eth`, tx);
+
+      // Verify balance
+      const balance = await web3.eth.getBalance(instance.address);
+      const newUserBalance = getBN(await web3.eth.getBalance(to));
+      assert.equal(
+        balance.toString(),
+        contractBalance.sub(amount).toString(),
+        "Incorrect contract balance"
+      );
+      assert.equal(
+        newUserBalance.toString(),
+        oldUserBalance.add(amount).toString(),
+        "Incorrect user balance"
+      );
+
+      contractBalance = getBN(balance);
+    });
+
+    it(`Owner can send the rest of the balance to himself`, async () => {
+      const oldUserBalance = getBN(await web3.eth.getBalance(owner));
+
+      const tx = await instance.withdraw(owner, contractBalance, {
+        from: owner,
+      });
+      const cost = await gasTracker.addCost(`Withdraw eth`, tx);
+
+      // Verify balance
+      const balance = await web3.eth.getBalance(instance.address);
+      const newUserBalance = getBN(await web3.eth.getBalance(owner));
+      assert.equal(balance.toString(), "0", "Incorrect contract balance");
+      assert.equal(
+        newUserBalance.toString(),
+        oldUserBalance.add(contractBalance).sub(getBN(cost.price)).toString(),
+        "Incorrect user balance"
+      );
+
+      contractBalance = balance;
+    });
+  });
 
   describe("\n GAS STATS", () => {
     it(`Get stats on gas`, async () => {
