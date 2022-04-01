@@ -11,8 +11,12 @@ import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.
 import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 
-// TODO : Storage gap ?
-
+/**
+ * @title MechaLandsV1 - TODO
+ * @author EthernalHorizons - <https://ethernalhorizons.com/>
+ * @custom:project-website  https://mechachain.io/
+ * @custom:security-contact contracts@ethernalhorizons.com
+ */
 contract MechaLandsV1 is
     Initializable,
     ERC721Upgradeable,
@@ -60,12 +64,20 @@ contract MechaLandsV1 is
     /**
      * @notice Event emitted when a planet has been revealed
      */
-    event PlanetRevealed(uint256 indexed planetId, string baseURI);
+    event PlanetRevealed(
+        uint256 indexed planetId,
+        string baseURI,
+        string baseExtension
+    );
 
     /**
      * @notice Event emitted when the baseURI of all lands of a planet has been changed
      */
-    event PlanetBaseURIChanged(uint256 indexed planetId, string baseURI);
+    event PlanetBaseURIChanged(
+        uint256 indexed planetId,
+        string baseURI,
+        string baseExtension
+    );
 
     /**
      * @notice Event emitted when the burnable option of a planet has been changed
@@ -92,8 +104,9 @@ contract MechaLandsV1 is
      * @notice Container for packing the information of a planet.
      * @member revealed If the lands of the planet are revealed (add the id after token URI).
      * @member burnable If users are authorized to burn their tokens for this planet.
-     * @member baseURI The base token URI use after reveal.
      * @member typesNumber Number of land types for this planet.
+     * @member baseURI The base token URI use after reveal.
+     * @member baseExtension Base extension for the end of token id.
      * @member supplyPerType Maximum number of land by type.
      * @member totalMinted Number of minted tokens by land type.
      * @member notRevealUriPerType The not reveal token URI by land type.
@@ -103,6 +116,7 @@ contract MechaLandsV1 is
         bool burnable;
         uint16 typesNumber;
         string baseURI;
+        string baseExtension;
         mapping(uint256 => uint256) supplyPerType;
         mapping(uint256 => uint256) totalMintedPerType;
         mapping(uint256 => string) notRevealUriPerType;
@@ -154,9 +168,6 @@ contract MechaLandsV1 is
     /// Number of existing mint rounds
     uint256 public roundsLength;
 
-    /// Base extension for the end of token id
-    string public baseExtension;
-
     /// All MechaChain planets (starts at index 1)
     mapping(uint256 => Planet) public planets;
 
@@ -188,7 +199,6 @@ contract MechaLandsV1 is
         __Ownable_init();
         __ReentrancyGuard_init();
         __UUPSUpgradeable_init();
-        baseExtension = ".json";
         version = 1;
     }
 
@@ -348,29 +358,35 @@ contract MechaLandsV1 is
      *
      * @param planetId The index of the planet.
      * @param baseURI The baseURI for all lands on this planet.
+     * @param baseExtension The base extension for the end of token id.
      */
-    function revealPlanet(uint256 planetId, string memory baseURI)
-        public
-        onlyOwner
-    {
+    function revealPlanet(
+        uint256 planetId,
+        string memory baseURI,
+        string memory baseExtension
+    ) public onlyOwner {
         require(!planets[planetId].revealed, "Already revealed");
         planets[planetId].revealed = true;
         planets[planetId].baseURI = baseURI;
-        emit PlanetRevealed(planetId, baseURI);
+        planets[planetId].baseExtension = baseExtension;
+        emit PlanetRevealed(planetId, baseURI, baseExtension);
     }
 
     /**
-     * @notice Change the base URI of a planet
+     * @notice Change the base URI and extension of a planet
      *
      * @param planetId The index of the planet.
      * @param baseURI The baseURI for all lands on this planet.
+     * @param baseExtension The base extension for the end of token id.
      */
-    function setPlanetBaseURI(uint256 planetId, string memory baseURI)
-        public
-        onlyOwner
-    {
+    function setPlanetBaseURI(
+        uint256 planetId,
+        string memory baseURI,
+        string memory baseExtension
+    ) public onlyOwner {
         planets[planetId].baseURI = baseURI;
-        emit PlanetBaseURIChanged(planetId, baseURI);
+        planets[planetId].baseExtension = baseExtension;
+        emit PlanetBaseURIChanged(planetId, baseURI, baseExtension);
     }
 
     /**
@@ -403,7 +419,7 @@ contract MechaLandsV1 is
      *
      * @param roundId The index of the planet mint round.
      * @param planetId The index of the planet.
-     * @param startTime The start time of the round in unix timestamp. 0 if not set.
+     * @param startTime The start time of the round in unix seconds timestamp. 0 if not set.
      * @param duration The duration of the round in seconds. 0 if ends at sold out.
      * @param validator The address of the whitelist validator. Can be 'address(0)' for no whitelist.
      * @param limitedPerType If the max mint limitation per wallet is defined par type or far all types.
@@ -558,13 +574,15 @@ contract MechaLandsV1 is
             return planets[planetId].notRevealUriPerType[landType];
         } else {
             string memory currentBaseURI = planets[planetId].baseURI;
+            string memory currentBaseExtension = planets[planetId]
+                .baseExtension;
             return
                 bytes(currentBaseURI).length > 0
                     ? string(
                         abi.encodePacked(
                             currentBaseURI,
                             tokenId.toString(),
-                            baseExtension
+                            currentBaseExtension
                         )
                     )
                     : "";
