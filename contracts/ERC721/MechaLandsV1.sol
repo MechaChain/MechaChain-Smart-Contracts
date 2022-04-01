@@ -107,6 +107,7 @@ contract MechaLandsV1 is
      * @member typesNumber Number of land types for this planet.
      * @member baseURI The base token URI use after reveal.
      * @member baseExtension Base extension for the end of token id.
+     * @member distributor The address that has the right to perform airdrops for this planet.
      * @member supplyPerType Maximum number of land by type.
      * @member totalMinted Number of minted tokens by land type.
      * @member notRevealUriPerType The not reveal token URI by land type.
@@ -117,6 +118,7 @@ contract MechaLandsV1 is
         uint16 typesNumber;
         string baseURI;
         string baseExtension;
+        address distributor;
         mapping(uint256 => uint256) supplyPerType;
         mapping(uint256 => uint256) totalMintedPerType;
         mapping(uint256 => string) notRevealUriPerType;
@@ -274,7 +276,7 @@ contract MechaLandsV1 is
      *
      * @dev Call {MechaLandsV1-_safeMint}.
      * @dev Requirements:
-     * - Only owner.
+     * - Only owner or the `distributor` of the planet.
      * - View {MechaLandsV1-_safeMint} requirements.
      *
      * @param wallet The wallet to transfer new tokens
@@ -287,7 +289,12 @@ contract MechaLandsV1 is
         uint256 planetId,
         uint256 landType,
         uint256 amount
-    ) external onlyOwner {
+    ) external {
+        require(
+            owner() == msg.sender ||
+                planets[planetId].distributor == msg.sender,
+            "Caller is not owner nor planet distributor"
+        );
         _safeMint(wallet, planetId, landType, amount);
     }
 
@@ -401,6 +408,19 @@ contract MechaLandsV1 is
     {
         planets[planetId].burnable = burnable;
         emit PlanetBurnableChanged(planetId, burnable);
+    }
+
+    /**
+     * @notice Set a distributor that has the right to perform airdrops for this planet.
+     *
+     * @param planetId The index of the planet.
+     * @param distributor The distributor address.
+     */
+    function setPlanetDistributor(uint256 planetId, address distributor)
+        public
+        onlyOwner
+    {
+        planets[planetId].distributor = distributor;
     }
 
     /**
