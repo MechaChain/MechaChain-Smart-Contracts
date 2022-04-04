@@ -82,5 +82,11 @@
       "address": "0xE22A901E5D0d1D21aa54144b1E7E41639c4bd435",
       "date": "20/01/2022, 20:38:21"
     }
+  },
+  "rinkeby": {
+    "Mechanium": {
+      "address": "0x277Dd42Fbf5adAeaA7ab2FA66A4B7f6D85667e09",
+      "date": "04/04/2022, 13:09:38"
+    }
   }
 }
