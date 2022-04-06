@@ -9,6 +9,7 @@
     "generate-types": "typechain --target=ethers-v5 build/contracts/*.json"
   },
   "devDependencies": {
+    "@openzeppelin/truffle-upgrades": "^1.15.0",
     "cli-progress": "^3.10.0",
     "ganache-cli": "^6.12.2",
     "solc-0.6": "npm:solc@^0.6.6",

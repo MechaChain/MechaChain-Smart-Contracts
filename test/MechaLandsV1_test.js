@@ -1409,15 +1409,25 @@ contract("MechaLandsV1", (accounts) => {
     });
 
     it(`User1 can burn tokens !`, async () => {
+      const oldSupply = await instance.totalSupply();
+
       const tx = await instance.burn(1, {
         from: users[0],
       });
       await gasTracker.addCost(`Burn x1`, tx);
+      const newSupply = await instance.totalSupply();
 
       // Token not exist anymore
       await expectRevert(
         instance.ownerOf(1),
         "ERC721: owner query for nonexistent token"
+      );
+
+      // Supply
+      assert.equal(
+        newSupply.toNumber(),
+        oldSupply.toNumber() - 1,
+        "Incorrect supply"
       );
     });
 
