@@ -195,7 +195,7 @@ contract MechaLandsV1 is
      * @notice Initialize contract
      */
     function initialize() public initializer {
-        __ERC721_init("MechaLands", "ML");
+        __ERC721_init("MechaLands", "$MECHALANDS");
         __ERC721Burnable_init();
         __Pausable_init();
         __Ownable_init();
