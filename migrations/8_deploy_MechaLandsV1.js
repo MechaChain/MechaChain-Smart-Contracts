@@ -4,7 +4,7 @@ const { time } = require("@openzeppelin/test-helpers");
 const { deployProxy } = require("@openzeppelin/truffle-upgrades");
 
 // Load utils
-const { getBN, getAmount, getDeployedContract } = require("../utils");
+const { setDeployedContract } = require("../utils");
 
 module.exports = async function (deployer, network, accounts) {
   // For local development
@@ -13,7 +13,15 @@ module.exports = async function (deployer, network, accounts) {
       deployer,
       initializer: "initialize",
     });
+
+    return;
   }
 
   // For other deployments
+  await deployProxy(MechaLandsV1, [], {
+    deployer,
+    initializer: "initialize",
+  });
+  const instance = await MechaLandsV1.deployed();
+  setDeployedContract(network, "MechaLandsV1", instance.address);
 };
