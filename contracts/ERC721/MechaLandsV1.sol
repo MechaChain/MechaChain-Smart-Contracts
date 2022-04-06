@@ -164,6 +164,9 @@ contract MechaLandsV1 is
     /// Last minted token id
     uint256 internal _tokenIdCounter;
 
+    /// Burned token counter
+    uint256 public burnedCounter;
+
     /// Number of existing planets
     uint256 public planetsLength;
 
@@ -195,7 +198,7 @@ contract MechaLandsV1 is
      * @notice Initialize contract
      */
     function initialize() public initializer {
-        __ERC721_init("MechaLands", "ML");
+        __ERC721_init("MechaLands", "$MECHALANDS");
         __ERC721Burnable_init();
         __Pausable_init();
         __Ownable_init();
@@ -535,6 +538,7 @@ contract MechaLandsV1 is
     function burn(uint256 tokenId) public virtual override whenNotPaused {
         uint256 planetId = tokenPlanet[tokenId];
         require(planets[planetId].burnable, "Planet not burnable");
+        burnedCounter++;
         super.burn(tokenId);
     }
 
@@ -613,7 +617,7 @@ contract MechaLandsV1 is
      * @notice Returns the total amount of tokens minted.
      */
     function totalSupply() public view returns (uint256) {
-        return _tokenIdCounter; // TODO remove burned tokens
+        return _tokenIdCounter - burnedCounter;
     }
 
     /**
