@@ -887,7 +887,9 @@ contract MechaLandsV1 is
         internal
         override
         onlyOwner
-    {}
+    {
+        version ++;
+    }
 
     receive() external payable {}
 }
