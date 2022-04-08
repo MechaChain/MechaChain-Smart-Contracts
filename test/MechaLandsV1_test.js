@@ -4,6 +4,8 @@ const { time, expectRevert, snapshot } = require("@openzeppelin/test-helpers");
 // Load artifacts
 const MechaLandsV1 = artifacts.require("MechaLandsV1");
 
+const MechaLandsUpgradeTest = artifacts.require("MechaLandsUpgradeTest");
+
 // Load utils
 const {
   getAmount,
@@ -12,8 +14,10 @@ const {
   gasTracker,
   getSignature,
 } = require("../utils");
+const {upgradeProxy, deployProxy} = require("@openzeppelin/truffle-upgrades");
 
-contract("MechaLandsV1", (accounts) => {
+contract("MechaLandsV1", async (accounts) => {
+
   const [owner, distributor, ...users] = accounts;
 
   const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
@@ -449,7 +453,8 @@ contract("MechaLandsV1", (accounts) => {
   it(`MechaLandsV1 should be deployed`, async () => {
     testStartTime = await time.latest();
 
-    instance = await MechaLandsV1.deployed();
+    //instance = await MechaLandsV1.deployed();
+    instance = await deployProxy(MechaLandsV1, [], {initializer: 'initialize'});
     assert(instance.address !== "");
 
     const version = await instance.version();
@@ -1509,6 +1514,22 @@ contract("MechaLandsV1", (accounts) => {
       );
 
       contractBalance = balance;
+    });
+  });
+
+  describe("\n UPGRADE CONTRACT", () => {
+    it(`Upgrade Smart Contract`, async () => {
+      const oldUserBalance = getBN(await instance.balanceOf(users[1]));
+
+      let instance2 = await upgradeProxy(instance.address, MechaLandsUpgradeTest);
+
+      const newUserBalance = getBN(await instance2.balanceOf(users[1]));
+
+      let value = await instance2.tellMeWhatIWant();
+
+      assert.equal(value.toString(), '130486', `The new function does not return the value we wanted`);
+      assert.equal(newUserBalance.toString(), oldUserBalance.toString(), "Incorrect balance after upgrading contract");
+      assert.equal((await instance2.version()).toString(), '2', `Bad version`);
     });
   });
 
