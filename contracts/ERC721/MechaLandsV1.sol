@@ -322,10 +322,10 @@ contract MechaLandsV1 is
         uint32[] memory supplyPerType,
         string[] memory notRevealUriPerType
     ) public onlyOwner {
-        require(planetId > 0, "Id can be 0");
+        require(planetId > 0, "Id can't be 0");
         require(
             planets[planetId].typesNumber <= typesNumber,
-            "Can decrease types"
+            "Can't decrease types"
         );
         require(
             supplyPerType.length == typesNumber &&
@@ -461,8 +461,8 @@ contract MechaLandsV1 is
         uint256[] memory supplyPerType,
         uint256[] memory maxMintPerType
     ) public onlyOwner {
-        require(roundId > 0, "Id can be 0");
-        require(planetId > 0, "Id can be 0");
+        require(roundId > 0, "Id can't be 0");
+        require(planetId > 0, "Id can't be 0");
         require(planetId <= planetsLength, "Invalid planetId");
 
         if (roundId == roundsLength + 1) {
