@@ -50,13 +50,22 @@ All smart contracts for the play to earn [MechaChain project](https://mechachain
 _For more informations : https://remix-ide.readthedocs.io/en/latest/remixd.html_
 
 ### Deploy with Truffle
+
+- **With a private key or mnemonics**
 First, please fill the `.env` file with `INFURA_PROJECT_ID` and, for testnets, `DEV_WALLET_PRIVATE_KEY`.
+
+- **With a web3 browsers extension** _(Truffle >= v5.5)_
+Run `truffle dashboard`, start the migration for `dashboard` network and go to _http://localhost:25012_. More informations [here](https://trufflesuite.com/blog/introducing-truffle-dashboard/).
+
 ```
 truffle migrate --f <contractIndex> --to <contractIndex> --network <networkName>
 ```
 - `--f <contractIndex>` is the first index of the migration file to run
 - `--to <contractIndex>` is the last index of the migration file to run (can be the same as the previous one)
-- `<networkName>` can be `development` _(local network)_, `matic`, `goerli`, `ropsten`, `mumbai` or `rinkeby`.
+- `<networkName>` can be `development` _(local network)_, `matic`, `goerli`, `ropsten`, `mumbai`, `rinkeby` or `dashboard`.
+
+
+
 
 ### Launch unit tests
 
