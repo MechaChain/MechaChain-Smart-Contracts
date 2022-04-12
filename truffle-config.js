@@ -68,4 +68,8 @@ module.exports = {
     polygonscan: process.env.POLYGONSCAN_API_KEY,
     etherscan: process.env.ETHERSCAN_API_KEY,
   },
+  dashboard: {
+    port: 25012,
+    host: "localhost",
+  },
 };

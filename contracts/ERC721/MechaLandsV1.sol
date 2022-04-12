@@ -12,8 +12,8 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeab
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 
 /**
- * @title MechaLandsV1 - TODO
- * @author EthernalHorizons - <https://ethernalhorizons.com/>
+ * @title MechaLands - Collection of unique lands on the surface of the planets of the MechaChain universe ; at the heart of space colonization
+ * @author MechaChain - <https://mechachain.io/>
  * @custom:project-website  https://mechachain.io/
  * @custom:security-contact contracts@ethernalhorizons.com
  */
