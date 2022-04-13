@@ -14,10 +14,9 @@ const {
   gasTracker,
   getSignature,
 } = require("../utils");
-const {upgradeProxy, deployProxy} = require("@openzeppelin/truffle-upgrades");
+const { upgradeProxy, deployProxy } = require("@openzeppelin/truffle-upgrades");
 
 contract("MechaLandsV1", async (accounts) => {
-
   const [owner, distributor, ...users] = accounts;
 
   const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
@@ -454,7 +453,9 @@ contract("MechaLandsV1", async (accounts) => {
     testStartTime = await time.latest();
 
     //instance = await MechaLandsV1.deployed();
-    instance = await deployProxy(MechaLandsV1, [], {initializer: 'initialize'});
+    instance = await deployProxy(MechaLandsV1, [], {
+      initializer: "initialize",
+    });
     assert(instance.address !== "");
 
     const version = await instance.version();
@@ -513,7 +514,7 @@ contract("MechaLandsV1", async (accounts) => {
       );
     });
 
-    it(`Owner can't create a planet (Reason: Id can be 0)`, async () => {
+    it(`Owner can't create a planet (Reason: Id can't be 0)`, async () => {
       await expectRevert(
         setupPlanet({
           planetId: 0,
@@ -526,7 +527,7 @@ contract("MechaLandsV1", async (accounts) => {
             "http://planet-1/land-3.json",
           ],
         }),
-        `Id can be 0`
+        `Id can't be 0`
       );
     });
 
@@ -644,7 +645,7 @@ contract("MechaLandsV1", async (accounts) => {
       );
     });
 
-    it(`Owner can't create a mint round (Reason: Id can be 0)`, async () => {
+    it(`Owner can't create a mint round (Reason: Id can't be 0)`, async () => {
       await expectRevert(
         setupMintRound({
           roundId: 0,
@@ -662,7 +663,7 @@ contract("MechaLandsV1", async (accounts) => {
           limitedPerType: false,
           maxMintPerType: [250, 125, 75, 50],
         }),
-        `Id can be 0`
+        `Id can't be 0`
       );
     });
 
@@ -1203,10 +1204,10 @@ contract("MechaLandsV1", async (accounts) => {
       );
     });
 
-    it(`Owner can't update a planet for remove a type (Reason: Can decrease types)`, async () => {
+    it(`Owner can't update a planet for remove a type (Reason: Can't decrease types)`, async () => {
       await expectRevert(
         setupPlanet({ ...planets[1], typesNumber: 3 }),
-        `Can decrease types`
+        `Can't decrease types`
       );
     });
 
@@ -1521,15 +1522,26 @@ contract("MechaLandsV1", async (accounts) => {
     it(`Upgrade Smart Contract`, async () => {
       const oldUserBalance = getBN(await instance.balanceOf(users[1]));
 
-      let instance2 = await upgradeProxy(instance.address, MechaLandsUpgradeTest);
+      let instance2 = await upgradeProxy(
+        instance.address,
+        MechaLandsUpgradeTest
+      );
 
       const newUserBalance = getBN(await instance2.balanceOf(users[1]));
 
       let value = await instance2.tellMeWhatIWant();
 
-      assert.equal(value.toString(), '130486', `The new function does not return the value we wanted`);
-      assert.equal(newUserBalance.toString(), oldUserBalance.toString(), "Incorrect balance after upgrading contract");
-      assert.equal((await instance2.version()).toString(), '2', `Bad version`);
+      assert.equal(
+        value.toString(),
+        "130486",
+        `The new function does not return the value we wanted`
+      );
+      assert.equal(
+        newUserBalance.toString(),
+        oldUserBalance.toString(),
+        "Incorrect balance after upgrading contract"
+      );
+      assert.equal((await instance2.version()).toString(), "2", `Bad version`);
     });
   });
 
