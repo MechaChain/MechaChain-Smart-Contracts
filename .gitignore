@@ -13,3 +13,4 @@ contracts/MechaniumVesting/artifacts
 contracts/MechaniumVestingWallet/artifacts
 .env
 .DS_Store
+.openzeppelin/unknown-1337.json

@@ -50,8 +50,10 @@ Used to stake an `amount` of tokens for a `lockPeriod` for the `msg.sender`
 
 
 
+
 ### `depositFor(address account, uint256 amount, uint256 lockPeriod) → bool` (external) <a name="IMechaniumStakingPool-depositFor-address-uint256-uint256-" id="IMechaniumStakingPool-depositFor-address-uint256-uint256-"></a>
 Used to stake an `amount` of tokens for a `lockPeriod` for an `account`
+
 
 
 
@@ -62,8 +64,10 @@ Used to calculate and pay pending rewards to the `msg.sender`
 
 
 
+
 ### `unstake(uint256[] depositIds) → bool` (external) <a name="IMechaniumStakingPool-unstake-uint256---" id="IMechaniumStakingPool-unstake-uint256---"></a>
 Used to unstake several deposits for the `msg.sender`
+
 
 
 
@@ -74,8 +78,10 @@ Used to unstake a `depositId` for the `msg.sender`
 
 
 
+
 ### `updateRewards() → bool` (external) <a name="IMechaniumStakingPool-updateRewards--" id="IMechaniumStakingPool-updateRewards--"></a>
 Used to update the rewards per weight and the total rewards
+
 
 
 
@@ -86,8 +92,10 @@ Used to change the rewardsPerBlock
 
 
 
+
 ### `remainingAllocatedTokens() → uint256` (external) <a name="IMechaniumStakingPool-remainingAllocatedTokens--" id="IMechaniumStakingPool-remainingAllocatedTokens--"></a>
 Used to get the remaining allocated tokens
+
 
 
 
@@ -98,8 +106,10 @@ Used to get the pending rewards for an `account`
 
 
 
+
 ### `canUpdateRewards() → bool` (external) <a name="IMechaniumStakingPool-canUpdateRewards--" id="IMechaniumStakingPool-canUpdateRewards--"></a>
 Can we call the rewards function or is it useless and will cause an error
+
 
 
 
@@ -110,8 +120,10 @@ Used to get the balance for an `account`
 
 
 
+
 ### `getDeposit(address account, uint256 depositId) → struct IMechaniumStakingPool.Deposit` (external) <a name="IMechaniumStakingPool-getDeposit-address-uint256-" id="IMechaniumStakingPool-getDeposit-address-uint256-"></a>
 Used to get the deposit (`depositId`) for an `account`
+
 
 
 
@@ -122,8 +134,10 @@ Used to get the length of deposits for an `account`
 
 
 
+
 ### `getUser(address account) → struct IMechaniumStakingPool.User` (external) <a name="IMechaniumStakingPool-getUser-address-" id="IMechaniumStakingPool-getUser-address-"></a>
 Used to get the User data for an `account`
+
 
 
 
@@ -134,8 +148,10 @@ Get the updated rewards
 
 
 
+
 ### `updatedTotalRewards() → uint256` (external) <a name="IMechaniumStakingPool-updatedTotalRewards--" id="IMechaniumStakingPool-updatedTotalRewards--"></a>
 Get the total updated rewards
+
 
 
 
@@ -146,14 +162,17 @@ Get the updated rewards per weight
 
 
 
+
 ### `calculateUserWeight(uint256 amount, uint64 stakingTime) → uint256` (external) <a name="IMechaniumStakingPool-calculateUserWeight-uint256-uint64-" id="IMechaniumStakingPool-calculateUserWeight-uint256-uint64-"></a>
 Calculate the weight based on `amount` and `stakingTime`
 
 
 
 
+
 ### `weightToReward(uint256 _weight, uint256 _rewardsPerWeight) → uint256` (external) <a name="IMechaniumStakingPool-weightToReward-uint256-uint256-" id="IMechaniumStakingPool-weightToReward-uint256-uint256-"></a>
 Converts stake weight to reward value, applying the division on weight
+
 
 
 

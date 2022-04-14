@@ -1,0 +1,659 @@
+{
+  "manifestVersion": "3.2",
+  "proxies": [
+    {
+      "address": "0x82c055C4f854A399307E97ad108F0b1ffDFBB338",
+      "txHash": "0x935402c012c7ee78caa3c32b077b9a0fee325bb62332436f6cd5525924f8c65d",
+      "kind": "uups"
+    },
+    {
+      "address": "0xE1d522E5B879D846633Abe9217f43452cea366D9",
+      "txHash": "0x09e45366a97ee801e0f2ec46d35b2381adb7c30fea0d27711897541d609d63dc",
+      "kind": "uups"
+    }
+  ],
+  "impls": {
+    "ffd0e80ccac0f4997d5b2079ac3753f24d03fe99e31feac4afdcc13304b96a41": {
+      "address": "0x1Be3C27E55867d9Ccc55765BbA14F350F9323539",
+      "txHash": "0x6c8ef7298e8903b31d7706fa91fb9bd5f241a056ff2ef1d3a8919b5880c4abba",
+      "layout": {
+        "storage": [
+          {
+            "contract": "Initializable",
+            "label": "_initialized",
+            "type": "t_bool",
+            "src": "../@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:39"
+          },
+          {
+            "contract": "Initializable",
+            "label": "_initializing",
+            "type": "t_bool",
+            "src": "../@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:44"
+          },
+          {
+            "contract": "ContextUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "../@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:36"
+          },
+          {
+            "contract": "ERC165Upgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "../@openzeppelin/contracts-upgradeable/utils/introspection/ERC165Upgradeable.sol:41"
+          },
+          {
+            "contract": "ERC721Upgradeable",
+            "label": "_name",
+            "type": "t_string_storage",
+            "src": "../@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:25"
+          },
+          {
+            "contract": "ERC721Upgradeable",
+            "label": "_symbol",
+            "type": "t_string_storage",
+            "src": "../@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:28"
+          },
+          {
+            "contract": "ERC721Upgradeable",
+            "label": "_owners",
+            "type": "t_mapping(t_uint256,t_address)",
+            "src": "../@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:31"
+          },
+          {
+            "contract": "ERC721Upgradeable",
+            "label": "_balances",
+            "type": "t_mapping(t_address,t_uint256)",
+            "src": "../@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:34"
+          },
+          {
+            "contract": "ERC721Upgradeable",
+            "label": "_tokenApprovals",
+            "type": "t_mapping(t_uint256,t_address)",
+            "src": "../@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:37"
+          },
+          {
+            "contract": "ERC721Upgradeable",
+            "label": "_operatorApprovals",
+            "type": "t_mapping(t_address,t_mapping(t_address,t_bool))",
+            "src": "../@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:40"
+          },
+          {
+            "contract": "ERC721Upgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)44_storage",
+            "src": "../@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:458"
+          },
+          {
+            "contract": "ERC721BurnableUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "../@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721BurnableUpgradeable.sol:38"
+          },
+          {
+            "contract": "PausableUpgradeable",
+            "label": "_paused",
+            "type": "t_bool",
+            "src": "../@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol:29"
+          },
+          {
+            "contract": "PausableUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "../@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol:102"
+          },
+          {
+            "contract": "OwnableUpgradeable",
+            "label": "_owner",
+            "type": "t_address",
+            "src": "../@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:22"
+          },
+          {
+            "contract": "OwnableUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "../@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:87"
+          },
+          {
+            "contract": "ReentrancyGuardUpgradeable",
+            "label": "_status",
+            "type": "t_uint256",
+            "src": "../@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol:38"
+          },
+          {
+            "contract": "ReentrancyGuardUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "../@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol:74"
+          },
+          {
+            "contract": "ERC1967UpgradeUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "../@openzeppelin/contracts-upgradeable/proxy/ERC1967/ERC1967UpgradeUpgradeable.sol:211"
+          },
+          {
+            "contract": "UUPSUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "../@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol:107"
+          },
+          {
+            "contract": "MechaLandsV1",
+            "label": "version",
+            "type": "t_uint256",
+            "src": "../project:/contracts/ERC721/MechaLandsV1.sol:146"
+          },
+          {
+            "contract": "MechaLandsV1",
+            "label": "_tokenIdCounter",
+            "type": "t_uint256",
+            "src": "../project:/contracts/ERC721/MechaLandsV1.sol:149"
+          },
+          {
+            "contract": "MechaLandsV1",
+            "label": "planetsLength",
+            "type": "t_uint256",
+            "src": "../project:/contracts/ERC721/MechaLandsV1.sol:152"
+          },
+          {
+            "contract": "MechaLandsV1",
+            "label": "roundsLength",
+            "type": "t_uint256",
+            "src": "../project:/contracts/ERC721/MechaLandsV1.sol:155"
+          },
+          {
+            "contract": "MechaLandsV1",
+            "label": "baseExtension",
+            "type": "t_string_storage",
+            "src": "../project:/contracts/ERC721/MechaLandsV1.sol:158"
+          },
+          {
+            "contract": "MechaLandsV1",
+            "label": "planets",
+            "type": "t_mapping(t_uint256,t_struct(Planet)5781_storage)",
+            "src": "../project:/contracts/ERC721/MechaLandsV1.sol:161"
+          },
+          {
+            "contract": "MechaLandsV1",
+            "label": "rounds",
+            "type": "t_mapping(t_uint256,t_struct(MintRound)5818_storage)",
+            "src": "../project:/contracts/ERC721/MechaLandsV1.sol:164"
+          },
+          {
+            "contract": "MechaLandsV1",
+            "label": "tokenType",
+            "type": "t_mapping(t_uint256,t_uint256)",
+            "src": "../project:/contracts/ERC721/MechaLandsV1.sol:167"
+          },
+          {
+            "contract": "MechaLandsV1",
+            "label": "tokenPlanet",
+            "type": "t_mapping(t_uint256,t_uint256)",
+            "src": "../project:/contracts/ERC721/MechaLandsV1.sol:170"
+          }
+        ],
+        "types": {
+          "t_uint256": {
+            "label": "uint256"
+          },
+          "t_string_storage": {
+            "label": "string"
+          },
+          "t_mapping(t_uint256,t_struct(Planet)5781_storage)": {
+            "label": "mapping(uint256 => struct MechaLandsV1.Planet)"
+          },
+          "t_struct(Planet)5781_storage": {
+            "label": "struct MechaLandsV1.Planet",
+            "members": [
+              {
+                "label": "revealed",
+                "type": "t_bool"
+              },
+              {
+                "label": "burnable",
+                "type": "t_bool"
+              },
+              {
+                "label": "typesNumber",
+                "type": "t_uint16"
+              },
+              {
+                "label": "baseURI",
+                "type": "t_string_storage"
+              },
+              {
+                "label": "supplyPerType",
+                "type": "t_mapping(t_uint256,t_uint256)"
+              },
+              {
+                "label": "totalMintedPerType",
+                "type": "t_mapping(t_uint256,t_uint256)"
+              },
+              {
+                "label": "notRevealUriPerType",
+                "type": "t_mapping(t_uint256,t_string_storage)"
+              }
+            ]
+          },
+          "t_bool": {
+            "label": "bool"
+          },
+          "t_uint16": {
+            "label": "uint16"
+          },
+          "t_mapping(t_uint256,t_uint256)": {
+            "label": "mapping(uint256 => uint256)"
+          },
+          "t_mapping(t_uint256,t_string_storage)": {
+            "label": "mapping(uint256 => string)"
+          },
+          "t_mapping(t_uint256,t_struct(MintRound)5818_storage)": {
+            "label": "mapping(uint256 => struct MechaLandsV1.MintRound)"
+          },
+          "t_struct(MintRound)5818_storage": {
+            "label": "struct MechaLandsV1.MintRound",
+            "members": [
+              {
+                "label": "limitedPerType",
+                "type": "t_bool"
+              },
+              {
+                "label": "planetId",
+                "type": "t_uint64"
+              },
+              {
+                "label": "startTime",
+                "type": "t_uint64"
+              },
+              {
+                "label": "duration",
+                "type": "t_uint64"
+              },
+              {
+                "label": "validator",
+                "type": "t_address"
+              },
+              {
+                "label": "pricePerType",
+                "type": "t_mapping(t_uint256,t_uint256)"
+              },
+              {
+                "label": "supplyPerType",
+                "type": "t_mapping(t_uint256,t_uint256)"
+              },
+              {
+                "label": "maxMintPerType",
+                "type": "t_mapping(t_uint256,t_uint256)"
+              },
+              {
+                "label": "totalMintedPerType",
+                "type": "t_mapping(t_uint256,t_uint256)"
+              },
+              {
+                "label": "totalMintedPerUser",
+                "type": "t_mapping(t_address,t_uint256)"
+              },
+              {
+                "label": "totalMintedPerTypePerUser",
+                "type": "t_mapping(t_address,t_mapping(t_uint256,t_uint256))"
+              }
+            ]
+          },
+          "t_uint64": {
+            "label": "uint64"
+          },
+          "t_address": {
+            "label": "address"
+          },
+          "t_mapping(t_address,t_uint256)": {
+            "label": "mapping(address => uint256)"
+          },
+          "t_mapping(t_address,t_mapping(t_uint256,t_uint256))": {
+            "label": "mapping(address => mapping(uint256 => uint256))"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]"
+          },
+          "t_mapping(t_uint256,t_address)": {
+            "label": "mapping(uint256 => address)"
+          },
+          "t_mapping(t_address,t_mapping(t_address,t_bool))": {
+            "label": "mapping(address => mapping(address => bool))"
+          },
+          "t_mapping(t_address,t_bool)": {
+            "label": "mapping(address => bool)"
+          },
+          "t_array(t_uint256)44_storage": {
+            "label": "uint256[44]"
+          }
+        }
+      }
+    },
+    "e34d39411aa206499c019a3afb66df00e3ecb3f6c65262c0b59cf2fde17acd15": {
+      "address": "0x31Cd6C86c28651e6dda5F3B7d4f213935eFC37B2",
+      "txHash": "0xa09d77f7ff70009ab8d9d0154c3630d46abb2f8127d7dc726dfa874db01f9243",
+      "layout": {
+        "storage": [
+          {
+            "contract": "Initializable",
+            "label": "_initialized",
+            "type": "t_bool",
+            "src": "../@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:39"
+          },
+          {
+            "contract": "Initializable",
+            "label": "_initializing",
+            "type": "t_bool",
+            "src": "../@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:44"
+          },
+          {
+            "contract": "ContextUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "../@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:36"
+          },
+          {
+            "contract": "ERC165Upgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "../@openzeppelin/contracts-upgradeable/utils/introspection/ERC165Upgradeable.sol:41"
+          },
+          {
+            "contract": "ERC721Upgradeable",
+            "label": "_name",
+            "type": "t_string_storage",
+            "src": "../@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:25"
+          },
+          {
+            "contract": "ERC721Upgradeable",
+            "label": "_symbol",
+            "type": "t_string_storage",
+            "src": "../@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:28"
+          },
+          {
+            "contract": "ERC721Upgradeable",
+            "label": "_owners",
+            "type": "t_mapping(t_uint256,t_address)",
+            "src": "../@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:31"
+          },
+          {
+            "contract": "ERC721Upgradeable",
+            "label": "_balances",
+            "type": "t_mapping(t_address,t_uint256)",
+            "src": "../@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:34"
+          },
+          {
+            "contract": "ERC721Upgradeable",
+            "label": "_tokenApprovals",
+            "type": "t_mapping(t_uint256,t_address)",
+            "src": "../@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:37"
+          },
+          {
+            "contract": "ERC721Upgradeable",
+            "label": "_operatorApprovals",
+            "type": "t_mapping(t_address,t_mapping(t_address,t_bool))",
+            "src": "../@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:40"
+          },
+          {
+            "contract": "ERC721Upgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)44_storage",
+            "src": "../@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:458"
+          },
+          {
+            "contract": "ERC721BurnableUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "../@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721BurnableUpgradeable.sol:38"
+          },
+          {
+            "contract": "PausableUpgradeable",
+            "label": "_paused",
+            "type": "t_bool",
+            "src": "../@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol:29"
+          },
+          {
+            "contract": "PausableUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "../@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol:102"
+          },
+          {
+            "contract": "OwnableUpgradeable",
+            "label": "_owner",
+            "type": "t_address",
+            "src": "../@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:22"
+          },
+          {
+            "contract": "OwnableUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "../@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:87"
+          },
+          {
+            "contract": "ReentrancyGuardUpgradeable",
+            "label": "_status",
+            "type": "t_uint256",
+            "src": "../@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol:38"
+          },
+          {
+            "contract": "ReentrancyGuardUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "../@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol:74"
+          },
+          {
+            "contract": "ERC1967UpgradeUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "../@openzeppelin/contracts-upgradeable/proxy/ERC1967/ERC1967UpgradeUpgradeable.sol:211"
+          },
+          {
+            "contract": "UUPSUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "../@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol:107"
+          },
+          {
+            "contract": "MechaLandsV1",
+            "label": "version",
+            "type": "t_uint256",
+            "src": "../project:/contracts/ERC721/MechaLandsV1.sol:162"
+          },
+          {
+            "contract": "MechaLandsV1",
+            "label": "_tokenIdCounter",
+            "type": "t_uint256",
+            "src": "../project:/contracts/ERC721/MechaLandsV1.sol:165"
+          },
+          {
+            "contract": "MechaLandsV1",
+            "label": "planetsLength",
+            "type": "t_uint256",
+            "src": "../project:/contracts/ERC721/MechaLandsV1.sol:168"
+          },
+          {
+            "contract": "MechaLandsV1",
+            "label": "roundsLength",
+            "type": "t_uint256",
+            "src": "../project:/contracts/ERC721/MechaLandsV1.sol:171"
+          },
+          {
+            "contract": "MechaLandsV1",
+            "label": "planets",
+            "type": "t_mapping(t_uint256,t_struct(Planet)5790_storage)",
+            "src": "../project:/contracts/ERC721/MechaLandsV1.sol:174"
+          },
+          {
+            "contract": "MechaLandsV1",
+            "label": "rounds",
+            "type": "t_mapping(t_uint256,t_struct(MintRound)5827_storage)",
+            "src": "../project:/contracts/ERC721/MechaLandsV1.sol:177"
+          },
+          {
+            "contract": "MechaLandsV1",
+            "label": "tokenType",
+            "type": "t_mapping(t_uint256,t_uint256)",
+            "src": "../project:/contracts/ERC721/MechaLandsV1.sol:180"
+          },
+          {
+            "contract": "MechaLandsV1",
+            "label": "tokenPlanet",
+            "type": "t_mapping(t_uint256,t_uint256)",
+            "src": "../project:/contracts/ERC721/MechaLandsV1.sol:183"
+          }
+        ],
+        "types": {
+          "t_uint256": {
+            "label": "uint256"
+          },
+          "t_mapping(t_uint256,t_struct(Planet)5790_storage)": {
+            "label": "mapping(uint256 => struct MechaLandsV1.Planet)"
+          },
+          "t_struct(Planet)5790_storage": {
+            "label": "struct MechaLandsV1.Planet",
+            "members": [
+              {
+                "label": "revealed",
+                "type": "t_bool"
+              },
+              {
+                "label": "burnable",
+                "type": "t_bool"
+              },
+              {
+                "label": "typesNumber",
+                "type": "t_uint16"
+              },
+              {
+                "label": "baseURI",
+                "type": "t_string_storage"
+              },
+              {
+                "label": "baseExtension",
+                "type": "t_string_storage"
+              },
+              {
+                "label": "distributor",
+                "type": "t_address"
+              },
+              {
+                "label": "supplyPerType",
+                "type": "t_mapping(t_uint256,t_uint256)"
+              },
+              {
+                "label": "totalMintedPerType",
+                "type": "t_mapping(t_uint256,t_uint256)"
+              },
+              {
+                "label": "notRevealUriPerType",
+                "type": "t_mapping(t_uint256,t_string_storage)"
+              }
+            ]
+          },
+          "t_bool": {
+            "label": "bool"
+          },
+          "t_uint16": {
+            "label": "uint16"
+          },
+          "t_string_storage": {
+            "label": "string"
+          },
+          "t_address": {
+            "label": "address"
+          },
+          "t_mapping(t_uint256,t_uint256)": {
+            "label": "mapping(uint256 => uint256)"
+          },
+          "t_mapping(t_uint256,t_string_storage)": {
+            "label": "mapping(uint256 => string)"
+          },
+          "t_mapping(t_uint256,t_struct(MintRound)5827_storage)": {
+            "label": "mapping(uint256 => struct MechaLandsV1.MintRound)"
+          },
+          "t_struct(MintRound)5827_storage": {
+            "label": "struct MechaLandsV1.MintRound",
+            "members": [
+              {
+                "label": "limitedPerType",
+                "type": "t_bool"
+              },
+              {
+                "label": "planetId",
+                "type": "t_uint64"
+              },
+              {
+                "label": "startTime",
+                "type": "t_uint64"
+              },
+              {
+                "label": "duration",
+                "type": "t_uint64"
+              },
+              {
+                "label": "validator",
+                "type": "t_address"
+              },
+              {
+                "label": "pricePerType",
+                "type": "t_mapping(t_uint256,t_uint256)"
+              },
+              {
+                "label": "supplyPerType",
+                "type": "t_mapping(t_uint256,t_uint256)"
+              },
+              {
+                "label": "maxMintPerType",
+                "type": "t_mapping(t_uint256,t_uint256)"
+              },
+              {
+                "label": "totalMintedPerType",
+                "type": "t_mapping(t_uint256,t_uint256)"
+              },
+              {
+                "label": "totalMintedPerUser",
+                "type": "t_mapping(t_address,t_uint256)"
+              },
+              {
+                "label": "totalMintedPerTypePerUser",
+                "type": "t_mapping(t_address,t_mapping(t_uint256,t_uint256))"
+              }
+            ]
+          },
+          "t_uint64": {
+            "label": "uint64"
+          },
+          "t_mapping(t_address,t_uint256)": {
+            "label": "mapping(address => uint256)"
+          },
+          "t_mapping(t_address,t_mapping(t_uint256,t_uint256))": {
+            "label": "mapping(address => mapping(uint256 => uint256))"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]"
+          },
+          "t_mapping(t_uint256,t_address)": {
+            "label": "mapping(uint256 => address)"
+          },
+          "t_mapping(t_address,t_mapping(t_address,t_bool))": {
+            "label": "mapping(address => mapping(address => bool))"
+          },
+          "t_mapping(t_address,t_bool)": {
+            "label": "mapping(address => bool)"
+          },
+          "t_array(t_uint256)44_storage": {
+            "label": "uint256[44]"
+          }
+        }
+      }
+    }
+  }
+}

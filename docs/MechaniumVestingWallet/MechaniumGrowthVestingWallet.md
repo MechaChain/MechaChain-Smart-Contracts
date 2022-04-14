@@ -63,6 +63,7 @@ MechaniumGrowthVestingWallet - Hold $MECHA allocated to the growth and marketing
 Event emitted when `caller` transferred `amount` unlock tokens for `to` address
 
 
+
 _Inherited from `MechaniumVestingWallet/MechaniumVestingWallet.sol`_.
 
 
@@ -70,11 +71,13 @@ _Inherited from `MechaniumVestingWallet/MechaniumVestingWallet.sol`_.
 Event emitted when all tokens have been transferred
 
 
+
 _Inherited from `MechaniumVestingWallet/MechaniumVestingWallet.sol`_.
 
 
 ### `ReleaseUintentedTokens(address token, address account, uint256 amount)` (inherited) <a name="MechaniumCanReleaseUnintented-ReleaseUintentedTokens-address-address-uint256-" id="MechaniumCanReleaseUnintented-ReleaseUintentedTokens-address-address-uint256-"></a>
 Event emitted when release unintented `amount` of `token` for `account` address
+
 
 
 _Inherited from `MechaniumUtils/MechaniumCanReleaseUnintented.sol`_.
@@ -87,6 +90,7 @@ Emitted when `newAdminRole` is set as ``role``'s admin role, replacing `previous
 {RoleAdminChanged} not being emitted signaling this.
 _Available since v3.1._
 
+
 _Inherited from `../@openzeppelin/contracts/access/IAccessControl.sol`_.
 
 
@@ -95,6 +99,7 @@ _Inherited from `../@openzeppelin/contracts/access/IAccessControl.sol`_.
 Emitted when `account` is granted `role`.
 `sender` is the account that originated the contract call, an admin role
 bearer except when using {AccessControl-_setupRole}.
+
 
 _Inherited from `../@openzeppelin/contracts/access/IAccessControl.sol`_.
 
@@ -106,6 +111,7 @@ Emitted when `account` is revoked `role`.
   - if using `revokeRole`, it is the admin role bearer
   - if using `renounceRole`, it is the role bearer (i.e. `account`)
 
+
 _Inherited from `../@openzeppelin/contracts/access/IAccessControl.sol`_.
 
 
@@ -116,12 +122,15 @@ _Inherited from `../@openzeppelin/contracts/access/IAccessControl.sol`_.
 
 Contract constructor sets the configuration of the vesting schedule
 
+
+Parameters:
 - `token_`: Address of the ERC20 token contract, this address cannot be changed later
 
 
 
 ### `transfer(address to, uint256 amount) → bool` (public) (inherited)<a name="MechaniumVestingWallet-transfer-address-uint256-" id="MechaniumVestingWallet-transfer-address-uint256-"></a>
 Transfer `amount` unlocked tokens `to` address
+
 
 
 _Inherited from `MechaniumVestingWallet/MechaniumVestingWallet.sol`_.
@@ -131,12 +140,14 @@ _Inherited from `MechaniumVestingWallet/MechaniumVestingWallet.sol`_.
 
 Return the number of tokens that can be unlock
 
+
 _Inherited from `MechaniumVestingWallet/MechaniumVestingWallet.sol`_.
 
 
 ### `token() → address` (public) (inherited)<a name="MechaniumVestingWallet-token--" id="MechaniumVestingWallet-token--"></a>
 
 Return the token IERC20
+
 
 _Inherited from `MechaniumVestingWallet/MechaniumVestingWallet.sol`_.
 
@@ -145,12 +156,14 @@ _Inherited from `MechaniumVestingWallet/MechaniumVestingWallet.sol`_.
 
 Return the total token hold by the contract
 
+
 _Inherited from `MechaniumVestingWallet/MechaniumVestingWallet.sol`_.
 
 
 ### `totalSupply() → uint256` (public) (inherited)<a name="MechaniumVestingWallet-totalSupply--" id="MechaniumVestingWallet-totalSupply--"></a>
 
 Return the total supply of tokens
+
 
 _Inherited from `MechaniumVestingWallet/MechaniumVestingWallet.sol`_.
 
@@ -159,12 +172,14 @@ _Inherited from `MechaniumVestingWallet/MechaniumVestingWallet.sol`_.
 
 Return the total tokens that have been transferred
 
+
 _Inherited from `MechaniumVestingWallet/MechaniumVestingWallet.sol`_.
 
 
 ### `vestingPerClock() → uint256` (public) (inherited)<a name="MechaniumVestingWallet-vestingPerClock--" id="MechaniumVestingWallet-vestingPerClock--"></a>
 
 Return the percentage of unlocked tokens per `vestingClockTime()` once the vesting schedule has started
+
 
 _Inherited from `MechaniumVestingWallet/MechaniumVestingWallet.sol`_.
 
@@ -173,12 +188,14 @@ _Inherited from `MechaniumVestingWallet/MechaniumVestingWallet.sol`_.
 
 Return the number of seconds between two `vestingPerClock()`
 
+
 _Inherited from `MechaniumVestingWallet/MechaniumVestingWallet.sol`_.
 
 
 ### `initialVesting() → uint256` (public) (inherited)<a name="MechaniumVestingWallet-initialVesting--" id="MechaniumVestingWallet-initialVesting--"></a>
 
 Return the percentage of unlocked tokens at the beginning of the vesting schedule
+
 
 _Inherited from `MechaniumVestingWallet/MechaniumVestingWallet.sol`_.
 
@@ -187,6 +204,7 @@ _Inherited from `MechaniumVestingWallet/MechaniumVestingWallet.sol`_.
 
 Return vesting schedule start time
 
+
 _Inherited from `MechaniumVestingWallet/MechaniumVestingWallet.sol`_.
 
 
@@ -194,11 +212,13 @@ _Inherited from `MechaniumVestingWallet/MechaniumVestingWallet.sol`_.
 fallback payable function ( used to receive ETH in tests )
 
 
+
 _Inherited from `MechaniumUtils/MechaniumCanReleaseUnintented.sol`_.
 
 
 ### `receive()` (external) (inherited)<a name="MechaniumCanReleaseUnintented-receive--" id="MechaniumCanReleaseUnintented-receive--"></a>
 receive payable function ( used to receive ETH in tests )
+
 
 
 _Inherited from `MechaniumUtils/MechaniumCanReleaseUnintented.sol`_.
@@ -209,6 +229,8 @@ Release an `amount` of `token` to an `account`
 This function is used to prevent unintented tokens that got sent to be stuck on the contract
 
 
+
+Parameters:
 - `token`: The address of the token contract (zero address for claiming native coins).
 
 - `account`: The address of the tokens/coins receiver.
@@ -222,12 +244,14 @@ _Inherited from `MechaniumUtils/MechaniumCanReleaseUnintented.sol`_.
 
 See {IERC165-supportsInterface}.
 
+
 _Inherited from `../@openzeppelin/contracts/access/AccessControl.sol`_.
 
 
 ### `hasRole(bytes32 role, address account) → bool` (public) (inherited)<a name="AccessControl-hasRole-bytes32-address-" id="AccessControl-hasRole-bytes32-address-"></a>
 
 Returns `true` if `account` has been granted `role`.
+
 
 _Inherited from `../@openzeppelin/contracts/access/AccessControl.sol`_.
 
@@ -237,6 +261,7 @@ _Inherited from `../@openzeppelin/contracts/access/AccessControl.sol`_.
 Returns the admin role that controls `role`. See {grantRole} and
 {revokeRole}.
 To change a role's admin, use {_setRoleAdmin}.
+
 
 _Inherited from `../@openzeppelin/contracts/access/AccessControl.sol`_.
 
@@ -249,6 +274,7 @@ event.
 Requirements:
 - the caller must have ``role``'s admin role.
 
+
 _Inherited from `../@openzeppelin/contracts/access/AccessControl.sol`_.
 
 
@@ -258,6 +284,7 @@ Revokes `role` from `account`.
 If `account` had been granted `role`, emits a {RoleRevoked} event.
 Requirements:
 - the caller must have ``role``'s admin role.
+
 
 _Inherited from `../@openzeppelin/contracts/access/AccessControl.sol`_.
 
@@ -273,6 +300,7 @@ event.
 Requirements:
 - the caller must be `account`.
 
+
 _Inherited from `../@openzeppelin/contracts/access/AccessControl.sol`_.
 
 
@@ -280,6 +308,7 @@ _Inherited from `../@openzeppelin/contracts/access/AccessControl.sol`_.
 
 ### `_addLockedToken(address token_)` (internal) (inherited) <a name="MechaniumCanReleaseUnintented-_addLockedToken-address-" id="MechaniumCanReleaseUnintented-_addLockedToken-address-"></a>
 Add a locked `token_` ( can't be released )
+
 
 
 _Inherited from `MechaniumUtils/MechaniumCanReleaseUnintented.sol`_.
@@ -290,6 +319,7 @@ _Inherited from `MechaniumUtils/MechaniumCanReleaseUnintented.sol`_.
 Revert with a standard message if `account` is missing `role`.
 The format of the revert reason is given by the following regular expression:
  /^AccessControl: account (0x[0-9a-f]{40}) is missing role (0x[0-9a-f]{64})$/
+
 
 _Inherited from `../@openzeppelin/contracts/access/AccessControl.sol`_.
 
@@ -309,6 +339,7 @@ system imposed by {AccessControl}.
 ====
 NOTE: This function is deprecated in favor of {_grantRole}.
 
+
 _Inherited from `../@openzeppelin/contracts/access/AccessControl.sol`_.
 
 
@@ -316,6 +347,7 @@ _Inherited from `../@openzeppelin/contracts/access/AccessControl.sol`_.
 
 Sets `adminRole` as ``role``'s admin role.
 Emits a {RoleAdminChanged} event.
+
 
 _Inherited from `../@openzeppelin/contracts/access/AccessControl.sol`_.
 
@@ -325,6 +357,7 @@ _Inherited from `../@openzeppelin/contracts/access/AccessControl.sol`_.
 Grants `role` to `account`.
 Internal function without access restriction.
 
+
 _Inherited from `../@openzeppelin/contracts/access/AccessControl.sol`_.
 
 
@@ -333,6 +366,7 @@ _Inherited from `../@openzeppelin/contracts/access/AccessControl.sol`_.
 Revokes `role` from `account`.
 Internal function without access restriction.
 
+
 _Inherited from `../@openzeppelin/contracts/access/AccessControl.sol`_.
 
 
@@ -340,10 +374,12 @@ _Inherited from `../@openzeppelin/contracts/access/AccessControl.sol`_.
 
 
 
+
 _Inherited from `../@openzeppelin/contracts/utils/Context.sol`_.
 
 
 ### `_msgData() → bytes` (internal) (inherited) <a name="Context-_msgData--" id="Context-_msgData--"></a>
+
 
 
 
@@ -361,6 +397,7 @@ with a standardized message including the required role.
 The format of the revert reason is given by the following regular expression:
  /^AccessControl: account (0x[0-9a-f]{40}) is missing role (0x[0-9a-f]{64})$/
 _Available since v4.1._
+
 
 _Inherited from `../@openzeppelin/contracts/access/AccessControl.sol`_.
 

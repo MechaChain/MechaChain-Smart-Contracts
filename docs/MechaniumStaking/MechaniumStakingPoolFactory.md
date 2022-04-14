@@ -59,8 +59,10 @@ Event emitted when a staking pool is created
 
 
 
+
 ### `CreateFlashPool(address poolAddress, uint256 allocatedTokens, uint256 initBlock, uint256 minStakingTime, uint256 maxStakingTime, uint256 minWeightMultiplier, uint256 maxWeightMultiplier, uint256 rewardsPerBlock)`  <a name="MechaniumStakingPoolFactory-CreateFlashPool-address-uint256-uint256-uint256-uint256-uint256-uint256-uint256-" id="MechaniumStakingPoolFactory-CreateFlashPool-address-uint256-uint256-uint256-uint256-uint256-uint256-uint256-"></a>
 Event emitted when a staking flash pool is created
+
 
 
 
@@ -71,8 +73,10 @@ Event emitted when an `amount` of tokens is added to `poolAddress` token allocat
 
 
 
+
 ### `AddAllocatedTokens(address poolAddress, uint256 amount, uint256 rewardsPerBlock)`  <a name="MechaniumStakingPoolFactory-AddAllocatedTokens-address-uint256-uint256-" id="MechaniumStakingPoolFactory-AddAllocatedTokens-address-uint256-uint256-"></a>
 Event emitted when an `amount` of tokens is added to `poolAddress` token allocation
+
 
 
 
@@ -83,14 +87,17 @@ Event emitted when `amount` of unallocated tokens is withdrawn to an `account`
 
 
 
+
 ### `ReleaseUintentedTokens(address token, address account, uint256 amount)` (inherited) <a name="MechaniumCanReleaseUnintendedOwnable-ReleaseUintentedTokens-address-address-uint256-" id="MechaniumCanReleaseUnintendedOwnable-ReleaseUintentedTokens-address-address-uint256-"></a>
 Event emitted when release unintended `amount` of `token` for `account` address
+
 
 
 _Inherited from `MechaniumUtils/MechaniumCanReleaseUnintendedOwnable.sol`_.
 
 
 ### `OwnershipTransferred(address previousOwner, address newOwner)` (inherited) <a name="Ownable-OwnershipTransferred-address-address-" id="Ownable-OwnershipTransferred-address-address-"></a>
+
 
 
 
@@ -108,11 +115,14 @@ _Inherited from `../@openzeppelin/contracts/access/Ownable.sol`_.
 
 
 
+
 ### `createPool(uint256 allocatedTokens, uint32 initBlock, uint64 minStakingTime, uint64 maxStakingTime, uint16 minWeightMultiplier, uint16 maxWeightMultiplier, uint64 rewardsLockingPeriod, uint256 rewardsPerBlock) → bool` (public) <a name="MechaniumStakingPoolFactory-createPool-uint256-uint32-uint64-uint64-uint16-uint16-uint64-uint256-" id="MechaniumStakingPoolFactory-createPool-uint256-uint32-uint64-uint64-uint16-uint16-uint64-uint256-"></a>
 Create new staking pool
 
 Deploy an instance of the StakingPool smart contract and transfer the tokens to it
 
+
+Parameters:
 - `allocatedTokens`: The number of tokens allocated for the pool
 
 - `initBlock`: The initial block of the pool to start
@@ -136,6 +146,8 @@ Create new staking flash pool
 
 Deploy an instance of the StakingPool smart contract and transfer the tokens to it
 
+
+Parameters:
 - `allocatedTokens`: The number of tokens allocated for the pool
 
 - `initBlock`: The initial block of the pool to start
@@ -157,6 +169,8 @@ Allocate more tokens to a staking pool
 
 Safe transfer the tokens to the pool
 
+
+Parameters:
 - `poolAddr`: The pool address
 
 - `amount`: The amount of tokens to allocate
@@ -168,6 +182,8 @@ Allocate more tokens to a staking pool and change the rewards per block
 
 Safe transfer the tokens to the pool
 
+
+Parameters:
 - `poolAddr`: The pool address
 
 - `amount`: The amount of tokens to allocate
@@ -180,6 +196,8 @@ Safe transfer the tokens to the pool
 Withdraw unallocated tokens
 
 
+
+Parameters:
 - `account`: The account that will receive the tokens
 
 - `amount`: The amount of tokens to withdraw
@@ -190,6 +208,8 @@ Withdraw unallocated tokens
 Release unintended tokens
 
 
+
+Parameters:
 - `pool`: The staking pool to release from
 
 - `token_`: The token to release
@@ -206,8 +226,10 @@ Get the factory ERC20 token
 
 
 
+
 ### `balance() → uint256` (public) <a name="MechaniumStakingPoolFactory-balance--" id="MechaniumStakingPoolFactory-balance--"></a>
 Get the factory ERC20 token balance
+
 
 
 
@@ -216,6 +238,8 @@ Get the factory ERC20 token balance
 Get staking pool data
 
 
+
+Parameters:
 - `poolAddr`: The pool address
 
 
@@ -224,11 +248,13 @@ Get staking pool data
 fallback payable function ( used to receive ETH in tests )
 
 
+
 _Inherited from `MechaniumUtils/MechaniumCanReleaseUnintendedOwnable.sol`_.
 
 
 ### `receive()` (external) (inherited)<a name="MechaniumCanReleaseUnintendedOwnable-receive--" id="MechaniumCanReleaseUnintendedOwnable-receive--"></a>
 receive payable function ( used to receive ETH in tests )
+
 
 
 _Inherited from `MechaniumUtils/MechaniumCanReleaseUnintendedOwnable.sol`_.
@@ -239,6 +265,8 @@ Release an `amount` of `token` to an `account`
 This function is used to prevent unintended tokens that got sent to be stuck on the contract
 
 
+
+Parameters:
 - `token`: The address of the token contract (zero address for claiming native coins).
 
 - `account`: The address of the tokens/coins receiver.
@@ -252,6 +280,7 @@ _Inherited from `MechaniumUtils/MechaniumCanReleaseUnintendedOwnable.sol`_.
 
 Returns the address of the current owner.
 
+
 _Inherited from `../@openzeppelin/contracts/access/Ownable.sol`_.
 
 
@@ -262,6 +291,7 @@ Leaves the contract without owner. It will not be possible to call
 NOTE: Renouncing ownership will leave the contract without an owner,
 thereby removing any functionality that is only available to the owner.
 
+
 _Inherited from `../@openzeppelin/contracts/access/Ownable.sol`_.
 
 
@@ -269,6 +299,7 @@ _Inherited from `../@openzeppelin/contracts/access/Ownable.sol`_.
 
 Transfers ownership of the contract to a new account (`newOwner`).
 Can only be called by the current owner.
+
 
 _Inherited from `../@openzeppelin/contracts/access/Ownable.sol`_.
 
@@ -283,8 +314,10 @@ _Inherited from `../@openzeppelin/contracts/access/Ownable.sol`_.
 
 
 
+
 ### `_addLockedToken(address token_)` (internal) (inherited) <a name="MechaniumCanReleaseUnintendedOwnable-_addLockedToken-address-" id="MechaniumCanReleaseUnintendedOwnable-_addLockedToken-address-"></a>
 Add a locked `token_` ( can't be released )
+
 
 
 _Inherited from `MechaniumUtils/MechaniumCanReleaseUnintendedOwnable.sol`_.
@@ -295,6 +328,7 @@ _Inherited from `MechaniumUtils/MechaniumCanReleaseUnintendedOwnable.sol`_.
 Transfers ownership of the contract to a new account (`newOwner`).
 Internal function without access restriction.
 
+
 _Inherited from `../@openzeppelin/contracts/access/Ownable.sol`_.
 
 
@@ -302,10 +336,12 @@ _Inherited from `../@openzeppelin/contracts/access/Ownable.sol`_.
 
 
 
+
 _Inherited from `../@openzeppelin/contracts/utils/Context.sol`_.
 
 
 ### `_msgData() → bytes` (internal) (inherited) <a name="Context-_msgData--" id="Context-_msgData--"></a>
+
 
 
 
@@ -319,6 +355,7 @@ _Inherited from `../@openzeppelin/contracts/utils/Context.sol`_.
 
 
 Throws if called by any account other than the owner.
+
 
 _Inherited from `../@openzeppelin/contracts/access/Ownable.sol`_.
 
