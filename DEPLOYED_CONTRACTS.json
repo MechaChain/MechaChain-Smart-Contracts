@@ -3,6 +3,10 @@
     "Mechanium": {
       "address": "0xc5bcc8ba3f33ab0d64f3473e861bdc0685b19ef5",
       "date": "24/11/2021, 14:34:43"
+    },
+    "MechaLandsV1": {
+      "address": "0xf7EB04e24d16621CbB73f9C98b0edc10DfDb3397",
+      "date": "14/04/2022, 15:10:55"
     }
   },
   "polygon": {
@@ -89,8 +93,11 @@
       "date": "04/04/2022, 13:09:38"
     },
     "MechaLandsV1": {
-      "address": "0x6B15922CD0119f7AB08e3EdD85C1a84A6B193721",
-      "date": "11/04/2022, 14:54:22"
+      "address": "0xF284b93bdc7F5db531a846B14F029eDfF151eD99",
+      "date": "14/04/2022, 14:53:22"
     }
+  },
+  "dashboard": {
+
   }
 }
