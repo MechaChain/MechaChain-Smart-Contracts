@@ -43,6 +43,10 @@
     "MechaniumStakingPoolFactory": {
       "address": "0xF04B871cDCa6b26892fB54D1A04d0bb7439eEd3A",
       "date": "17/02/2022, 20:37:05"
+    },
+    "MechaniumPublicDistribution": {
+      "address": "0x540DD105a30794F43D6ac04157616f33E7E46772",
+      "date": "20/04/2022, 13:55:31"
     }
   },
   "ropsten": {
@@ -52,6 +56,10 @@
     }
   },
   "rinkeby": {
+    "Mechanium": {
+      "address": "0x277Dd42Fbf5adAeaA7ab2FA66A4B7f6D85667e09",
+      "date": "04/04/2022, 13:09:38"
+    },
     "MechaLandsV1": {
       "address": "0x6B15922CD0119f7AB08e3EdD85C1a84A6B193721",
       "date": "11/04/2022, 14:54:22"
