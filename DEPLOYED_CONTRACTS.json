@@ -79,6 +79,10 @@
     "MechaniumStakingPoolFactory": {
       "address": "0xF04B871cDCa6b26892fB54D1A04d0bb7439eEd3A",
       "date": "17/02/2022, 20:37:05"
+    },
+    "MechaniumPublicDistribution": {
+      "address": "0x540DD105a30794F43D6ac04157616f33E7E46772",
+      "date": "20/04/2022, 13:55:31"
     }
   },
   "ropsten": {
