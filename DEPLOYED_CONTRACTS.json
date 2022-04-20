@@ -22,6 +22,10 @@
       "address": "0x7a3D891Ca74b0c33F4AFda76225D7929Ee17eBd2",
       "date": "24/11/2021, 18:39:18"
     },
+    "MechaniumPublicDistribution": {
+      "address": "0x20F658a4E652fDADC45a0c5523676B963E88Eb13",
+      "date": "20/04/2022, 15:19:16"
+    },
     "MechaniumStakingPoolFactory": {
       "address": "0x90278C771BB49E985b896A8e6BBe02078ae9fb79",
       "date": "24/11/2021, 18:39:18"
@@ -102,6 +106,5 @@
     }
   },
   "dashboard": {
-
   }
 }
