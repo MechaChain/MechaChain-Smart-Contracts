@@ -26,6 +26,10 @@
       "address": "0x20F658a4E652fDADC45a0c5523676B963E88Eb13",
       "date": "20/04/2022, 15:19:16"
     },
+    "MechaniumAirdropDistribution": {
+      "address": "0x09bb42BaD9895148ddA95d6Afc571e7D8C756565",
+      "date": "26/04/2022, 16:16:17"
+    },
     "MechaniumStakingPoolFactory": {
       "address": "0x90278C771BB49E985b896A8e6BBe02078ae9fb79",
       "date": "24/11/2021, 18:39:18"
@@ -87,6 +91,10 @@
     "MechaniumPublicDistribution": {
       "address": "0x540DD105a30794F43D6ac04157616f33E7E46772",
       "date": "20/04/2022, 13:55:31"
+    },
+    "MechaniumAirdropDistribution": {
+      "address": "0x4ac390EAE8763C313bBEff8Aeb9BFcF55BE20c74",
+      "date": "26/04/2022, 16:16:17"
     }
   },
   "ropsten": {
@@ -106,5 +114,9 @@
     }
   },
   "dashboard": {
+    "Mechanium": {
+      "address": "0xacd4e2d936be9b16c01848a3742a34b3d5a5bdfa",
+      "date": "24/11/2021, 18:39:18"
+    }
   }
 }
