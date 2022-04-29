@@ -751,7 +751,7 @@ contract MechaLandsV1 is
         uint256 roundId,
         uint256 landType,
         uint256 amount
-    ) internal {
+    ) internal virtual {
         MintRound storage round = rounds[roundId];
         require(round.planetId > 0, "Invalid round");
         require(
@@ -888,7 +888,7 @@ contract MechaLandsV1 is
         override
         onlyOwner
     {
-        version ++;
+        version++;
     }
 
     receive() external payable {}
