@@ -14,6 +14,14 @@ function getBN(value) {
   return new BN(`${value}`);
 }
 
+function getBN(value) {
+  return new BN(`${value}`);
+}
+
+function objectFilter(object, predicate) {
+  return Object.fromEntries(Object.entries(object).filter(predicate));
+}
+
 function getDeployedContract(network, name, trowError = false) {
   network = network.replace("-fork", ""); // avoid migrations dry-run (simulation)
   if (
@@ -160,6 +168,7 @@ module.exports = {
     getStats,
     consoleStats,
   },
+  objectFilter,
   getSignature,
   getAmount,
   getBN,

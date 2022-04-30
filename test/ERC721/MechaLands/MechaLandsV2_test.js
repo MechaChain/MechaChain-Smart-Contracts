@@ -12,7 +12,7 @@ const {
   getBNRange,
   gasTracker,
   getSignature,
-} = require("../utils");
+} = require("../../utils");
 const { upgradeProxy, deployProxy } = require("@openzeppelin/truffle-upgrades");
 
 contract("MechaLandsV2", async (accounts) => {
