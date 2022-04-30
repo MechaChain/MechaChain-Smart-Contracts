@@ -116,7 +116,7 @@ const setupMintRound = async (
   const tx = await instance.setupMintRound(
     roundId,
     planetId,
-    testStartTime.add(startTime),
+    startTime ? testStartTime.add(startTime) : testStartTime,
     duration,
     validator,
     limitedPerType || false,
@@ -132,7 +132,9 @@ const setupMintRound = async (
   assert.equal(round.planetId.toString(), planetId.toString(), "Bad planetId");
   assert.equal(
     round.startTime.toString(),
-    testStartTime.add(startTime).toString(),
+    startTime
+      ? testStartTime.add(startTime).toString()
+      : testStartTime.toString(),
     "Bad startTime"
   );
   assert.equal(round.duration.toString(), duration.toString(), "Bad duration");
@@ -493,14 +495,43 @@ const burn = async (instance, tokenId, user) => {
   contractStorage.burnedTokens = [...contractStorage.burnedTokens, tokenId];
 };
 
+/**
+ * Get remaining tokens for a landType in a round
+ */
+const getRemainingTokens = async (instance, roundId, landType) => {
+  const round = await instance.rounds(roundId);
+  const planetSupply = await instance.planetSupplyByType(
+    round.planetId,
+    landType
+  );
+  const planetTotalMinted = await instance.planetTotalMintedByType(
+    round.planetId,
+    landType
+  );
+  const remainingInPlanet =
+    planetSupply.toNumber() - planetTotalMinted.toNumber();
+
+  const roundSupply = await instance.roundSupplyByType(roundId, landType);
+  const roundTotalMinted = await instance.roundTotalMintedByType(
+    roundId,
+    landType
+  );
+  const remainingInRound = roundSupply.toNumber() - roundTotalMinted.toNumber();
+
+  return remainingInRound > remainingInPlanet
+    ? remainingInPlanet
+    : remainingInRound;
+};
+
 const getContractStorage = () => contractStorage;
 
 module.exports = {
-  burn,
-  getContractStorage,
   setTestStartTime,
   setupPlanet,
   setupMintRound,
   mint,
   airdrop,
+  burn,
+  getRemainingTokens,
+  getContractStorage,
 };
