@@ -22,6 +22,7 @@ const contractStorage = {
   rounds: {},
   tokens: {},
   tokenOfOwner: {},
+  burnedTokens: [],
   balance: getBN(0),
 };
 
@@ -351,7 +352,7 @@ const mint = async (
         [element]: {
           owner: user,
           type: landType,
-          planetId: round.planetId,
+          planetId: round.planetId.toNumber(),
         },
       }),
       {}
@@ -486,8 +487,10 @@ const burn = async (instance, tokenId, user) => {
 
   contractStorage.tokens = objectFilter(
     contractStorage.tokens,
-    ([key, value]) => key !== tokenId
+    (key, value) => key != tokenId
   );
+
+  contractStorage.burnedTokens = [...contractStorage.burnedTokens, tokenId];
 };
 
 const getContractStorage = () => contractStorage;

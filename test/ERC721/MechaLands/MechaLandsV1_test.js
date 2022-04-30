@@ -1424,8 +1424,6 @@ contract("MechaLandsV1", async (accounts) => {
         tx: newInstance.transactionHash,
       });
 
-      console.log(getContractStorage());
-
       gasTracker.consoleStats();
     });
   });

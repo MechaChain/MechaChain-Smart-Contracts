@@ -19,7 +19,12 @@ function getBN(value) {
 }
 
 function objectFilter(object, predicate) {
-  return Object.fromEntries(Object.entries(object).filter(predicate));
+  return Object.keys(object)
+    .filter((key) => predicate(key, object[key]))
+    .reduce((obj, key) => {
+      obj[key] = object[key];
+      return obj;
+    }, {});
 }
 
 function getDeployedContract(network, name, trowError = false) {
