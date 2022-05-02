@@ -83,7 +83,7 @@ contract MechaLandsV2 is MechaLandsV1 {
     ) public onlyOwner {
         require(
             address(mechaniumToken) != address(0),
-            "Mechanium Token not set"
+            "Mechanium token not set"
         );
 
         MechaLandsV1.setupMintRound(
@@ -122,7 +122,7 @@ contract MechaLandsV2 is MechaLandsV1 {
         if (paymentType == 1) {
             require(
                 address(mechaniumToken) != address(0),
-                "Mechanium Token not set"
+                "Mechanium token not set"
             );
         }
         roundPaymentType[roundId] = paymentType;
@@ -202,7 +202,7 @@ contract MechaLandsV2 is MechaLandsV1 {
             // Mechanium payment
             require(
                 address(mechaniumToken) != address(0),
-                "Mechanium Token not set"
+                "Mechanium token not set"
             );
 
             mechaniumToken.safeTransferFrom(msg.sender, address(this), price);
