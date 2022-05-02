@@ -1,5 +1,6 @@
 // Load modules
 const { time, expectRevert } = require("@openzeppelin/test-helpers");
+const { ZERO_ADDRESS } = require("@openzeppelin/test-helpers/src/constants");
 
 // Load utils
 const {
@@ -8,8 +9,6 @@ const {
   getSignature,
   objectFilter,
 } = require("../../../utils");
-
-const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 
 let testStartTime;
 
@@ -108,24 +107,42 @@ const setupMintRound = async (
     supplyPerType,
     maxMintPerType,
     validator_private_key,
+    isMechaniumPaymentType,
   },
   from
 ) => {
   validator = validator || ZERO_ADDRESS;
+  let tx;
+  if (isMechaniumPaymentType) {
+    tx = await instance.setupMechaniumMintRound(
+      roundId,
+      planetId,
+      startTime ? testStartTime.add(startTime) : testStartTime,
+      duration,
+      validator,
+      limitedPerType || false,
+      pricePerType,
+      supplyPerType,
+      maxMintPerType,
+      { from: from }
+    );
+    await gasTracker.addCost("Setup Mecha Mint Round", tx);
+  } else {
+    tx = await instance.setupMintRound(
+      roundId,
+      planetId,
+      startTime ? testStartTime.add(startTime) : testStartTime,
+      duration,
+      validator,
+      limitedPerType || false,
+      pricePerType,
+      supplyPerType,
+      maxMintPerType,
+      { from: from }
+    );
+    await gasTracker.addCost("Setup Mint Round", tx);
+  }
 
-  const tx = await instance.setupMintRound(
-    roundId,
-    planetId,
-    startTime ? testStartTime.add(startTime) : testStartTime,
-    duration,
-    validator,
-    limitedPerType || false,
-    pricePerType,
-    supplyPerType,
-    maxMintPerType,
-    { from: from }
-  );
-  await gasTracker.addCost("Setup Mint Round", tx);
   const round = await instance.rounds(roundId);
 
   // Tests
@@ -165,6 +182,15 @@ const setupMintRound = async (
       maxMintPerType[i].toString(),
       "Bad maxMintPerType"
     );
+
+    // For v2
+    if (isMechaniumPaymentType !== undefined) {
+      assert.equal(
+        (await instance.roundPaymentType(roundId)).toString(),
+        isMechaniumPaymentType ? "1" : "0",
+        "Bad roundPaymentType"
+      );
+    }
   }
 
   // Update expected storage

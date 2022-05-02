@@ -1,5 +1,6 @@
 // Load modules
 const { time, expectRevert, snapshot } = require("@openzeppelin/test-helpers");
+const { ZERO_ADDRESS } = require("@openzeppelin/test-helpers/src/constants");
 const { upgradeProxy, deployProxy } = require("@openzeppelin/truffle-upgrades");
 const cliProgress = require("cli-progress");
 const { getAmount, gasTracker } = require("../../../utils");
@@ -7,6 +8,7 @@ const { getAmount, gasTracker } = require("../../../utils");
 // Load artifacts
 const MechaLandsV1 = artifacts.require("MechaLandsV1");
 const MechaLandsV2 = artifacts.require("MechaLandsV2");
+const Mechanium = artifacts.require("Mechanium");
 
 // Load functions
 const {
@@ -23,7 +25,7 @@ const {
 contract("MechaLandsV2", async (accounts) => {
   const [owner, distributor, ...users] = accounts;
 
-  let instance, testStartTime, chainid;
+  let instance, testStartTime, chainid, mechanium;
 
   const planets = [
     {}, // 0 not possible
@@ -41,7 +43,7 @@ contract("MechaLandsV2", async (accounts) => {
     {
       planetId: 2,
       typesNumber: 4,
-      supplyPerType: [5, 5, 5, 5],
+      supplyPerType: [30, 20, 20, 20],
       notRevealUriPerType: [
         "http://planet-2/land-1.json",
         "http://planet-2/land-1.json",
@@ -83,6 +85,42 @@ contract("MechaLandsV2", async (accounts) => {
         getAmount(0.075),
         getAmount(0.1),
       ],
+      supplyPerType: [999, 999, 999, 999], // incoherent supply for use planet supply
+      limitedPerType: true,
+      maxMintPerType: [5, 5, 5, 5],
+    },
+    {
+      roundId: 3,
+      planetId: 2,
+      startTime: 0, // to add to `testStartTime`
+      duration: 0,
+      validator: "0x6F76846f7C90EcEC371e1d96cA93bfE9d36eEb83",
+      validator_private_key:
+        "0xfeae30926cea7dfa8fb803c348aef7f06941b9af7770e6b62c0dcb543d3391a7",
+      pricePerType: [
+        getAmount(100),
+        getAmount(200),
+        getAmount(300),
+        getAmount(400),
+      ],
+      supplyPerType: [10, 10, 10, 10],
+      isMechaniumPaymentType: true,
+      limitedPerType: true,
+      maxMintPerType: [8, 8, 8, 8],
+    },
+    {
+      roundId: 4,
+      planetId: 2,
+      startTime: 0, // to add to `testStartTime`
+      duration: 0,
+      // no validator
+      pricePerType: [
+        getAmount(100),
+        getAmount(200),
+        getAmount(300),
+        getAmount(400),
+      ],
+      isMechaniumPaymentType: true,
       supplyPerType: [999, 999, 999, 999], // incoherent supply for use planet supply
       limitedPerType: true,
       maxMintPerType: [5, 5, 5, 5],
@@ -257,11 +295,88 @@ contract("MechaLandsV2", async (accounts) => {
   });
 
   describe("\n UPGRADE CONTRACT", () => {
-    it(`Upgrade Smart Contract`, async () => {
+    it(`Upgrade Smart Contract to MechaLandsV2`, async () => {
       instance = await upgradeProxy(instance.address, MechaLandsV2);
-      assert.equal((await instance.version()).toString(), "2", `Bad version`);
+      mechanium = await Mechanium.deployed();
     });
 
+    it(`Smart Contract is now at version v2`, async () => {
+      assert.equal((await instance.version()).toString(), "2", `Bad version`);
+    });
+  });
+
+  describe("\n SET MECHANIUM AND MINT ROUND", () => {
+    it(`Owner create planet 2`, async () => {
+      await setupPlanet(instance, planets[2], owner);
+    });
+
+    it(`User can't create a mechanium mint round (Reason: caller is not the owner)`, async () => {
+      await expectRevert(
+        setupMintRound(instance, rounds[3], users[0]),
+        `Ownable: caller is not the owner`
+      );
+    });
+
+    it(`Owner can't create a mechanium mint round (Reason: Mechanium token not set)`, async () => {
+      await expectRevert(
+        setupMintRound(instance, rounds[3], owner),
+        `Mechanium token not set`
+      );
+    });
+
+    it(`User can't change round payment type (Reason: caller is not the owner)`, async () => {
+      await expectRevert(
+        instance.setRoundPaymentType(1, 0, { from: users[1] }),
+        `Ownable: caller is not the owner`
+      );
+    });
+
+    it(`Owner can't create a mechanium mint round (Reason: Mechanium token not set)`, async () => {
+      await expectRevert(
+        instance.setRoundPaymentType(1, 1),
+        `Mechanium token not set`
+      );
+    });
+
+    it(`User can't change mechanium token address (Reason: caller is not the owner)`, async () => {
+      await expectRevert(
+        instance.setMechaniumToken(mechanium.address, { from: users[1] }),
+        `Ownable: caller is not the owner`
+      );
+    });
+
+    it(`Owner can change mechanium token address`, async () => {
+      const oldMechaniumToken = await instance.mechaniumToken();
+
+      const tx = await instance.setMechaniumToken(mechanium.address, {
+        from: owner,
+      });
+      await gasTracker.addCost(`Set Mechanium Token`, tx);
+
+      const newMechaniumToken = await instance.mechaniumToken();
+
+      assert.equal(
+        oldMechaniumToken.toString(),
+        ZERO_ADDRESS,
+        "Mechanium token is not null"
+      );
+      assert.equal(
+        newMechaniumToken.toString(),
+        mechanium.address,
+        "Bad mechanium token"
+      );
+    });
+
+    it(`Owner create round 3 with mechanium payment and validator`, async () => {
+      await setupMintRound(instance, rounds[3], owner);
+    });
+
+    it(`Owner create public round 4 with mechanium payment`, async () => {
+      await setupMintRound(instance, rounds[4], owner);
+    });
+  });
+
+  describe("\n STORAGE", () => {
     it(`Data of minted tokens has not changed`, async () => {
       const totalSupply = await instance.totalSupply();
       const tokens = getContractStorage().tokens;
