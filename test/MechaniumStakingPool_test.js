@@ -691,7 +691,8 @@ contract("MechaniumStakingPool", (accounts) => {
 
     assert(newPool);
 
-    const oldRemainingAllocatedTokens = await newPool.remainingAllocatedTokens();
+    const oldRemainingAllocatedTokens =
+      await newPool.remainingAllocatedTokens();
 
     await time.advanceBlock();
     await time.advanceBlock();
@@ -700,9 +701,13 @@ contract("MechaniumStakingPool", (accounts) => {
     await time.advanceBlock();
     await newPool.updateRewards();
 
-    const newRemainingAllocatedTokens = await newPool.remainingAllocatedTokens();
+    const newRemainingAllocatedTokens =
+      await newPool.remainingAllocatedTokens();
 
-    assert(oldRemainingAllocatedTokens.toString() === newRemainingAllocatedTokens.toString());
+    assert(
+      oldRemainingAllocatedTokens.toString() ===
+        newRemainingAllocatedTokens.toString()
+    );
 
     await time.advanceBlock();
     await time.advanceBlock();
@@ -716,11 +721,17 @@ contract("MechaniumStakingPool", (accounts) => {
 
     const userPendingRewards = await newPool.pendingRewards(staker1);
 
-    assert(mainStakingPoolData.rewardsPerBlock.toString() === userPendingRewards.toString());
+    assert(
+      mainStakingPoolData.rewardsPerBlock.toString() ===
+        userPendingRewards.toString()
+    );
 
     const remainingAllocatedTokens = await newPool.remainingAllocatedTokens();
 
-    assert(mainStakingPoolData.allocatedTokens.sub(userPendingRewards).toString() === remainingAllocatedTokens.toString());
+    assert(
+      mainStakingPoolData.allocatedTokens.sub(userPendingRewards).toString() ===
+        remainingAllocatedTokens.toString()
+    );
   });
 
   it("Remaining allocated tokens takes into account the number of rewarded tokens", async () => {
@@ -760,7 +771,7 @@ contract("MechaniumStakingPool", (accounts) => {
     const weightMultiplier =
       (mainStakingPoolData.maxWeightMultiplier.toNumber() -
         mainStakingPoolData.minWeightMultiplier.toNumber()) /
-      4 +
+        4 +
       1;
 
     const userProfile = await mainPool.getUser(staker3);

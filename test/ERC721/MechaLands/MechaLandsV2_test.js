@@ -3,7 +3,7 @@ const { time, expectRevert, snapshot } = require("@openzeppelin/test-helpers");
 const { ZERO_ADDRESS } = require("@openzeppelin/test-helpers/src/constants");
 const { upgradeProxy, deployProxy } = require("@openzeppelin/truffle-upgrades");
 const cliProgress = require("cli-progress");
-const { getAmount, gasTracker } = require("../../../utils");
+const { getAmount, gasTracker, getBN } = require("../../../utils");
 
 // Load artifacts
 const MechaLandsV1 = artifacts.require("MechaLandsV1");
@@ -20,6 +20,7 @@ const {
   airdrop,
   setTestStartTime,
   getRemainingTokens,
+  setVersion,
 } = require("./MechaLands_functions");
 
 contract("MechaLandsV2", async (accounts) => {
@@ -32,7 +33,7 @@ contract("MechaLandsV2", async (accounts) => {
     {
       planetId: 1,
       typesNumber: 4,
-      supplyPerType: [30, 20, 20, 20],
+      supplyPerType: [50, 50, 40, 10],
       notRevealUriPerType: [
         "http://planet-1/land-1.json",
         "http://planet-1/land-1.json",
@@ -43,7 +44,7 @@ contract("MechaLandsV2", async (accounts) => {
     {
       planetId: 2,
       typesNumber: 4,
-      supplyPerType: [30, 20, 20, 20],
+      supplyPerType: [50, 50, 40, 10],
       notRevealUriPerType: [
         "http://planet-2/land-1.json",
         "http://planet-2/land-1.json",
@@ -69,9 +70,9 @@ contract("MechaLandsV2", async (accounts) => {
         getAmount(0.05),
         getAmount(0.08),
       ],
-      supplyPerType: [10, 10, 10, 10],
+      supplyPerType: [25, 25, 20, 5],
       limitedPerType: true,
-      maxMintPerType: [8, 8, 8, 8],
+      maxMintPerType: [10, 10, 10, 10],
     },
     {
       roundId: 2,
@@ -87,26 +88,26 @@ contract("MechaLandsV2", async (accounts) => {
       ],
       supplyPerType: [999, 999, 999, 999], // incoherent supply for use planet supply
       limitedPerType: true,
-      maxMintPerType: [5, 5, 5, 5],
+      maxMintPerType: [200, 200, 200, 200],
     },
     {
       roundId: 3,
       planetId: 2,
-      startTime: 0, // to add to `testStartTime`
-      duration: 0,
+      startTime: time.duration.days(1), // to add to `testStartTime`
+      duration: time.duration.days(1),
       validator: "0x6F76846f7C90EcEC371e1d96cA93bfE9d36eEb83",
       validator_private_key:
         "0xfeae30926cea7dfa8fb803c348aef7f06941b9af7770e6b62c0dcb543d3391a7",
       pricePerType: [
-        getAmount(100),
-        getAmount(200),
-        getAmount(300),
-        getAmount(400),
+        getAmount(10),
+        getAmount(20),
+        getAmount(30),
+        getAmount(40),
       ],
-      supplyPerType: [10, 10, 10, 10],
       isMechaniumPaymentType: true,
+      supplyPerType: [25, 25, 20, 5],
       limitedPerType: true,
-      maxMintPerType: [8, 8, 8, 8],
+      maxMintPerType: [10, 10, 10, 10],
     },
     {
       roundId: 4,
@@ -114,16 +115,11 @@ contract("MechaLandsV2", async (accounts) => {
       startTime: 0, // to add to `testStartTime`
       duration: 0,
       // no validator
-      pricePerType: [
-        getAmount(100),
-        getAmount(200),
-        getAmount(300),
-        getAmount(400),
-      ],
+      pricePerType: [getAmount(1), getAmount(10), getAmount(20), getAmount(30)],
       isMechaniumPaymentType: true,
       supplyPerType: [999, 999, 999, 999], // incoherent supply for use planet supply
       limitedPerType: true,
-      maxMintPerType: [5, 5, 5, 5],
+      maxMintPerType: [200, 200, 200, 200],
     },
   ];
 
@@ -150,6 +146,7 @@ contract("MechaLandsV2", async (accounts) => {
 
       const version = await instance.version();
       assert.equal(version.toString(), "1", "Bad version");
+      setVersion(1);
       chainid = await instance.chainid();
       chainid = chainid.toString();
     });
@@ -302,6 +299,7 @@ contract("MechaLandsV2", async (accounts) => {
 
     it(`Smart Contract is now at version v2`, async () => {
       assert.equal((await instance.version()).toString(), "2", `Bad version`);
+      setVersion(2);
     });
   });
 
@@ -373,6 +371,351 @@ contract("MechaLandsV2", async (accounts) => {
 
     it(`Owner create public round 4 with mechanium payment`, async () => {
       await setupMintRound(instance, rounds[4], owner);
+    });
+  });
+
+  /**
+   * ROUND 3 MINT
+   */
+  describe("\n ROUND 3 MINT", () => {
+    it(`Round 3 started`, async () => {
+      await time.increaseTo(testStartTime.add(rounds[3].startTime));
+      const round = await instance.rounds(3);
+      const latestTime = await time.latest();
+      assert.equal(
+        latestTime.gte(round.startTime),
+        true,
+        "Start time not correct"
+      );
+    });
+
+    it(`User can't mint with eth (Reason: insufficient allowance)`, async () => {
+      await expectRevert(
+        mint(
+          instance,
+          {
+            roundId: 3,
+            landType: 1,
+            amount: 1,
+            maxMint: 10,
+          },
+          users[1]
+        ),
+        `ERC20: insufficient allowance`
+      );
+    });
+
+    it(`User can't mint if he did not approve tokens first`, async () => {
+      await mechanium.transfer(users[1], rounds[3].pricePerType[0]);
+      await expectRevert(
+        mint(
+          instance,
+          {
+            roundId: 3,
+            landType: 1,
+            amount: 1,
+            maxMint: 10,
+          },
+          users[1]
+        ),
+        `ERC20: insufficient allowance.`
+      );
+    });
+
+    it(`User can't mint if he did not approve all tokens first`, async () => {
+      await mechanium.approve(
+        instance.address,
+        rounds[3].pricePerType[0].div(getBN(2)),
+        { from: users[1] }
+      );
+
+      await expectRevert(
+        mint(
+          instance,
+          {
+            roundId: 3,
+            landType: 1,
+            amount: 1,
+            maxMint: 10,
+          },
+          users[1]
+        ),
+        `ERC20: insufficient allowance.`
+      );
+    });
+
+    it(`User can mint with mechanium tokens`, async () => {
+      const user = users[1];
+      const price = rounds[3].pricePerType[0];
+
+      const oldUserTokenBalance = await mechanium.balanceOf(user);
+      const oldContractTokenBalance = await mechanium.balanceOf(
+        instance.address
+      );
+
+      await mint(
+        instance,
+        {
+          roundId: 3,
+          landType: 1,
+          amount: 1,
+          maxMint: 10,
+          token: mechanium,
+        },
+        user
+      );
+
+      const newUserTokenBalance = await mechanium.balanceOf(user);
+      const newContractTokenBalance = await mechanium.balanceOf(
+        instance.address
+      );
+
+      assert.equal(
+        newContractTokenBalance.toString(),
+        oldContractTokenBalance.add(price).toString(),
+        "Incorrect pool token balance"
+      );
+
+      assert.equal(
+        newUserTokenBalance.toString(),
+        oldUserTokenBalance.sub(price).toString(),
+        "Incorrect user token balance"
+      );
+    });
+
+    it(`All users mint in round 3`, async () => {
+      const roundId = 3;
+      for (let landType = 1; landType <= 4; landType++) {
+        const price = rounds[roundId].pricePerType[landType - 1];
+        let remainingTokens = await getRemainingTokens(
+          instance,
+          roundId,
+          landType
+        );
+        let stopMessage;
+
+        const progressBar = new cliProgress.SingleBar(
+          {
+            format:
+              "\tMint in round 1 (lands " +
+              landType +
+              "): [{bar}] {percentage}% | {value}/{total} tokens | ETA: {eta}s | Duration: {duration_formatted}",
+          },
+          cliProgress.Presets.shades_classic
+        );
+        progressBar.start(remainingTokens, 0);
+
+        // Foreach users
+        for (let i = 0; i < users.length; i++) {
+          const user = users[i];
+          remainingTokens = await getRemainingTokens(
+            instance,
+            roundId,
+            landType
+          );
+
+          let amount = MINT_AMOUNTS_ARRAY[i % MINT_AMOUNTS_ARRAY.length];
+          if (remainingTokens == 0) {
+            stopMessage = `\t${
+              i + 1
+            } users minted before sold out of land ${landType}`;
+            break;
+          } else if (amount > remainingTokens) {
+            amount = remainingTokens;
+          }
+
+          await mechanium.transfer(user, price.mul(getBN(amount)));
+
+          await mint(
+            instance,
+            {
+              roundId,
+              landType,
+              amount,
+              maxMint: 100,
+              token: mechanium,
+            },
+            user
+          );
+
+          // Progress
+          progressBar.increment(amount);
+        }
+
+        progressBar.stop();
+
+        if (stopMessage) {
+          console.log(stopMessage);
+        }
+      }
+    });
+  });
+
+  /**
+   * ROUND 4 MINT
+   */
+  describe("\n ROUND 4 MINT", () => {
+    it(`User can mint with mechanium tokens`, async () => {
+      const user = users[1];
+      const price = rounds[4].pricePerType[0];
+
+      await mechanium.transfer(user, price);
+
+      const oldUserTokenBalance = await mechanium.balanceOf(user);
+      const oldContractTokenBalance = await mechanium.balanceOf(
+        instance.address
+      );
+
+      await mint(
+        instance,
+        {
+          roundId: 4,
+          landType: 1,
+          amount: 1,
+          maxMint: 10,
+          token: mechanium,
+        },
+        user
+      );
+
+      const newUserTokenBalance = await mechanium.balanceOf(user);
+      const newContractTokenBalance = await mechanium.balanceOf(
+        instance.address
+      );
+
+      assert.equal(
+        newContractTokenBalance.toString(),
+        oldContractTokenBalance.add(price).toString(),
+        "Incorrect pool token balance"
+      );
+
+      assert.equal(
+        newUserTokenBalance.toString(),
+        oldUserTokenBalance.sub(price).toString(),
+        "Incorrect user token balance"
+      );
+    });
+
+    it(`Owner can change round payment type to eth`, async () => {
+      await instance.setRoundPaymentType(4, 0);
+
+      const paymentType = await instance.roundPaymentType(4);
+      assert.equal(paymentType.toNumber(), 0, "Round payment type not correct");
+    });
+
+    it(`User can now mint with eth`, async () => {
+      const user = users[1];
+      const price = rounds[4].pricePerType[0];
+
+      const oldContractBalance = await web3.eth.getBalance(instance.address);
+
+      await mint(
+        instance,
+        {
+          roundId: 4,
+          landType: 1,
+          amount: 1,
+          maxMint: 10,
+        },
+        user
+      );
+
+      const newContractBalance = await web3.eth.getBalance(instance.address);
+
+      assert.equal(
+        newContractBalance.toString(),
+        getBN(oldContractBalance).add(price).toString(),
+        "Incorrect contract balance"
+      );
+    });
+
+    it(`Owner can re change round payment type to mecha`, async () => {
+      await instance.setRoundPaymentType(4, 1);
+
+      const paymentType = await instance.roundPaymentType(4);
+      assert.equal(paymentType.toNumber(), 1, "Round payment type not correct");
+    });
+
+    it(`All users mint in round 4`, async () => {
+      const roundId = 4;
+      for (let landType = 1; landType <= 4; landType++) {
+        const price = rounds[roundId].pricePerType[landType - 1];
+        let remainingTokens = await getRemainingTokens(
+          instance,
+          roundId,
+          landType
+        );
+        let stopMessage;
+
+        const progressBar = new cliProgress.SingleBar(
+          {
+            format:
+              "\tMint in round 1 (lands " +
+              landType +
+              "): [{bar}] {percentage}% | {value}/{total} tokens | ETA: {eta}s | Duration: {duration_formatted}",
+          },
+          cliProgress.Presets.shades_classic
+        );
+        progressBar.start(remainingTokens, 0);
+
+        // Foreach users
+        for (let i = 0; i < users.length; i++) {
+          const user = users[i];
+          remainingTokens = await getRemainingTokens(
+            instance,
+            roundId,
+            landType
+          );
+
+          let amount = MINT_AMOUNTS_ARRAY[i % MINT_AMOUNTS_ARRAY.length];
+          if (remainingTokens == 0) {
+            stopMessage = `\t${
+              i + 1
+            } users minted before sold out of land ${landType}`;
+            break;
+          } else if (amount > remainingTokens) {
+            amount = remainingTokens;
+          }
+
+          await mechanium.transfer(user, price.mul(getBN(amount)));
+
+          await mint(
+            instance,
+            {
+              roundId,
+              landType,
+              amount,
+              token: mechanium,
+            },
+            user
+          );
+
+          // Progress
+          progressBar.increment(amount);
+        }
+
+        progressBar.stop();
+
+        if (stopMessage) {
+          console.log(stopMessage);
+        }
+      }
+    });
+
+    it(`Planet 2 is now sold out, users can't mint anymore (Reason: Planet supply exceeded)`, async () => {
+      const user = users[users.length - 1]; // last user (should not have exceeded his limit)
+      for (let landType = 1; landType <= planets[2].typesNumber; landType++) {
+        await mechanium.transfer(user, rounds[4].pricePerType[landType - 1]);
+
+        await expectRevert(
+          mint(
+            instance,
+            { roundId: 4, landType, amount: 1, token: mechanium },
+            user
+          ),
+          `Planet supply exceeded`
+        );
+      }
     });
   });
 

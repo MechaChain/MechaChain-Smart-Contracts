@@ -11,6 +11,7 @@ const {
 } = require("../../../utils");
 
 let testStartTime;
+let version = 0;
 
 /**
  * Various data that should be kept by the contract.
@@ -23,10 +24,15 @@ const contractStorage = {
   tokenOfOwner: {},
   burnedTokens: [],
   balance: getBN(0),
+  mechaniumBalance: getBN(0),
 };
 
 const setTestStartTime = (startTime) => {
   testStartTime = startTime;
+};
+
+const setVersion = (v) => {
+  version = v;
 };
 
 /**
@@ -184,7 +190,7 @@ const setupMintRound = async (
     );
 
     // For v2
-    if (isMechaniumPaymentType !== undefined) {
+    if (version >= 2) {
       assert.equal(
         (await instance.roundPaymentType(roundId)).toString(),
         isMechaniumPaymentType ? "1" : "0",
@@ -224,7 +230,7 @@ const getTokensFromTransferEvent = (txData) => {
  */
 const mint = async (
   instance,
-  { roundId, landType, amount, maxMint },
+  { roundId, landType, amount, maxMint, token },
   user,
   overrideData = {}
 ) => {
@@ -247,12 +253,26 @@ const mint = async (
 
   const unitPrice = await instance.roundPriceByType(roundId, landType);
   const price = overrideData?.price || unitPrice.mul(getBN(amount));
+
+  // v2 variables
+  let paymentType, oldContractTokenBalance;
+
+  // Approve tokens for v2
+  if (version >= 2) {
+    paymentType = await instance.roundPaymentType(roundId);
+    paymentType = paymentType.toNumber();
+    if (paymentType === 1 && token) {
+      oldContractTokenBalance = await token.balanceOf(instance.address);
+      await token.approve(instance.address, price, { from: user });
+    }
+  }
+
   let tx;
   if (round.validator === ZERO_ADDRESS) {
     // mint without validator
     tx = await instance.mint(roundId, landType, amount, {
       from: user,
-      value: price,
+      value: paymentType && paymentType === 1 ? 0 : price,
     });
     await gasTracker.addCost(`Public mint x${amount}`, tx);
   } else {
@@ -286,7 +306,7 @@ const mint = async (
       signature,
       {
         from: user,
-        value: price,
+        value: paymentType === 1 ? 0 : price,
       }
     );
     await gasTracker.addCost(`Whitelist mint x${amount}`, tx);
@@ -339,6 +359,17 @@ const mint = async (
     "Total supply not valid"
   );
 
+  // token balance
+  if (paymentType === 1 && token) {
+    const newContractTokenBalance = await token.balanceOf(instance.address);
+
+    assert.equal(
+      newContractTokenBalance.toString(),
+      oldContractTokenBalance.add(price).toString(),
+      "Incorrect pool token balance"
+    );
+  }
+
   // Token test
   const mintedTokens = getTokensFromTransferEvent(tx);
   for (tokenId of mintedTokens) {
@@ -365,7 +396,12 @@ const mint = async (
   }
 
   // Increase contractBalance
-  contractStorage.balance = contractStorage.balance.add(price);
+  if (paymentType && paymentType === 1) {
+    contractStorage.mechaniumBalance =
+      contractStorage.mechaniumBalance.add(price);
+  } else {
+    contractStorage.balance = contractStorage.balance.add(price);
+  }
 
   // Update expected storage
   contractStorage.tokenOfOwner[user] = [
@@ -552,6 +588,7 @@ const getRemainingTokens = async (instance, roundId, landType) => {
 const getContractStorage = () => contractStorage;
 
 module.exports = {
+  setVersion,
   setTestStartTime,
   setupPlanet,
   setupMintRound,
