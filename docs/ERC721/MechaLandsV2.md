@@ -1,5 +1,5 @@
-# `MechaLandsV1`
-**Documentation of `ERC721/MechaLandsV1.sol`.**
+# `MechaLandsV2`
+**Documentation of `ERC721/MechaLandsV2.sol`.**
 
 MechaLands - Collection of unique lands on the surface of the planets of the MechaChain universe ; at the heart of space colonization
 
@@ -8,13 +8,15 @@ MechaLands - Collection of unique lands on the surface of the planets of the Mec
 
 ## TABLE OF CONTENTS
 - [Events](#events)
-    - [`PlanetSetup`](#MechaLandsV1-PlanetSetup-uint256-uint16-uint32---string---) 
-    - [`PlanetMintRoundSetup`](#MechaLandsV1-PlanetMintRoundSetup-uint256-uint256-uint64-uint64-address-bool-uint256---uint256---uint256---) 
-    - [`PlanetRevealed`](#MechaLandsV1-PlanetRevealed-uint256-string-string-) 
-    - [`PlanetBaseURIChanged`](#MechaLandsV1-PlanetBaseURIChanged-uint256-string-string-) 
-    - [`PlanetBurnableChanged`](#MechaLandsV1-PlanetBurnableChanged-uint256-bool-) 
-    - [`Withdrawn`](#MechaLandsV1-Withdrawn-address-uint256-) 
-    - [`TokenWithdrawn`](#MechaLandsV1-TokenWithdrawn-address-address-uint256-) 
+    - [`MechaniumTokenChanged`](#MechaLandsV2-MechaniumTokenChanged-address-) 
+    - [`PlanetRoundPaymentTypeChanged`](#MechaLandsV2-PlanetRoundPaymentTypeChanged-uint256-uint256-) 
+    - [`PlanetSetup`](#MechaLandsV1-PlanetSetup-uint256-uint16-uint32---string---) (inherited)
+    - [`PlanetMintRoundSetup`](#MechaLandsV1-PlanetMintRoundSetup-uint256-uint256-uint64-uint64-address-bool-uint256---uint256---uint256---) (inherited)
+    - [`PlanetRevealed`](#MechaLandsV1-PlanetRevealed-uint256-string-string-) (inherited)
+    - [`PlanetBaseURIChanged`](#MechaLandsV1-PlanetBaseURIChanged-uint256-string-string-) (inherited)
+    - [`PlanetBurnableChanged`](#MechaLandsV1-PlanetBurnableChanged-uint256-bool-) (inherited)
+    - [`Withdrawn`](#MechaLandsV1-Withdrawn-address-uint256-) (inherited)
+    - [`TokenWithdrawn`](#MechaLandsV1-TokenWithdrawn-address-address-uint256-) (inherited)
     - [`Upgraded`](#ERC1967UpgradeUpgradeable-Upgraded-address-) (inherited)
     - [`AdminChanged`](#ERC1967UpgradeUpgradeable-AdminChanged-address-address-) (inherited)
     - [`BeaconUpgraded`](#ERC1967UpgradeUpgradeable-BeaconUpgraded-address-) (inherited)
@@ -26,35 +28,39 @@ MechaLands - Collection of unique lands on the surface of the planets of the Mec
     - [`ApprovalForAll`](#IERC721Upgradeable-ApprovalForAll-address-address-bool-) (inherited)
 
 - [Public Functions](#public-functions)
-    - [`constructor`](#MechaLandsV1-constructor--) 
-    - [`initialize`](#MechaLandsV1-initialize--) 
-    - [`mint`](#MechaLandsV1-mint-uint256-uint256-uint256-) 
-    - [`mintWithValidation`](#MechaLandsV1-mintWithValidation-uint256-uint256-uint256-uint256-uint256-bytes-) 
-    - [`airdrop`](#MechaLandsV1-airdrop-address-uint256-uint256-uint256-) 
-    - [`setupPlanet`](#MechaLandsV1-setupPlanet-uint256-uint16-uint32---string---) 
-    - [`revealPlanet`](#MechaLandsV1-revealPlanet-uint256-string-string-) 
-    - [`setPlanetBaseURI`](#MechaLandsV1-setPlanetBaseURI-uint256-string-string-) 
-    - [`setPlanetBurnable`](#MechaLandsV1-setPlanetBurnable-uint256-bool-) 
-    - [`setPlanetDistributor`](#MechaLandsV1-setPlanetDistributor-uint256-address-) 
-    - [`setupMintRound`](#MechaLandsV1-setupMintRound-uint256-uint64-uint64-uint64-address-bool-uint256---uint256---uint256---) 
-    - [`pause`](#MechaLandsV1-pause--) 
-    - [`unpause`](#MechaLandsV1-unpause--) 
-    - [`burn`](#MechaLandsV1-burn-uint256-) 
-    - [`withdraw`](#MechaLandsV1-withdraw-address-payable-uint256-) 
-    - [`withdrawTokens`](#MechaLandsV1-withdrawTokens-address-address-uint256-) 
-    - [`tokenURI`](#MechaLandsV1-tokenURI-uint256-) 
-    - [`totalSupply`](#MechaLandsV1-totalSupply--) 
-    - [`planetSupplyByType`](#MechaLandsV1-planetSupplyByType-uint256-uint256-) 
-    - [`planetTotalMintedByType`](#MechaLandsV1-planetTotalMintedByType-uint256-uint256-) 
-    - [`planetNotRevealUriByType`](#MechaLandsV1-planetNotRevealUriByType-uint256-uint256-) 
-    - [`roundSupplyByType`](#MechaLandsV1-roundSupplyByType-uint256-uint256-) 
-    - [`roundPriceByType`](#MechaLandsV1-roundPriceByType-uint256-uint256-) 
-    - [`roundMaxMintByType`](#MechaLandsV1-roundMaxMintByType-uint256-uint256-) 
-    - [`roundTotalMintedByType`](#MechaLandsV1-roundTotalMintedByType-uint256-uint256-) 
-    - [`roundTotalMintedByTypeForUser`](#MechaLandsV1-roundTotalMintedByTypeForUser-address-uint256-uint256-) 
-    - [`roundTotalMintedForUser`](#MechaLandsV1-roundTotalMintedForUser-address-uint256-) 
-    - [`chainid`](#MechaLandsV1-chainid--) 
-    - [`receive`](#MechaLandsV1-receive--) 
+    - [`setupMechaniumMintRound`](#MechaLandsV2-setupMechaniumMintRound-uint256-uint64-uint64-uint64-address-bool-uint256---uint256---uint256---) 
+    - [`setRoundPaymentType`](#MechaLandsV2-setRoundPaymentType-uint256-uint256-) 
+    - [`setMechaniumToken`](#MechaLandsV2-setMechaniumToken-address-) 
+    - [`withdrawMechaniumToken`](#MechaLandsV2-withdrawMechaniumToken-address-uint256-) 
+    - [`constructor`](#MechaLandsV1-constructor--) (inherited)
+    - [`initialize`](#MechaLandsV1-initialize--) (inherited)
+    - [`mint`](#MechaLandsV1-mint-uint256-uint256-uint256-) (inherited)
+    - [`mintWithValidation`](#MechaLandsV1-mintWithValidation-uint256-uint256-uint256-uint256-uint256-bytes-) (inherited)
+    - [`airdrop`](#MechaLandsV1-airdrop-address-uint256-uint256-uint256-) (inherited)
+    - [`setupPlanet`](#MechaLandsV1-setupPlanet-uint256-uint16-uint32---string---) (inherited)
+    - [`revealPlanet`](#MechaLandsV1-revealPlanet-uint256-string-string-) (inherited)
+    - [`setPlanetBaseURI`](#MechaLandsV1-setPlanetBaseURI-uint256-string-string-) (inherited)
+    - [`setPlanetBurnable`](#MechaLandsV1-setPlanetBurnable-uint256-bool-) (inherited)
+    - [`setPlanetDistributor`](#MechaLandsV1-setPlanetDistributor-uint256-address-) (inherited)
+    - [`setupMintRound`](#MechaLandsV1-setupMintRound-uint256-uint64-uint64-uint64-address-bool-uint256---uint256---uint256---) (inherited)
+    - [`pause`](#MechaLandsV1-pause--) (inherited)
+    - [`unpause`](#MechaLandsV1-unpause--) (inherited)
+    - [`burn`](#MechaLandsV1-burn-uint256-) (inherited)
+    - [`withdraw`](#MechaLandsV1-withdraw-address-payable-uint256-) (inherited)
+    - [`withdrawTokens`](#MechaLandsV1-withdrawTokens-address-address-uint256-) (inherited)
+    - [`tokenURI`](#MechaLandsV1-tokenURI-uint256-) (inherited)
+    - [`totalSupply`](#MechaLandsV1-totalSupply--) (inherited)
+    - [`planetSupplyByType`](#MechaLandsV1-planetSupplyByType-uint256-uint256-) (inherited)
+    - [`planetTotalMintedByType`](#MechaLandsV1-planetTotalMintedByType-uint256-uint256-) (inherited)
+    - [`planetNotRevealUriByType`](#MechaLandsV1-planetNotRevealUriByType-uint256-uint256-) (inherited)
+    - [`roundSupplyByType`](#MechaLandsV1-roundSupplyByType-uint256-uint256-) (inherited)
+    - [`roundPriceByType`](#MechaLandsV1-roundPriceByType-uint256-uint256-) (inherited)
+    - [`roundMaxMintByType`](#MechaLandsV1-roundMaxMintByType-uint256-uint256-) (inherited)
+    - [`roundTotalMintedByType`](#MechaLandsV1-roundTotalMintedByType-uint256-uint256-) (inherited)
+    - [`roundTotalMintedByTypeForUser`](#MechaLandsV1-roundTotalMintedByTypeForUser-address-uint256-uint256-) (inherited)
+    - [`roundTotalMintedForUser`](#MechaLandsV1-roundTotalMintedForUser-address-uint256-) (inherited)
+    - [`chainid`](#MechaLandsV1-chainid--) (inherited)
+    - [`receive`](#MechaLandsV1-receive--) (inherited)
     - [`proxiableUUID`](#UUPSUpgradeable-proxiableUUID--) (inherited)
     - [`upgradeTo`](#UUPSUpgradeable-upgradeTo-address-) (inherited)
     - [`upgradeToAndCall`](#UUPSUpgradeable-upgradeToAndCall-address-bytes-) (inherited)
@@ -76,11 +82,11 @@ MechaLands - Collection of unique lands on the surface of the planets of the Mec
     - [`safeTransferFrom`](#ERC721Upgradeable-safeTransferFrom-address-address-uint256-bytes-) (inherited)
 
 - [Internal Functions](#internal-functions)
-    - [`_roundMint`](#MechaLandsV1-_roundMint-address-uint256-uint256-uint256-) 
-    - [`_safeMint`](#MechaLandsV1-_safeMint-address-uint256-uint256-uint256-) 
-    - [`_checkSignature`](#MechaLandsV1-_checkSignature-address-uint256-uint256-uint256-uint256-bytes-address-) 
-    - [`_beforeTokenTransfer`](#MechaLandsV1-_beforeTokenTransfer-address-address-uint256-) 
-    - [`_authorizeUpgrade`](#MechaLandsV1-_authorizeUpgrade-address-) 
+    - [`_roundMint`](#MechaLandsV2-_roundMint-address-uint256-uint256-uint256-) 
+    - [`_safeMint`](#MechaLandsV1-_safeMint-address-uint256-uint256-uint256-) (inherited)
+    - [`_checkSignature`](#MechaLandsV1-_checkSignature-address-uint256-uint256-uint256-uint256-bytes-address-) (inherited)
+    - [`_beforeTokenTransfer`](#MechaLandsV1-_beforeTokenTransfer-address-address-uint256-) (inherited)
+    - [`_authorizeUpgrade`](#MechaLandsV1-_authorizeUpgrade-address-) (inherited)
     - [`__UUPSUpgradeable_init`](#UUPSUpgradeable-__UUPSUpgradeable_init--) (inherited)
     - [`__UUPSUpgradeable_init_unchained`](#UUPSUpgradeable-__UUPSUpgradeable_init_unchained--) (inherited)
     - [`__ERC1967Upgrade_init`](#ERC1967UpgradeUpgradeable-__ERC1967Upgrade_init--) (inherited)
@@ -138,60 +144,81 @@ MechaLands - Collection of unique lands on the surface of the planets of the Mec
     - [`onlyInitializing`](#Initializable-onlyInitializing--) (inherited)
 
 - [Structs](#structs)
-    - [`Planet`](#MechaLandsV1-Planet) 
-    - [`MintRound`](#MechaLandsV1-MintRound) 
+    - [`Planet`](#MechaLandsV1-Planet) (inherited)
+    - [`MintRound`](#MechaLandsV1-MintRound) (inherited)
 
 
 
 ## EVENTS
 
-### `PlanetSetup(uint256 planetId, uint16 typesNumber, uint32[] supplyPerType, string[] notRevealUriPerType)`  <a name="MechaLandsV1-PlanetSetup-uint256-uint16-uint32---string---" id="MechaLandsV1-PlanetSetup-uint256-uint16-uint32---string---"></a>
+### `MechaniumTokenChanged(address token)`  <a name="MechaLandsV2-MechaniumTokenChanged-address-" id="MechaLandsV2-MechaniumTokenChanged-address-"></a>
+Event emitted when owner set or change the ERC20 mechanium address
+
+
+
+
+
+### `PlanetRoundPaymentTypeChanged(uint256 roundId, uint256 paymentType)`  <a name="MechaLandsV2-PlanetRoundPaymentTypeChanged-uint256-uint256-" id="MechaLandsV2-PlanetRoundPaymentTypeChanged-uint256-uint256-"></a>
+Event emitted when owner set or change the payment type of a round
+
+
+
+
+
+### `PlanetSetup(uint256 planetId, uint16 typesNumber, uint32[] supplyPerType, string[] notRevealUriPerType)` (inherited) <a name="MechaLandsV1-PlanetSetup-uint256-uint16-uint32---string---" id="MechaLandsV1-PlanetSetup-uint256-uint16-uint32---string---"></a>
 Event emitted when a planet is created or edited
 
 
 
+_Inherited from `ERC721/MechaLandsV1.sol`_.
 
 
-### `PlanetMintRoundSetup(uint256 roundId, uint256 planetId, uint64 startTime, uint64 duration, address validator, bool limitedPerType, uint256[] pricePerType, uint256[] supplyPerType, uint256[] maxMintPerType)`  <a name="MechaLandsV1-PlanetMintRoundSetup-uint256-uint256-uint64-uint64-address-bool-uint256---uint256---uint256---" id="MechaLandsV1-PlanetMintRoundSetup-uint256-uint256-uint64-uint64-address-bool-uint256---uint256---uint256---"></a>
+### `PlanetMintRoundSetup(uint256 roundId, uint256 planetId, uint64 startTime, uint64 duration, address validator, bool limitedPerType, uint256[] pricePerType, uint256[] supplyPerType, uint256[] maxMintPerType)` (inherited) <a name="MechaLandsV1-PlanetMintRoundSetup-uint256-uint256-uint64-uint64-address-bool-uint256---uint256---uint256---" id="MechaLandsV1-PlanetMintRoundSetup-uint256-uint256-uint64-uint64-address-bool-uint256---uint256---uint256---"></a>
 Event emitted when a mint round of a planet is created or edited
 
 
 
+_Inherited from `ERC721/MechaLandsV1.sol`_.
 
 
-### `PlanetRevealed(uint256 planetId, string baseURI, string baseExtension)`  <a name="MechaLandsV1-PlanetRevealed-uint256-string-string-" id="MechaLandsV1-PlanetRevealed-uint256-string-string-"></a>
+### `PlanetRevealed(uint256 planetId, string baseURI, string baseExtension)` (inherited) <a name="MechaLandsV1-PlanetRevealed-uint256-string-string-" id="MechaLandsV1-PlanetRevealed-uint256-string-string-"></a>
 Event emitted when a planet has been revealed
 
 
 
+_Inherited from `ERC721/MechaLandsV1.sol`_.
 
 
-### `PlanetBaseURIChanged(uint256 planetId, string baseURI, string baseExtension)`  <a name="MechaLandsV1-PlanetBaseURIChanged-uint256-string-string-" id="MechaLandsV1-PlanetBaseURIChanged-uint256-string-string-"></a>
+### `PlanetBaseURIChanged(uint256 planetId, string baseURI, string baseExtension)` (inherited) <a name="MechaLandsV1-PlanetBaseURIChanged-uint256-string-string-" id="MechaLandsV1-PlanetBaseURIChanged-uint256-string-string-"></a>
 Event emitted when the baseURI of all lands of a planet has been changed
 
 
 
+_Inherited from `ERC721/MechaLandsV1.sol`_.
 
 
-### `PlanetBurnableChanged(uint256 planetId, bool burnable)`  <a name="MechaLandsV1-PlanetBurnableChanged-uint256-bool-" id="MechaLandsV1-PlanetBurnableChanged-uint256-bool-"></a>
+### `PlanetBurnableChanged(uint256 planetId, bool burnable)` (inherited) <a name="MechaLandsV1-PlanetBurnableChanged-uint256-bool-" id="MechaLandsV1-PlanetBurnableChanged-uint256-bool-"></a>
 Event emitted when the burnable option of a planet has been changed
 
 
 
+_Inherited from `ERC721/MechaLandsV1.sol`_.
 
 
-### `Withdrawn(address to, uint256 amount)`  <a name="MechaLandsV1-Withdrawn-address-uint256-" id="MechaLandsV1-Withdrawn-address-uint256-"></a>
+### `Withdrawn(address to, uint256 amount)` (inherited) <a name="MechaLandsV1-Withdrawn-address-uint256-" id="MechaLandsV1-Withdrawn-address-uint256-"></a>
 Event emitted when native coin were removed from the contract
 
 
 
+_Inherited from `ERC721/MechaLandsV1.sol`_.
 
 
-### `TokenWithdrawn(address to, address token, uint256 amount)`  <a name="MechaLandsV1-TokenWithdrawn-address-address-uint256-" id="MechaLandsV1-TokenWithdrawn-address-address-uint256-"></a>
+### `TokenWithdrawn(address to, address token, uint256 amount)` (inherited) <a name="MechaLandsV1-TokenWithdrawn-address-address-uint256-" id="MechaLandsV1-TokenWithdrawn-address-address-uint256-"></a>
 Event emitted when some ERC20 were removed from the contract
 
 
 
+_Inherited from `ERC721/MechaLandsV1.sol`_.
 
 
 ### `Upgraded(address implementation)` (inherited) <a name="ERC1967UpgradeUpgradeable-Upgraded-address-" id="ERC1967UpgradeUpgradeable-Upgraded-address-"></a>
@@ -269,21 +296,97 @@ _Inherited from `../@openzeppelin/contracts-upgradeable/token/ERC721/IERC721Upgr
 
 ## PUBLIC FUNCTIONS
 
-### `constructor()` (public) <a name="MechaLandsV1-constructor--" id="MechaLandsV1-constructor--"></a>
+### `setupMechaniumMintRound(uint256 roundId, uint64 planetId, uint64 startTime, uint64 duration, address validator, bool limitedPerType, uint256[] pricePerType, uint256[] supplyPerType, uint256[] maxMintPerType)` (public) <a name="MechaLandsV2-setupMechaniumMintRound-uint256-uint64-uint64-uint64-address-bool-uint256---uint256---uint256---" id="MechaLandsV2-setupMechaniumMintRound-uint256-uint64-uint64-uint64-address-bool-uint256---uint256---uint256---"></a>
+Create or edit a mint round for a planet with mechanium payment
+
+
+Requirements:
+- 'mechaniumToken' has to be set.
+- View {MechaLandsV1-setupMintRound} requirements.
+
+
+
+Parameters:
+- `roundId`: The index of the planet mint round.
+
+- `planetId`: The index of the planet.
+
+- `startTime`: The start time of the round in unix seconds timestamp. 0 if not set.
+
+- `duration`: The duration of the round in seconds. 0 if ends at sold out.
+
+- `validator`: The address of the whitelist validator. Can be 'address(0)' for no whitelist.
+
+- `limitedPerType`: If the max mint limitation per wallet is defined par type or far all types.
+
+- `pricePerType`: The price by land type of the round in wei.
+
+- `supplyPerType`: The round supply by land type.
+
+- `maxMintPerType`: The maximum number of tokens that a user can mint per type during the round. If `limitedPerType`, all values should be the same.
+
+
+
+### `setRoundPaymentType(uint256 roundId, uint256 paymentType)` (public) <a name="MechaLandsV2-setRoundPaymentType-uint256-uint256-" id="MechaLandsV2-setRoundPaymentType-uint256-uint256-"></a>
+Change the payment type of a round
+
+
+Requirements:
+- `roundId` must exist
+- `roundId` can be 0.
+- 'mechaniumToken' has to be set.
+- View {MechaLandsV1-setupMintRound} requirements.
+
+
+
+Parameters:
+- `roundId`: The index of the planet mint round.
+
+- `paymentType`: The payment type (0 = network native coins / 1 = mechanium)
+
+
+
+### `setMechaniumToken(address token)` (public) <a name="MechaLandsV2-setMechaniumToken-address-" id="MechaLandsV2-setMechaniumToken-address-"></a>
+Set the mechanium token address for all mechanium payment
 
 
 
 
+Parameters:
+- `token`: The address of the token contract.
 
 
-### `initialize()` (public) <a name="MechaLandsV1-initialize--" id="MechaLandsV1-initialize--"></a>
+
+### `withdrawMechaniumToken(address to, uint256 amount)` (public) <a name="MechaLandsV2-withdrawMechaniumToken-address-uint256-" id="MechaLandsV2-withdrawMechaniumToken-address-uint256-"></a>
+Withdraw mechanium
+
+
+
+
+Parameters:
+- `to`: The address of the tokens/coins receiver.
+
+- `amount`: Amount to claim.
+
+
+
+### `constructor()` (public) (inherited)<a name="MechaLandsV1-constructor--" id="MechaLandsV1-constructor--"></a>
+
+
+
+
+_Inherited from `ERC721/MechaLandsV1.sol`_.
+
+
+### `initialize()` (public) (inherited)<a name="MechaLandsV1-initialize--" id="MechaLandsV1-initialize--"></a>
 Initialize contract
 
 
 
+_Inherited from `ERC721/MechaLandsV1.sol`_.
 
 
-### `mint(uint256 roundId, uint256 landType, uint256 amount)` (external) <a name="MechaLandsV1-mint-uint256-uint256-uint256-" id="MechaLandsV1-mint-uint256-uint256-uint256-"></a>
+### `mint(uint256 roundId, uint256 landType, uint256 amount)` (external) (inherited)<a name="MechaLandsV1-mint-uint256-uint256-uint256-" id="MechaLandsV1-mint-uint256-uint256-uint256-"></a>
 Mint the `amount` of planet land type in a round without validator
 
 
@@ -301,9 +404,10 @@ Parameters:
 
 - `amount`: The number of lands to mint
 
+_Inherited from `ERC721/MechaLandsV1.sol`_.
 
 
-### `mintWithValidation(uint256 roundId, uint256 landType, uint256 amount, uint256 maxMint, uint256 payloadExpiration, bytes sig)` (external) <a name="MechaLandsV1-mintWithValidation-uint256-uint256-uint256-uint256-uint256-bytes-" id="MechaLandsV1-mintWithValidation-uint256-uint256-uint256-uint256-uint256-bytes-"></a>
+### `mintWithValidation(uint256 roundId, uint256 landType, uint256 amount, uint256 maxMint, uint256 payloadExpiration, bytes sig)` (external) (inherited)<a name="MechaLandsV1-mintWithValidation-uint256-uint256-uint256-uint256-uint256-bytes-" id="MechaLandsV1-mintWithValidation-uint256-uint256-uint256-uint256-uint256-bytes-"></a>
 Mint the `amount` of planet land type with the signature of the round validator.
 
 
@@ -329,9 +433,10 @@ Parameters:
 
 - `sig`: The EC signature generated by the round validator
 
+_Inherited from `ERC721/MechaLandsV1.sol`_.
 
 
-### `airdrop(address wallet, uint256 planetId, uint256 landType, uint256 amount)` (external) <a name="MechaLandsV1-airdrop-address-uint256-uint256-uint256-" id="MechaLandsV1-airdrop-address-uint256-uint256-uint256-"></a>
+### `airdrop(address wallet, uint256 planetId, uint256 landType, uint256 amount)` (external) (inherited)<a name="MechaLandsV1-airdrop-address-uint256-uint256-uint256-" id="MechaLandsV1-airdrop-address-uint256-uint256-uint256-"></a>
 Mint the `amount` of planet land type and transfers it to `wallet`.
 
 
@@ -351,9 +456,10 @@ Parameters:
 
 - `amount`: The number of lands to mint
 
+_Inherited from `ERC721/MechaLandsV1.sol`_.
 
 
-### `setupPlanet(uint256 planetId, uint16 typesNumber, uint32[] supplyPerType, string[] notRevealUriPerType)` (public) <a name="MechaLandsV1-setupPlanet-uint256-uint16-uint32---string---" id="MechaLandsV1-setupPlanet-uint256-uint16-uint32---string---"></a>
+### `setupPlanet(uint256 planetId, uint16 typesNumber, uint32[] supplyPerType, string[] notRevealUriPerType)` (public) (inherited)<a name="MechaLandsV1-setupPlanet-uint256-uint16-uint32---string---" id="MechaLandsV1-setupPlanet-uint256-uint16-uint32---string---"></a>
 Create or edit a planet.
 
 
@@ -375,9 +481,10 @@ Parameters:
 
 - `notRevealUriPerType`: The base token URI by land type (or all the not reveal URI if not revealed).
 
+_Inherited from `ERC721/MechaLandsV1.sol`_.
 
 
-### `revealPlanet(uint256 planetId, string baseURI, string baseExtension)` (public) <a name="MechaLandsV1-revealPlanet-uint256-string-string-" id="MechaLandsV1-revealPlanet-uint256-string-string-"></a>
+### `revealPlanet(uint256 planetId, string baseURI, string baseExtension)` (public) (inherited)<a name="MechaLandsV1-revealPlanet-uint256-string-string-" id="MechaLandsV1-revealPlanet-uint256-string-string-"></a>
 Activate token revelation for a planet and set his base URI
 
 
@@ -392,9 +499,10 @@ Parameters:
 
 - `baseExtension`: The base extension for the end of token id.
 
+_Inherited from `ERC721/MechaLandsV1.sol`_.
 
 
-### `setPlanetBaseURI(uint256 planetId, string baseURI, string baseExtension)` (public) <a name="MechaLandsV1-setPlanetBaseURI-uint256-string-string-" id="MechaLandsV1-setPlanetBaseURI-uint256-string-string-"></a>
+### `setPlanetBaseURI(uint256 planetId, string baseURI, string baseExtension)` (public) (inherited)<a name="MechaLandsV1-setPlanetBaseURI-uint256-string-string-" id="MechaLandsV1-setPlanetBaseURI-uint256-string-string-"></a>
 Change the base URI and extension of a planet
 
 
@@ -407,9 +515,10 @@ Parameters:
 
 - `baseExtension`: The base extension for the end of token id.
 
+_Inherited from `ERC721/MechaLandsV1.sol`_.
 
 
-### `setPlanetBurnable(uint256 planetId, bool burnable)` (public) <a name="MechaLandsV1-setPlanetBurnable-uint256-bool-" id="MechaLandsV1-setPlanetBurnable-uint256-bool-"></a>
+### `setPlanetBurnable(uint256 planetId, bool burnable)` (public) (inherited)<a name="MechaLandsV1-setPlanetBurnable-uint256-bool-" id="MechaLandsV1-setPlanetBurnable-uint256-bool-"></a>
 Activate burnable option for a planet
 
 
@@ -420,9 +529,10 @@ Parameters:
 
 - `burnable`: If users are authorized to burn their tokens for this planet.
 
+_Inherited from `ERC721/MechaLandsV1.sol`_.
 
 
-### `setPlanetDistributor(uint256 planetId, address distributor)` (public) <a name="MechaLandsV1-setPlanetDistributor-uint256-address-" id="MechaLandsV1-setPlanetDistributor-uint256-address-"></a>
+### `setPlanetDistributor(uint256 planetId, address distributor)` (public) (inherited)<a name="MechaLandsV1-setPlanetDistributor-uint256-address-" id="MechaLandsV1-setPlanetDistributor-uint256-address-"></a>
 Set a distributor that has the right to perform airdrops for this planet.
 
 
@@ -433,9 +543,10 @@ Parameters:
 
 - `distributor`: The distributor address.
 
+_Inherited from `ERC721/MechaLandsV1.sol`_.
 
 
-### `setupMintRound(uint256 roundId, uint64 planetId, uint64 startTime, uint64 duration, address validator, bool limitedPerType, uint256[] pricePerType, uint256[] supplyPerType, uint256[] maxMintPerType)` (public) <a name="MechaLandsV1-setupMintRound-uint256-uint64-uint64-uint64-address-bool-uint256---uint256---uint256---" id="MechaLandsV1-setupMintRound-uint256-uint64-uint64-uint64-address-bool-uint256---uint256---uint256---"></a>
+### `setupMintRound(uint256 roundId, uint64 planetId, uint64 startTime, uint64 duration, address validator, bool limitedPerType, uint256[] pricePerType, uint256[] supplyPerType, uint256[] maxMintPerType)` (public) (inherited)<a name="MechaLandsV1-setupMintRound-uint256-uint64-uint64-uint64-address-bool-uint256---uint256---uint256---" id="MechaLandsV1-setupMintRound-uint256-uint64-uint64-uint64-address-bool-uint256---uint256---uint256---"></a>
 Create or edit a mint round for a planet
 
 
@@ -471,23 +582,26 @@ Parameters:
 
 - `maxMintPerType`: The maximum number of tokens that a user can mint per type during the round. If `limitedPerType`, all values should be the same.
 
+_Inherited from `ERC721/MechaLandsV1.sol`_.
 
 
-### `pause()` (public) <a name="MechaLandsV1-pause--" id="MechaLandsV1-pause--"></a>
+### `pause()` (public) (inherited)<a name="MechaLandsV1-pause--" id="MechaLandsV1-pause--"></a>
 Pause the contract : disables mints, transactions and burns until `unpause`
 
 
 
+_Inherited from `ERC721/MechaLandsV1.sol`_.
 
 
-### `unpause()` (public) <a name="MechaLandsV1-unpause--" id="MechaLandsV1-unpause--"></a>
+### `unpause()` (public) (inherited)<a name="MechaLandsV1-unpause--" id="MechaLandsV1-unpause--"></a>
 Unpause the contract
 
 
 
+_Inherited from `ERC721/MechaLandsV1.sol`_.
 
 
-### `burn(uint256 tokenId)` (public) <a name="MechaLandsV1-burn-uint256-" id="MechaLandsV1-burn-uint256-"></a>
+### `burn(uint256 tokenId)` (public) (inherited)<a name="MechaLandsV1-burn-uint256-" id="MechaLandsV1-burn-uint256-"></a>
 
 Burns `tokenId`. See {ERC721-_burn}.
 
@@ -496,9 +610,10 @@ Requirements:
 - The caller must own `tokenId` or be an approved operator.
 
 
+_Inherited from `ERC721/MechaLandsV1.sol`_.
 
 
-### `withdraw(address payable to, uint256 amount)` (public) <a name="MechaLandsV1-withdraw-address-payable-uint256-" id="MechaLandsV1-withdraw-address-payable-uint256-"></a>
+### `withdraw(address payable to, uint256 amount)` (public) (inherited)<a name="MechaLandsV1-withdraw-address-payable-uint256-" id="MechaLandsV1-withdraw-address-payable-uint256-"></a>
 Withdraw network native coins
 
 
@@ -509,9 +624,10 @@ Parameters:
 
 - `amount`: Amount to claim.
 
+_Inherited from `ERC721/MechaLandsV1.sol`_.
 
 
-### `withdrawTokens(address to, address token, uint256 amount)` (public) <a name="MechaLandsV1-withdrawTokens-address-address-uint256-" id="MechaLandsV1-withdrawTokens-address-address-uint256-"></a>
+### `withdrawTokens(address to, address token, uint256 amount)` (public) (inherited)<a name="MechaLandsV1-withdrawTokens-address-address-uint256-" id="MechaLandsV1-withdrawTokens-address-address-uint256-"></a>
 Withdraw ERC20
 
 
@@ -524,97 +640,111 @@ Parameters:
 
 - `amount`: Amount to claim.
 
+_Inherited from `ERC721/MechaLandsV1.sol`_.
 
 
-### `tokenURI(uint256 tokenId) → string` (public) <a name="MechaLandsV1-tokenURI-uint256-" id="MechaLandsV1-tokenURI-uint256-"></a>
+### `tokenURI(uint256 tokenId) → string` (public) (inherited)<a name="MechaLandsV1-tokenURI-uint256-" id="MechaLandsV1-tokenURI-uint256-"></a>
 Returns the URI of `tokenId` or the not revealed uri, according to its planet and land type
 
 
 
+_Inherited from `ERC721/MechaLandsV1.sol`_.
 
 
-### `totalSupply() → uint256` (public) <a name="MechaLandsV1-totalSupply--" id="MechaLandsV1-totalSupply--"></a>
+### `totalSupply() → uint256` (public) (inherited)<a name="MechaLandsV1-totalSupply--" id="MechaLandsV1-totalSupply--"></a>
 Returns the total amount of tokens minted.
 
 
 
+_Inherited from `ERC721/MechaLandsV1.sol`_.
 
 
-### `planetSupplyByType(uint256 planetId, uint256 landType) → uint256` (public) <a name="MechaLandsV1-planetSupplyByType-uint256-uint256-" id="MechaLandsV1-planetSupplyByType-uint256-uint256-"></a>
+### `planetSupplyByType(uint256 planetId, uint256 landType) → uint256` (public) (inherited)<a name="MechaLandsV1-planetSupplyByType-uint256-uint256-" id="MechaLandsV1-planetSupplyByType-uint256-uint256-"></a>
 Return the supply of `landType` for `planetId`
 
 
 
+_Inherited from `ERC721/MechaLandsV1.sol`_.
 
 
-### `planetTotalMintedByType(uint256 planetId, uint256 landType) → uint256` (public) <a name="MechaLandsV1-planetTotalMintedByType-uint256-uint256-" id="MechaLandsV1-planetTotalMintedByType-uint256-uint256-"></a>
+### `planetTotalMintedByType(uint256 planetId, uint256 landType) → uint256` (public) (inherited)<a name="MechaLandsV1-planetTotalMintedByType-uint256-uint256-" id="MechaLandsV1-planetTotalMintedByType-uint256-uint256-"></a>
 Return the total minted of `landType` for `planetId`
 
 
 
+_Inherited from `ERC721/MechaLandsV1.sol`_.
 
 
-### `planetNotRevealUriByType(uint256 planetId, uint256 landType) → string` (public) <a name="MechaLandsV1-planetNotRevealUriByType-uint256-uint256-" id="MechaLandsV1-planetNotRevealUriByType-uint256-uint256-"></a>
+### `planetNotRevealUriByType(uint256 planetId, uint256 landType) → string` (public) (inherited)<a name="MechaLandsV1-planetNotRevealUriByType-uint256-uint256-" id="MechaLandsV1-planetNotRevealUriByType-uint256-uint256-"></a>
 Return the not reveal URI of `landType` for `planetId`
 
 
 
+_Inherited from `ERC721/MechaLandsV1.sol`_.
 
 
-### `roundSupplyByType(uint256 roundId, uint256 landType) → uint256` (public) <a name="MechaLandsV1-roundSupplyByType-uint256-uint256-" id="MechaLandsV1-roundSupplyByType-uint256-uint256-"></a>
+### `roundSupplyByType(uint256 roundId, uint256 landType) → uint256` (public) (inherited)<a name="MechaLandsV1-roundSupplyByType-uint256-uint256-" id="MechaLandsV1-roundSupplyByType-uint256-uint256-"></a>
 Return the supply of `landType` for `roundId`
 
 
 
+_Inherited from `ERC721/MechaLandsV1.sol`_.
 
 
-### `roundPriceByType(uint256 roundId, uint256 landType) → uint256` (public) <a name="MechaLandsV1-roundPriceByType-uint256-uint256-" id="MechaLandsV1-roundPriceByType-uint256-uint256-"></a>
+### `roundPriceByType(uint256 roundId, uint256 landType) → uint256` (public) (inherited)<a name="MechaLandsV1-roundPriceByType-uint256-uint256-" id="MechaLandsV1-roundPriceByType-uint256-uint256-"></a>
 Return the price of a single `landType` for `roundId`
 
 
 
+_Inherited from `ERC721/MechaLandsV1.sol`_.
 
 
-### `roundMaxMintByType(uint256 roundId, uint256 landType) → uint256` (public) <a name="MechaLandsV1-roundMaxMintByType-uint256-uint256-" id="MechaLandsV1-roundMaxMintByType-uint256-uint256-"></a>
+### `roundMaxMintByType(uint256 roundId, uint256 landType) → uint256` (public) (inherited)<a name="MechaLandsV1-roundMaxMintByType-uint256-uint256-" id="MechaLandsV1-roundMaxMintByType-uint256-uint256-"></a>
 Return the maximum number of `landType` tokens that a user can mint for `roundId`
 
 
 
+_Inherited from `ERC721/MechaLandsV1.sol`_.
 
 
-### `roundTotalMintedByType(uint256 roundId, uint256 landType) → uint256` (public) <a name="MechaLandsV1-roundTotalMintedByType-uint256-uint256-" id="MechaLandsV1-roundTotalMintedByType-uint256-uint256-"></a>
+### `roundTotalMintedByType(uint256 roundId, uint256 landType) → uint256` (public) (inherited)<a name="MechaLandsV1-roundTotalMintedByType-uint256-uint256-" id="MechaLandsV1-roundTotalMintedByType-uint256-uint256-"></a>
 Return the total minted of `landType` for `roundId`
 
 
 
+_Inherited from `ERC721/MechaLandsV1.sol`_.
 
 
-### `roundTotalMintedByTypeForUser(address user, uint256 roundId, uint256 landType) → uint256` (public) <a name="MechaLandsV1-roundTotalMintedByTypeForUser-address-uint256-uint256-" id="MechaLandsV1-roundTotalMintedByTypeForUser-address-uint256-uint256-"></a>
+### `roundTotalMintedByTypeForUser(address user, uint256 roundId, uint256 landType) → uint256` (public) (inherited)<a name="MechaLandsV1-roundTotalMintedByTypeForUser-address-uint256-uint256-" id="MechaLandsV1-roundTotalMintedByTypeForUser-address-uint256-uint256-"></a>
 Return the total minted of `landType` for `user` in `roundId`
 
 
 
+_Inherited from `ERC721/MechaLandsV1.sol`_.
 
 
-### `roundTotalMintedForUser(address user, uint256 roundId) → uint256` (public) <a name="MechaLandsV1-roundTotalMintedForUser-address-uint256-" id="MechaLandsV1-roundTotalMintedForUser-address-uint256-"></a>
+### `roundTotalMintedForUser(address user, uint256 roundId) → uint256` (public) (inherited)<a name="MechaLandsV1-roundTotalMintedForUser-address-uint256-" id="MechaLandsV1-roundTotalMintedForUser-address-uint256-"></a>
 Return the total minted for `user` in `roundId` for all lands
 
 
 
+_Inherited from `ERC721/MechaLandsV1.sol`_.
 
 
-### `chainid() → uint256` (public) <a name="MechaLandsV1-chainid--" id="MechaLandsV1-chainid--"></a>
-
-
-
-
-
-
-### `receive()` (external) <a name="MechaLandsV1-receive--" id="MechaLandsV1-receive--"></a>
+### `chainid() → uint256` (public) (inherited)<a name="MechaLandsV1-chainid--" id="MechaLandsV1-chainid--"></a>
 
 
 
 
+_Inherited from `ERC721/MechaLandsV1.sol`_.
+
+
+### `receive()` (external) (inherited)<a name="MechaLandsV1-receive--" id="MechaLandsV1-receive--"></a>
+
+
+
+
+_Inherited from `ERC721/MechaLandsV1.sol`_.
 
 
 ### `proxiableUUID() → bytes32` (external) (inherited)<a name="UUPSUpgradeable-proxiableUUID--" id="UUPSUpgradeable-proxiableUUID--"></a>
@@ -784,14 +914,15 @@ _Inherited from `../@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgra
 
 ## INTERNAL FUNCTIONS
 
-### `_roundMint(address wallet, uint256 roundId, uint256 landType, uint256 amount)` (internal)  <a name="MechaLandsV1-_roundMint-address-uint256-uint256-uint256-" id="MechaLandsV1-_roundMint-address-uint256-uint256-uint256-"></a>
+### `_roundMint(address wallet, uint256 roundId, uint256 landType, uint256 amount)` (internal)  <a name="MechaLandsV2-_roundMint-address-uint256-uint256-uint256-" id="MechaLandsV2-_roundMint-address-uint256-uint256-uint256-"></a>
 Safely mint the `amount` of planet land type for `wallet` in a `round`
 
 
 Call {MechaLandsV1-_safeMint}.
 Requirements:
 - round must be active
-- msg.value must contain the price
+- if the round payment type is 0, msg.value must contain the price
+- if the round payment type is 1, 'safeTransfer' the price from the msg.sender account (must be approved before)
 - The supply of the round for the land type must not be exceeded with amount
 - View {MechaLandsV1-_safeMint} Requirements
 
@@ -810,7 +941,7 @@ Parameters:
 
 
 
-### `_safeMint(address wallet, uint256 planetId, uint256 landType, uint256 amount)` (internal)  <a name="MechaLandsV1-_safeMint-address-uint256-uint256-uint256-" id="MechaLandsV1-_safeMint-address-uint256-uint256-uint256-"></a>
+### `_safeMint(address wallet, uint256 planetId, uint256 landType, uint256 amount)` (internal) (inherited) <a name="MechaLandsV1-_safeMint-address-uint256-uint256-uint256-" id="MechaLandsV1-_safeMint-address-uint256-uint256-uint256-"></a>
 Safely mint the `amount` of planet land type for `wallet`
 
 
@@ -832,9 +963,10 @@ Parameters:
 
 - `amount`: The number of lands to mint
 
+_Inherited from `ERC721/MechaLandsV1.sol`_.
 
 
-### `_checkSignature(address wallet, uint256 payloadExpiration, uint256 maxMint, uint256 landType, uint256 roundId, bytes sig, address signer)` (internal)  <a name="MechaLandsV1-_checkSignature-address-uint256-uint256-uint256-uint256-bytes-address-" id="MechaLandsV1-_checkSignature-address-uint256-uint256-uint256-uint256-bytes-address-"></a>
+### `_checkSignature(address wallet, uint256 payloadExpiration, uint256 maxMint, uint256 landType, uint256 roundId, bytes sig, address signer)` (internal) (inherited) <a name="MechaLandsV1-_checkSignature-address-uint256-uint256-uint256-uint256-bytes-address-" id="MechaLandsV1-_checkSignature-address-uint256-uint256-uint256-uint256-bytes-address-"></a>
 Reverts if the data does not correspond to the signature, to the correct validator or if it has expired
 
 
@@ -860,20 +992,23 @@ Parameters:
 
 - `signer`: The address that is supposed to be the signatory
 
+_Inherited from `ERC721/MechaLandsV1.sol`_.
 
 
-### `_beforeTokenTransfer(address from, address to, uint256 tokenId)` (internal)  <a name="MechaLandsV1-_beforeTokenTransfer-address-address-uint256-" id="MechaLandsV1-_beforeTokenTransfer-address-address-uint256-"></a>
-
-
-
-
-
-
-### `_authorizeUpgrade(address newImplementation)` (internal)  <a name="MechaLandsV1-_authorizeUpgrade-address-" id="MechaLandsV1-_authorizeUpgrade-address-"></a>
+### `_beforeTokenTransfer(address from, address to, uint256 tokenId)` (internal) (inherited) <a name="MechaLandsV1-_beforeTokenTransfer-address-address-uint256-" id="MechaLandsV1-_beforeTokenTransfer-address-address-uint256-"></a>
 
 
 
 
+_Inherited from `ERC721/MechaLandsV1.sol`_.
+
+
+### `_authorizeUpgrade(address newImplementation)` (internal) (inherited) <a name="MechaLandsV1-_authorizeUpgrade-address-" id="MechaLandsV1-_authorizeUpgrade-address-"></a>
+
+
+
+
+_Inherited from `ERC721/MechaLandsV1.sol`_.
 
 
 ### `__UUPSUpgradeable_init()` (internal) (inherited) <a name="UUPSUpgradeable-__UUPSUpgradeable_init--" id="UUPSUpgradeable-__UUPSUpgradeable_init--"></a>
@@ -1365,7 +1500,7 @@ _Inherited from `../@openzeppelin/contracts-upgradeable/proxy/utils/Initializabl
 
 ## STRUCTS
 
-### `Planet`  <a name="MechaLandsV1-Planet" id="MechaLandsV1-Planet"></a>
+### `Planet` (inherited) <a name="MechaLandsV1-Planet" id="MechaLandsV1-Planet"></a>
 - bool revealed
 - bool burnable
 - uint16 typesNumber
@@ -1376,9 +1511,10 @@ _Inherited from `../@openzeppelin/contracts-upgradeable/proxy/utils/Initializabl
 - mapping(uint256 => uint256) totalMintedPerType
 - mapping(uint256 => string) notRevealUriPerType
 
+_Inherited from `ERC721/MechaLandsV1.sol`_.
 
 
-### `MintRound`  <a name="MechaLandsV1-MintRound" id="MechaLandsV1-MintRound"></a>
+### `MintRound` (inherited) <a name="MechaLandsV1-MintRound" id="MechaLandsV1-MintRound"></a>
 - bool limitedPerType
 - uint64 planetId
 - uint64 startTime
@@ -1391,5 +1527,6 @@ _Inherited from `../@openzeppelin/contracts-upgradeable/proxy/utils/Initializabl
 - mapping(address => uint256) totalMintedPerUser
 - mapping(address => mapping(uint256 => uint256)) totalMintedPerTypePerUser
 
+_Inherited from `ERC721/MechaLandsV1.sol`_.
 
 
