@@ -81,7 +81,7 @@ function getSignature(validator_private_key, data) {
 }
 
 // gasTracker;
-const costs = [];
+let costs = [];
 let gasPrice = 0;
 const addCost = async (action, data) => {
   const tx = await web3.eth.getTransaction(data.tx);
@@ -99,6 +99,9 @@ const addCost = async (action, data) => {
   };
   costs.push(cost);
   return cost;
+};
+const resetCost = () => {
+  costs = [];
 };
 const getStats = () => {
   const stats = costs.reduce((prev, curr) => {
@@ -172,6 +175,7 @@ module.exports = {
     addCost,
     getStats,
     consoleStats,
+    resetCost,
   },
   objectFilter,
   getSignature,

@@ -89,6 +89,7 @@ const setupPlanet = async (
 
   // Update expected storage
   contractStorage.planets[planetId] = {
+    totalMintedPerType: Array(planet.typesNumber.toNumber() + 1).fill(0),
     ...contractStorage.planets[planetId],
     ...planet,
     supplyPerType,
@@ -118,12 +119,13 @@ const setupMintRound = async (
   from
 ) => {
   validator = validator || ZERO_ADDRESS;
+  startTime = startTime ? testStartTime.add(startTime) : testStartTime;
   let tx;
   if (isMechaniumPaymentType) {
     tx = await instance.setupMechaniumMintRound(
       roundId,
       planetId,
-      startTime ? testStartTime.add(startTime) : testStartTime,
+      startTime,
       duration,
       validator,
       limitedPerType || false,
@@ -137,7 +139,7 @@ const setupMintRound = async (
     tx = await instance.setupMintRound(
       roundId,
       planetId,
-      startTime ? testStartTime.add(startTime) : testStartTime,
+      startTime,
       duration,
       validator,
       limitedPerType || false,
@@ -155,9 +157,7 @@ const setupMintRound = async (
   assert.equal(round.planetId.toString(), planetId.toString(), "Bad planetId");
   assert.equal(
     round.startTime.toString(),
-    startTime
-      ? testStartTime.add(startTime).toString()
-      : testStartTime.toString(),
+    startTime.toString(),
     "Bad startTime"
   );
   assert.equal(round.duration.toString(), duration.toString(), "Bad duration");
@@ -201,8 +201,13 @@ const setupMintRound = async (
 
   // Update expected storage
   contractStorage.rounds[roundId] = {
+    totalMintedPerType: Array(pricePerType.length + 1).fill(0),
     ...contractStorage.rounds[roundId],
     ...round,
+    planetId,
+    startTime,
+    duration,
+    validator,
     validator_private_key,
     pricePerType,
     supplyPerType,
@@ -404,6 +409,10 @@ const mint = async (
   }
 
   // Update expected storage
+  contractStorage.planets[round.planetId.toNumber()].totalMintedPerType[
+    landType
+  ] += amount;
+  contractStorage.rounds[roundId].totalMintedPerType[landType] += amount;
   contractStorage.tokenOfOwner[user] = [
     ...(contractStorage.tokenOfOwner[user] || []),
     ...mintedTokens,
@@ -498,6 +507,9 @@ const airdrop = async (
   }
 
   // Update expected storage
+  contractStorage.planets[tokenPlanet.toNumber()].totalMintedPerType[
+    landType
+  ] += amount;
   contractStorage.tokenOfOwner[user] = [
     ...contractStorage.tokenOfOwner[user],
     ...mintedTokens,

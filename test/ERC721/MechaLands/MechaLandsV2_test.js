@@ -295,6 +295,9 @@ contract("MechaLandsV2", async (accounts) => {
     it(`Upgrade Smart Contract to MechaLandsV2`, async () => {
       instance = await upgradeProxy(instance.address, MechaLandsV2);
       mechanium = await Mechanium.deployed();
+
+      // reset gas cost
+      gasTracker.resetCost();
     });
 
     it(`Smart Contract is now at version v2`, async () => {
@@ -767,6 +770,344 @@ contract("MechaLandsV2", async (accounts) => {
       }
 
       progressBar.stop();
+    });
+
+    it(`Data of planets has not changed`, async () => {
+      const planetsLength = await instance.planetsLength();
+      const planets = getContractStorage().planets;
+
+      // planetsLength test
+      assert.equal(
+        planetsLength.toNumber(),
+        Object.keys(planets).length,
+        `Bad planets lengths`
+      );
+
+      // Each data test
+      for (var planetId in planets) {
+        const planet = planets[planetId];
+        const contractPlanet = await instance.planets(planetId);
+
+        assert.equal(
+          contractPlanet.typesNumber.toString(),
+          planet.typesNumber.toString(),
+          "typesNumber not valid"
+        );
+
+        assert.equal(
+          contractPlanet.baseURI.toString(),
+          planet.baseURI.toString(),
+          "baseURI not valid"
+        );
+
+        assert.equal(
+          contractPlanet.baseExtension.toString(),
+          planet.baseExtension.toString(),
+          "baseExtension not valid"
+        );
+
+        assert.equal(
+          contractPlanet.distributor.toString(),
+          planet.distributor.toString(),
+          "distributor not valid"
+        );
+
+        for (let landType = 1; landType <= planet.typesNumber; landType++) {
+          const planetSupplyByType = await instance.planetSupplyByType(
+            planetId,
+            landType
+          );
+          assert.equal(
+            planetSupplyByType.toString(),
+            planet.supplyPerType[landType - 1].toString(),
+            "supply not valid"
+          );
+
+          const notRevealUriPerType = await instance.planetNotRevealUriByType(
+            planetId,
+            landType
+          );
+          assert.equal(
+            notRevealUriPerType.toString(),
+            planet.notRevealUriPerType[landType - 1].toString(),
+            "URI not valid"
+          );
+
+          const planetTotalMintedByType =
+            await instance.planetTotalMintedByType(planetId, landType);
+          assert.equal(
+            planetTotalMintedByType.toString(),
+            planet.supplyPerType[landType - 1].toString(),
+            "total minted not valid"
+          );
+        }
+      }
+    });
+
+    it(`Data of rounds has not changed`, async () => {
+      const roundsLength = await instance.roundsLength();
+      const rounds = getContractStorage().rounds;
+
+      // planetsLength test
+      assert.equal(
+        roundsLength.toNumber(),
+        Object.keys(rounds).length,
+        `Bad rounds lengths`
+      );
+
+      // Each data test
+      for (var roundId in rounds) {
+        const round = rounds[roundId];
+        const contractRounds = await instance.rounds(roundId);
+
+        assert.equal(
+          contractRounds.limitedPerType.toString(),
+          round.limitedPerType.toString(),
+          "limitedPerType not valid"
+        );
+
+        assert.equal(
+          contractRounds.planetId.toString(),
+          round.planetId.toString(),
+          "planetId not valid"
+        );
+
+        assert.equal(
+          contractRounds.startTime.toString(),
+          round.startTime.toString(),
+          "startTime not valid"
+        );
+
+        assert.equal(
+          contractRounds.duration.toString(),
+          round.duration.toString(),
+          "duration not valid"
+        );
+
+        assert.equal(
+          contractRounds.validator.toString(),
+          round.validator.toString(),
+          "validator not valid"
+        );
+
+        for (let landType = 1; landType <= round.typesNumber; landType++) {
+          const roundSupplyByType = await instance.roundSupplyByType(
+            roundId,
+            landType
+          );
+          assert.equal(
+            roundSupplyByType.toString(),
+            planet.supplyPerType[landType - 1].toString(),
+            "supply not valid"
+          );
+
+          const roundPriceByType = await instance.roundPriceByType(
+            roundId,
+            landType
+          );
+          assert.equal(
+            roundPriceByType.toString(),
+            planet.pricePerType[landType - 1].toString(),
+            "priceByType not valid"
+          );
+
+          const roundMaxMintByType = await instance.roundMaxMintByType(
+            roundId,
+            landType
+          );
+          assert.equal(
+            roundMaxMintByType.toString(),
+            planet.maxMintPerType[landType - 1].toString(),
+            "maxMintByType not valid"
+          );
+
+          const roundTotalMintedByType = await instance.roundTotalMintedByType(
+            roundId,
+            landType
+          );
+          assert.equal(
+            roundTotalMintedByType.toString(),
+            round.totalMintedPerType[landType].toString(),
+            "total minted not valid"
+          );
+        }
+      }
+    });
+
+    it(`Data of rounds has not changed`, async () => {
+      const roundsLength = await instance.roundsLength();
+      const rounds = getContractStorage().rounds;
+
+      // planetsLength test
+      assert.equal(
+        roundsLength.toNumber(),
+        Object.keys(rounds).length,
+        `Bad rounds lengths`
+      );
+
+      // Each data test
+      for (var roundId in rounds) {
+        const round = rounds[roundId];
+        const contractRounds = await instance.rounds(roundId);
+
+        assert.equal(
+          contractRounds.limitedPerType.toString(),
+          round.limitedPerType.toString(),
+          "limitedPerType not valid"
+        );
+
+        assert.equal(
+          contractRounds.planetId.toString(),
+          round.planetId.toString(),
+          "planetId not valid"
+        );
+
+        assert.equal(
+          contractRounds.startTime.toString(),
+          round.startTime.toString(),
+          "startTime not valid"
+        );
+
+        assert.equal(
+          contractRounds.duration.toString(),
+          round.duration.toString(),
+          "duration not valid"
+        );
+
+        assert.equal(
+          contractRounds.validator.toString(),
+          round.validator.toString(),
+          "validator not valid"
+        );
+
+        for (let landType = 1; landType <= round.typesNumber; landType++) {
+          const roundSupplyByType = await instance.roundSupplyByType(
+            roundId,
+            landType
+          );
+          assert.equal(
+            roundSupplyByType.toString(),
+            planet.supplyPerType[landType - 1].toString(),
+            "supply not valid"
+          );
+
+          const roundPriceByType = await instance.roundPriceByType(
+            roundId,
+            landType
+          );
+          assert.equal(
+            roundPriceByType.toString(),
+            planet.pricePerType[landType - 1].toString(),
+            "priceByType not valid"
+          );
+
+          const roundMaxMintByType = await instance.roundMaxMintByType(
+            roundId,
+            landType
+          );
+          assert.equal(
+            roundMaxMintByType.toString(),
+            planet.maxMintPerType[landType - 1].toString(),
+            "maxMintByType not valid"
+          );
+
+          const roundTotalMintedByType = await instance.roundTotalMintedByType(
+            roundId,
+            landType
+          );
+          assert.equal(
+            roundTotalMintedByType.toString(),
+            round.totalMintedPerType[landType].toString(),
+            "total minted not valid"
+          );
+        }
+      }
+    });
+
+    it(`Contract has the correct eth amount according to the mints (v1 and v2)`, async () => {
+      const balance = await web3.eth.getBalance(instance.address);
+      assert.equal(
+        balance.toString(),
+        getContractStorage().balance.toString(),
+        "Incorrect ETH balance"
+      );
+    });
+  });
+
+  /**
+   * WITHDRAW
+   */
+  describe("\n WITHDRAW", () => {
+    it(`Contract has the correct $MECHA amount according to the mints`, async () => {
+      const balance = await mechanium.balanceOf(instance.address);
+      assert.equal(
+        balance.toString(),
+        getContractStorage().mechaniumBalance.toString(),
+        "Incorrect $MECHA balance"
+      );
+    });
+
+    it(`Users can't withdraw contract $MECHA (Reason: caller is not the owner)`, async () => {
+      await expectRevert(
+        instance.withdrawMechaniumToken(
+          users[0],
+          getContractStorage().mechaniumBalance,
+          {
+            from: users[0],
+          }
+        ),
+        `Ownable: caller is not the owner`
+      );
+    });
+
+    it(`Owner can withdraw all $MECHA to himself`, async () => {
+      const oldUserBalance = await mechanium.balanceOf(owner);
+
+      const tx = await instance.withdrawMechaniumToken(
+        owner,
+        getContractStorage().mechaniumBalance,
+        {
+          from: owner,
+        }
+      );
+      const cost = await gasTracker.addCost(`Withdraw $MECHA`, tx);
+
+      // Verify balance
+      const balance = await mechanium.balanceOf(instance.address);
+
+      const newUserBalance = await mechanium.balanceOf(owner);
+      assert.equal(balance.toString(), "0", "Incorrect contract balance");
+      assert.equal(
+        newUserBalance.toString(),
+        oldUserBalance.add(getContractStorage().mechaniumBalance).toString(),
+        "Incorrect user balance"
+      );
+
+      getContractStorage().mechaniumBalance = balance;
+    });
+
+    it(`Owner can withdraw all eth to himself`, async () => {
+      const oldUserBalance = getBN(await web3.eth.getBalance(owner));
+
+      const tx = await instance.withdraw(owner, getContractStorage().balance, {
+        from: owner,
+      });
+      const cost = await gasTracker.addCost(`Withdraw eth`, tx);
+
+      // Verify balance
+      const balance = await web3.eth.getBalance(instance.address);
+      const newUserBalance = getBN(await web3.eth.getBalance(owner));
+      assert.equal(balance.toString(), "0", "Incorrect contract balance");
+      assert.equal(
+        newUserBalance.toString(),
+        oldUserBalance
+          .add(getContractStorage().balance)
+          .sub(getBN(cost.price))
+          .toString(),
+        "Incorrect user balance"
+      );
+
+      getContractStorage().balance = balance;
     });
   });
 
