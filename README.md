@@ -11,7 +11,7 @@ All smart contracts for the play to earn [MechaChain project](https://mechachain
 [ethereum-url]: https://ethereum.org/fr/
 [node-image]: https://img.shields.io/badge/node_v16-blue
 [node-url]: https://nodejs.org/ko/blog/release/v16.13.0/
-[solidity-image]: https://img.shields.io/badge/Solidity_v0.8.7-gray?logo=Solidity
+[solidity-image]: https://img.shields.io/badge/Solidity_v0.8.15-gray?logo=Solidity
 [solidity-url]: https://nodejs.org/uk/blog/release/v12.14.1/
 
 - [MechaChain Smart Contracts](#mechachain-smart-contracts)

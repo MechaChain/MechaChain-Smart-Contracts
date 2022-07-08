@@ -10,22 +10,22 @@
   },
   "devDependencies": {
     "@openzeppelin/truffle-upgrades": "^1.15.0",
-    "cli-progress": "^3.10.0",
+    "cli-progress": "^3.11.2",
     "ganache-cli": "^6.12.2",
-    "solc-0.6": "npm:solc@^0.6.6",
-    "solc-0.8": "npm:solc@^0.8.13",
-    "solidity-docgen": "^0.5.16",
-    "truffle-plugin-verify": "^0.5.24"
+    "solc-0.6": "npm:solc@^0.8.15",
+    "solc-0.8": "npm:solc@^0.8.15",
+    "solidity-docgen": "^0.5.17",
+    "truffle-plugin-verify": "^0.5.26"
   },
   "dependencies": {
     "@maticnetwork/pos-portal": "^1.5.2",
-    "@openzeppelin/contracts": "^4.5.0",
-    "@openzeppelin/contracts-upgradeable": "^4.5.2",
+    "@openzeppelin/contracts": "^4.7.0",
+    "@openzeppelin/contracts-upgradeable": "^4.7.0",
     "@openzeppelin/test-helpers": "^0.5.15",
-    "@truffle/hdwallet-provider": "^2.0.4",
-    "@typechain/ethers-v5": "^10.0.0",
-    "dotenv": "^16.0.0",
-    "typechain": "^8.0.0",
-    "web3-utils": "^1.7.1"
+    "@truffle/hdwallet-provider": "^2.0.10",
+    "@typechain/ethers-v5": "^10.1.0",
+    "dotenv": "^16.0.1",
+    "typechain": "^8.1.0",
+    "web3-utils": "^1.7.4"
   }
 }
