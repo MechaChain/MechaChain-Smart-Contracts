@@ -83,6 +83,11 @@ contract MechaPilots2219V1 is
     event BurnableChanged(bool newBurnable);
 
     /**
+     * @notice Event emitted when `maxMintsPerWallet` has been modified
+     */
+    event MaxMintsPerWalletChanged(uint256 newMaxMintsPerWallet);
+
+    /**
      * @notice Event emitted when native coin were removed from the contract
      */
     event Withdrawn(address indexed to, uint256 amount);
@@ -160,17 +165,17 @@ contract MechaPilots2219V1 is
     /// Contract version
     uint256 public version;
 
-    /// Total of minted token
-    uint256 private _totalMinted;
-
-    /// Total of minted token by faction
-    uint256[] private _totalMintedByFaction;
-
-    /// Burned token counter
-    uint256 public burnedCounter;
+    /// Number of tokens that a wallet can mint in a public round
+    uint256 public maxMintsPerWallet;
 
     /// Number of existing mint rounds
     uint256 public roundsLength;
+
+    /// Burned token counter
+    uint256 public totalBurned;
+
+    /// If tokens are burnable
+    bool public burnable;
 
     /// The base token URI to add before unrevealed token id
     string public baseURI;
@@ -178,8 +183,11 @@ contract MechaPilots2219V1 is
     /// Base extension for the end of token id in `tokenURI` for unrevealed tokens
     string public baseExtension;
 
-    // Optional mapping for token reveal URIs
-    mapping(uint256 => string) private _tokenURIs;
+    /// Total of minted token
+    uint256 internal _totalMinted;
+
+    /// Total of minted token by faction
+    uint256[] internal _totalMintedByFaction;
 
     /// Map of faction by tokenId
     mapping(uint256 => Faction) public tokenFaction;
@@ -190,8 +198,12 @@ contract MechaPilots2219V1 is
     /// Identifier that can still be minted
     mapping(uint256 => uint256) internal availableIds;
 
+    // Optional mapping for token reveal URIs
+    mapping(uint256 => string) internal _tokenURIs;
+
     /// Total of minted token by address and round
-    mapping(address => mapping(uint256 => uint256)) ownerToRoundTotalMinted;
+    mapping(address => mapping(uint256 => uint256))
+        public ownerToRoundTotalMinted;
 
     /**
      * ========================
@@ -215,10 +227,13 @@ contract MechaPilots2219V1 is
         __Ownable_init();
         __UUPSUpgradeable_init();
 
+        // Roles
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _grantRole(URI_UPDATER_ROLE, msg.sender);
-        version = 1;
+
+        // Storage initialisation
         baseExtension = ".json";
+        maxMintsPerWallet = 2;
     }
 
     /**
@@ -239,7 +254,11 @@ contract MechaPilots2219V1 is
         uint256 amount
     ) external payable whenNotPaused {
         require(rounds[roundId].validator == address(0), "Need a sig");
-        // TODO check max
+        require(
+            ownerToRoundTotalMinted[msg.sender][roundId] + amount <=
+                maxMintsPerWallet,
+            "Max allowed"
+        );
         _roundMint(msg.sender, roundId, factionId, amount);
     }
 
@@ -472,6 +491,27 @@ contract MechaPilots2219V1 is
     }
 
     /**
+     * @notice Activate burnable option
+     * @param newBurnable If users are authorized to burn their tokens or not
+     */
+    function setBurnable(bool newBurnable) public virtual onlyOwner {
+        burnable = newBurnable;
+        emit BurnableChanged(newBurnable);
+    }
+
+    /**
+     * @notice Change number of tokens that a wallet can mint in a public wave
+     */
+    function setMaxMintsPerWallet(uint256 newMaxMints)
+        external
+        virtual
+        onlyOwner
+    {
+        maxMintsPerWallet = newMaxMints;
+        emit MaxMintsPerWalletChanged(newMaxMints);
+    }
+
+    /**
      * @dev Burns `tokenId`. See {ERC721-_burn}.
      *
      * Requirements:
@@ -479,10 +519,8 @@ contract MechaPilots2219V1 is
      * - The caller must own `tokenId` or be an approved operator.
      */
     function burn(uint256 tokenId) public virtual override whenNotPaused {
-        // uint256 planetId = tokenPlanet[tokenId];
-        // require(planets[planetId].burnable, "Planet not burnable");
-        // burnedCounter++;
-        // TODO
+        require(burnable, "Not burnable");
+        totalBurned++;
         super.burn(tokenId);
     }
 
@@ -557,7 +595,7 @@ contract MechaPilots2219V1 is
      * @notice Returns the total amount of tokens minted.
      */
     function totalSupply() public view returns (uint256) {
-        return _totalMinted - burnedCounter;
+        return _totalMinted - totalBurned;
     }
 
     /**
