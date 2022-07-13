@@ -23,7 +23,6 @@ contract MechaPilots2219V1 is
     ERC721BurnableUpgradeable,
     PausableUpgradeable,
     OwnableUpgradeable,
-    ReentrancyGuardUpgradeable,
     UUPSUpgradeable
 {
     using Strings for uint256;
@@ -189,7 +188,6 @@ contract MechaPilots2219V1 is
         __ERC721Burnable_init();
         __Pausable_init();
         __Ownable_init();
-        __ReentrancyGuard_init();
         __UUPSUpgradeable_init();
         version = 1;
     }
@@ -210,7 +208,7 @@ contract MechaPilots2219V1 is
         uint256 roundId,
         Faction faction,
         uint256 amount
-    ) external payable whenNotPaused nonReentrant {
+    ) external payable whenNotPaused {
         require(rounds[roundId].validator == address(0), "Need a sig");
         // TODO check max
         _roundMint(msg.sender, roundId, faction, amount);
@@ -239,7 +237,7 @@ contract MechaPilots2219V1 is
         uint256 maxMint,
         uint256 payloadExpiration,
         bytes memory sig
-    ) external payable whenNotPaused nonReentrant {
+    ) external payable whenNotPaused {
         require(rounds[roundId].validator != address(0), "No round validator");
         require(
             ownerToRoundTotalMinted[msg.sender][roundId] + amount <= maxMint,
@@ -464,6 +462,7 @@ contract MechaPilots2219V1 is
      * - round must be active
      * - msg.value must contain the price
      * - The supply of the round for the `faction` must not be exceeded with amount
+     * - msg.sender must not be a smart contract
      * - View {MechaPilots2219V1-_safeMint} Requirements
      *
      * @dev Increase `ownerToRoundTotalMinted`
@@ -480,6 +479,14 @@ contract MechaPilots2219V1 is
         uint256 amount
     ) internal {
         MintRound storage round = rounds[roundId];
+
+        // No smart contract
+        require(
+            msg.sender == tx.origin,
+            "Minting from smart contracts is disallowed"
+        );
+
+        // Round active
         require(
             block.timestamp >= round.startTime &&
                 round.startTime > 0 &&
