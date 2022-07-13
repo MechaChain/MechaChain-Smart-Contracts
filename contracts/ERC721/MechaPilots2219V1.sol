@@ -40,7 +40,7 @@ contract MechaPilots2219V1 is
      */
     event MintRoundSetup(
         uint256 indexed roundId,
-        uint32 supply,
+        uint32[2] supply,
         uint64 startTime,
         uint64 duration,
         address validator
@@ -93,19 +93,19 @@ contract MechaPilots2219V1 is
 
     /**
      * @notice Container for packing the information of a mint round.
-     * @member supply Number of tokens that can be minted in this round. Can be 0 for use the total supply
-     * @member totalMinted Number of token minted in this round
      * @member startTime The start date of the round in seconds
      * @member duration The duration of the round in seconds. Can be 0 for no time limitation
      * @member price The price of the round in ETH (can be 0)
+     * @member supply Number of tokens that can be minted in this round by faction. Can be 0 for use the total faction supply
+     * @member totalMinted Number of token minted in this round by faction
      * @member validator The address of the whitelist validator. Can be 'address(0)' for no whitelist
      * @member price The price configuration for a single token in the round
      */
     struct MintRound {
-        uint32 supply;
-        uint32 totalMinted;
         uint64 startTime;
         uint64 duration;
+        uint32[2] supply;
+        uint32[2] totalMinted;
         address validator;
         MintPrice price;
     }
@@ -153,6 +153,9 @@ contract MechaPilots2219V1 is
     /// Total of minted token
     uint256 private _totalMinted;
 
+    /// Total of minted token by faction
+    uint256[] private _totalMintedByFaction;
+
     /// Burned token counter
     uint256 public burnedCounter;
 
@@ -193,7 +196,7 @@ contract MechaPilots2219V1 is
     }
 
     /**
-     * @notice Mint the `amount` of `faction`token in a round without validator
+     * @notice Mint the `amount` of `factionId` token in a round without validator
      *
      * @dev Call {MechaPilots2219V1-_roundMint}.
      * @dev Requirements:
@@ -201,17 +204,17 @@ contract MechaPilots2219V1 is
      * - View {MechaPilots2219V1-_roundMint} requirements
      *
      * @param roundId The mint round index
-     * @param faction The token faction
+     * @param factionId The token faction
      * @param amount The number of tokens to mint
      */
     function mint(
         uint256 roundId,
-        Faction faction,
+        uint256 factionId,
         uint256 amount
     ) external payable whenNotPaused {
         require(rounds[roundId].validator == address(0), "Need a sig");
         // TODO check max
-        _roundMint(msg.sender, roundId, faction, amount);
+        _roundMint(msg.sender, roundId, factionId, amount);
     }
 
     /**
@@ -224,7 +227,7 @@ contract MechaPilots2219V1 is
      * - View {MechaPilots2219V1-_roundMint} requirements.
      *
      * @param roundId The mint round index (verified in `sig`)
-     * @param faction The token faction (verified in `sig`)
+     * @param factionId The token faction (verified in `sig`)
      * @param amount The number of tokens to mint
      * @param maxMint The maximum token that the user is allowed to mint in the round (verified in `sig`)
      * @param payloadExpiration The maximum timestamp before the signature is considered invalid (verified in `sig`)
@@ -232,7 +235,7 @@ contract MechaPilots2219V1 is
      */
     function mintWithValidation(
         uint256 roundId,
-        Faction faction,
+        uint256 factionId,
         uint256 amount,
         uint256 maxMint,
         uint256 payloadExpiration,
@@ -247,13 +250,13 @@ contract MechaPilots2219V1 is
             msg.sender,
             payloadExpiration,
             maxMint,
-            faction,
+            factionId,
             roundId,
             sig,
             rounds[roundId].validator
         );
 
-        _roundMint(msg.sender, roundId, faction, amount);
+        _roundMint(msg.sender, roundId, factionId, amount);
     }
 
     /**
@@ -265,15 +268,15 @@ contract MechaPilots2219V1 is
      * - View {MechaPilots2219V1-_safeMint} requirements.
      *
      * @param wallet The wallet to transfer new tokens
-     * @param faction The faction
+     * @param factionId The faction
      * @param amount The number of tokens to mint
      */
     function airdrop(
         address wallet,
-        Faction faction,
+        uint256 factionId,
         uint256 amount
     ) external onlyOwner {
-        _safeMint(wallet, faction, amount);
+        _safeMint(wallet, factionId, amount);
     }
 
     /**
@@ -284,7 +287,7 @@ contract MechaPilots2219V1 is
      * - `roundId` can be 0.
      *
      * @param roundId The index of the mint round.
-     * @param supply TODO
+     * @param supply Number of tokens that can be minted in this round by faction. Can be 0 for use the total faction supply
      * @param startTime The start time of the round in unix seconds timestamp. 0 if not set.
      * @param duration The duration of the round in seconds. 0 if ends at sold out.
      * @param validator The address of the whitelist validator. Can be 'address(0)' for no whitelist.
@@ -295,7 +298,7 @@ contract MechaPilots2219V1 is
      */
     function setupMintRound(
         uint256 roundId,
-        uint32 supply,
+        uint32[2] memory supply,
         uint64 startTime,
         uint64 duration,
         address validator,
@@ -469,13 +472,13 @@ contract MechaPilots2219V1 is
      *
      * @param wallet The wallet to transfer new tokens
      * @param roundId The mint round index
-     * @param faction The faction
+     * @param factionId The faction
      * @param amount The number of tokens to mint
      */
     function _roundMint(
         address wallet,
         uint256 roundId,
-        Faction faction,
+        uint256 factionId,
         uint256 amount
     ) internal {
         MintRound storage round = rounds[roundId];
@@ -494,11 +497,27 @@ contract MechaPilots2219V1 is
                     block.timestamp < round.startTime + round.duration),
             "Round not in progress"
         );
+
+        // Correct price
         require(roundPrice(roundId) * amount <= msg.value, "Wrong price");
 
-        // TODO Round supply
+        // Round supply requirements
+        require(
+            (round.supply[factionId] == 0 ||
+                round.totalMinted[factionId] + amount <=
+                round.supply[factionId]),
+            "Wave supply exceeded"
+        );
 
-        _safeMint(wallet, faction, amount);
+        // Increase `totalMinted` if needed
+        if (round.supply[factionId] != 0) {
+            round.totalMinted[factionId] += uint32(amount);
+        }
+
+        // Safe mint
+        _safeMint(wallet, factionId, amount);
+
+        // TODO emit MintPaid
 
         // Increase round total minted
         ownerToRoundTotalMinted[msg.sender][roundId] += amount;
@@ -515,35 +534,45 @@ contract MechaPilots2219V1 is
      * @dev Increase `_totalMinted`
      *
      * @param wallet The wallet to transfer new tokens
-     * @param faction The faction
+     * @param factionId The faction
      * @param amount The number of tokens to mint
      */
     function _safeMint(
         address wallet,
-        Faction faction,
+        uint256 factionId,
         uint256 amount
     ) internal {
-        // TODO faction exist and faction supply
+        Faction faction = Faction(factionId);
         require(amount > 0, "Zero amount");
-        require(MAX_SUPPLY - _totalMinted >= amount, "Supply exceeded");
+        require(_totalMinted + amount <= MAX_SUPPLY, "Supply exceeded");
+        require(
+            _totalMintedByFaction[factionId] + amount <=
+                MAX_SUPPLY_BY_FACTION[factionId],
+            "Faction supply exceeded"
+        );
 
         // Mint
         for (uint256 i = 0; i < amount; i++) {
-            uint256 tokenId = _getRandomToken(wallet);
+            uint256 tokenId = _getRandomToken(wallet, _totalMinted + i);
             _mint(wallet, tokenId);
             tokenFaction[tokenId] = faction;
         }
         _totalMinted += amount;
+        _totalMintedByFaction[factionId] += amount;
     }
 
     /**
      * @notice Gives a identifier from a pseudo random function (inspired by Cyberkongs VX)
      *
      * @param wallet The wallet to complexify the random
+     * @param totalMinted Updated total minted
      */
-    function _getRandomToken(address wallet) internal returns (uint256) {
-        uint256 remaining = MAX_SUPPLY - _totalMinted;
-        uint256 rand = uint256(
+    function _getRandomToken(address wallet, uint256 totalMinted)
+        internal
+        returns (uint256)
+    {
+        uint256 remaining = MAX_SUPPLY - totalMinted;
+        uint256 rand = (uint256(
             keccak256(
                 abi.encodePacked(
                     wallet,
@@ -552,7 +581,7 @@ contract MechaPilots2219V1 is
                     remaining
                 )
             )
-        ) % remaining;
+        ) % remaining) + 1;
         uint256 value = rand;
 
         if (availableIds[rand] != 0) {
@@ -579,7 +608,7 @@ contract MechaPilots2219V1 is
      * @param wallet The user wallet
      * @param payloadExpiration The maximum timestamp before the signature is considered invalid
      * @param maxMint The maximum token that the user is allowed to mint in the round
-     * @param faction The faction that is allowed to mint
+     * @param factionId The faction that is allowed to mint
      * @param roundId The roundId that is allowed to mint
      * @param sig The EC signature generated by the signatory
      * @param signer The address that is supposed to be the signatory
@@ -588,7 +617,7 @@ contract MechaPilots2219V1 is
         address wallet,
         uint256 payloadExpiration,
         uint256 maxMint,
-        Faction faction,
+        uint256 factionId,
         uint256 roundId,
         bytes memory sig,
         address signer
@@ -600,7 +629,7 @@ contract MechaPilots2219V1 is
                     wallet,
                     payloadExpiration,
                     maxMint,
-                    faction,
+                    factionId,
                     roundId,
                     address(this),
                     block.chainid
