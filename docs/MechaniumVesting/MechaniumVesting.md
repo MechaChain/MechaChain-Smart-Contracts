@@ -53,6 +53,7 @@ MechaniumVesting - Abstract class for vesting and distribution smart contract
     - [`_unlockTokensCalc`](#MechaniumVesting-_unlockTokensCalc-uint256-uint256-) 
     - [`_pendingTokensCalc`](#MechaniumVesting-_pendingTokensCalc-uint256-uint256-) 
     - [`_addLockedToken`](#MechaniumCanReleaseUnintented-_addLockedToken-address-) (inherited)
+    - [`_checkRole`](#AccessControl-_checkRole-bytes32-) (inherited)
     - [`_checkRole`](#AccessControl-_checkRole-bytes32-address-) (inherited)
     - [`_setupRole`](#AccessControl-_setupRole-bytes32-address-) (inherited)
     - [`_setRoleAdmin`](#AccessControl-_setRoleAdmin-bytes32-bytes32-) (inherited)
@@ -351,6 +352,7 @@ If `account` had not been already granted `role`, emits a {RoleGranted}
 event.
 Requirements:
 - the caller must have ``role``'s admin role.
+May emit a {RoleGranted} event.
 
 
 _Inherited from `../@openzeppelin/contracts/access/AccessControl.sol`_.
@@ -362,6 +364,7 @@ Revokes `role` from `account`.
 If `account` had been granted `role`, emits a {RoleRevoked} event.
 Requirements:
 - the caller must have ``role``'s admin role.
+May emit a {RoleRevoked} event.
 
 
 _Inherited from `../@openzeppelin/contracts/access/AccessControl.sol`_.
@@ -377,6 +380,7 @@ If the calling account had been revoked `role`, emits a {RoleRevoked}
 event.
 Requirements:
 - the caller must be `account`.
+May emit a {RoleRevoked} event.
 
 
 _Inherited from `../@openzeppelin/contracts/access/AccessControl.sol`_.
@@ -433,6 +437,17 @@ Add a locked `token_` ( can't be released )
 _Inherited from `MechaniumUtils/MechaniumCanReleaseUnintented.sol`_.
 
 
+### `_checkRole(bytes32 role)` (internal) (inherited) <a name="AccessControl-_checkRole-bytes32-" id="AccessControl-_checkRole-bytes32-"></a>
+
+Revert with a standard message if `_msgSender()` is missing `role`.
+Overriding this function changes the behavior of the {onlyRole} modifier.
+Format of the revert message is described in {_checkRole}.
+_Available since v4.6._
+
+
+_Inherited from `../@openzeppelin/contracts/access/AccessControl.sol`_.
+
+
 ### `_checkRole(bytes32 role, address account)` (internal) (inherited) <a name="AccessControl-_checkRole-bytes32-address-" id="AccessControl-_checkRole-bytes32-address-"></a>
 
 Revert with a standard message if `account` is missing `role`.
@@ -449,6 +464,7 @@ Grants `role` to `account`.
 If `account` had not been already granted `role`, emits a {RoleGranted}
 event. Note that unlike {grantRole}, this function doesn't perform any
 checks on the calling account.
+May emit a {RoleGranted} event.
 [WARNING]
 ====
 This function should only be called from the constructor when setting
@@ -475,6 +491,7 @@ _Inherited from `../@openzeppelin/contracts/access/AccessControl.sol`_.
 
 Grants `role` to `account`.
 Internal function without access restriction.
+May emit a {RoleGranted} event.
 
 
 _Inherited from `../@openzeppelin/contracts/access/AccessControl.sol`_.
@@ -484,6 +501,7 @@ _Inherited from `../@openzeppelin/contracts/access/AccessControl.sol`_.
 
 Revokes `role` from `account`.
 Internal function without access restriction.
+May emit a {RoleRevoked} event.
 
 
 _Inherited from `../@openzeppelin/contracts/access/AccessControl.sol`_.
