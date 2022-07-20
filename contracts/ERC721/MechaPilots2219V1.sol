@@ -126,8 +126,8 @@ contract MechaPilots2219V1 is
      * @notice Container for packing the configuration of a price variation
      * @member max The maximum price which will be decreasing in wei
      * @member min The minimum price after which it no longer decreases in wei
-     * @member decreaseAmount The number of wei that will be subtracted from the price every `decreaseTime` (0 if no decrease)
-     * @member decreaseTime The number of seconds to wait between each decreasing
+     * @member decreaseAmount The number of wei that will be subtracted from the price every `decreaseTime`
+     * @member decreaseTime The number of seconds to wait between each decreasing (0 if no decrease)
      */
     struct MintPrice {
         uint256 max;
@@ -153,14 +153,14 @@ contract MechaPilots2219V1 is
      * ========================
      */
 
-    /// Maximum supply of all contract
-    uint256 public constant MAX_SUPPLY = 2219;
-
     /// Role that has the right to manage the URIs for reveal
     bytes32 public constant URI_UPDATER_ROLE = keccak256("URI_UPDATER_ROLE");
 
     /// Maximum supply for each faction
-    uint256[] public MAX_SUPPLY_BY_FACTION = [1109, 1110];
+    uint256[] public MAX_SUPPLY_BY_FACTION;
+
+    /// Maximum supply of all contract
+    uint256 public MAX_SUPPLY;
 
     /// Contract version
     uint256 public version;
@@ -234,6 +234,8 @@ contract MechaPilots2219V1 is
         // Storage initialisation
         baseExtension = ".json";
         maxMintsPerWallet = 2;
+        MAX_SUPPLY_BY_FACTION = [1109, 1110];
+        MAX_SUPPLY = 2219;
     }
 
     /**
