@@ -233,6 +233,7 @@ contract MechaPilots2219V1 is
 
         // Storage initialisation
         version = 1;
+        _totalMintedByFaction = [0, 0];
         baseExtension = ".json";
         maxMintsPerWallet = 2;
         MAX_SUPPLY_BY_FACTION = [1109, 1110];
