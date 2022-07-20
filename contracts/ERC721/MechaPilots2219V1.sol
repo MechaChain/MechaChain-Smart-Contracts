@@ -193,7 +193,7 @@ contract MechaPilots2219V1 is
     mapping(uint256 => Faction) public tokenFaction;
 
     /// All mint rounds (starts at index 1)
-    mapping(uint256 => MintRound) public rounds;
+    mapping(uint256 => MintRound) internal _rounds;
 
     /// Identifier that can still be minted
     mapping(uint256 => uint256) internal availableIds;
@@ -232,6 +232,7 @@ contract MechaPilots2219V1 is
         _grantRole(URI_UPDATER_ROLE, msg.sender);
 
         // Storage initialisation
+        version = 1;
         baseExtension = ".json";
         maxMintsPerWallet = 2;
         MAX_SUPPLY_BY_FACTION = [1109, 1110];
@@ -255,7 +256,7 @@ contract MechaPilots2219V1 is
         uint256 factionId,
         uint256 amount
     ) external payable whenNotPaused {
-        require(rounds[roundId].validator == address(0), "Need a sig");
+        require(_rounds[roundId].validator == address(0), "Need a sig");
         require(
             ownerToRoundTotalMinted[msg.sender][roundId] + amount <=
                 maxMintsPerWallet,
@@ -288,7 +289,7 @@ contract MechaPilots2219V1 is
         uint256 payloadExpiration,
         bytes memory sig
     ) external payable whenNotPaused {
-        require(rounds[roundId].validator != address(0), "No round validator");
+        require(_rounds[roundId].validator != address(0), "No round validator");
         require(
             ownerToRoundTotalMinted[msg.sender][roundId] + amount <= maxMint,
             "Validator max allowed"
@@ -305,7 +306,7 @@ contract MechaPilots2219V1 is
                 block.chainid
             ),
             sig,
-            rounds[roundId].validator
+            _rounds[roundId].validator
         );
 
         _roundMint(msg.sender, roundId, factionId, amount);
@@ -447,7 +448,7 @@ contract MechaPilots2219V1 is
             roundsLength += 1;
         }
 
-        MintRound storage round = rounds[roundId];
+        MintRound storage round = _rounds[roundId];
         round.startTime = startTime;
         round.supply = supply;
         round.duration = duration;
@@ -597,6 +598,15 @@ contract MechaPilots2219V1 is
     }
 
     /**
+     * @notice Returns the MintRound structure of `roundId`
+     *
+     * @dev Better web3 accessibility that a public variable (includes arrays)
+     */
+    function round(uint256 roundId) external view returns (MintRound memory) {
+        return _rounds[roundId];
+    }
+
+    /**
      * @notice Returns the total amount of tokens minted.
      */
     function totalSupply() public view returns (uint256) {
@@ -619,7 +629,7 @@ contract MechaPilots2219V1 is
      * @param roundId The round index
      */
     function roundPrice(uint256 roundId) public view returns (uint256) {
-        MintRound memory round = rounds[roundId];
+        MintRound memory round = _rounds[roundId];
         MintPrice memory price = round.price;
 
         if (price.decreaseTime == 0 || block.timestamp < round.startTime) {
@@ -673,7 +683,7 @@ contract MechaPilots2219V1 is
         uint256 factionId,
         uint256 amount
     ) internal {
-        MintRound storage round = rounds[roundId];
+        MintRound storage round = _rounds[roundId];
 
         // No smart contract
         require(
