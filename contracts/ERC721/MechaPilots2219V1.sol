@@ -347,6 +347,7 @@ contract MechaPilots2219V1 is
         );
 
         _tokenURIs[tokenId] = uri;
+        emit TokenRevealed(tokenId, msg.sender, uri);
     }
 
     /**
@@ -364,6 +365,7 @@ contract MechaPilots2219V1 is
     {
         _requireMinted(tokenId);
         _tokenURIs[tokenId] = uri;
+        emit TokenRevealed(tokenId, msg.sender, uri);
     }
 
     /**
@@ -382,6 +384,7 @@ contract MechaPilots2219V1 is
         for (uint256 i; i < tokenIds.length; i++) {
             _requireMinted(tokenIds[i]);
             _tokenURIs[tokenIds[i]] = uri[i];
+            emit TokenRevealed(tokenIds[i], msg.sender, uri[i]);
         }
     }
 
