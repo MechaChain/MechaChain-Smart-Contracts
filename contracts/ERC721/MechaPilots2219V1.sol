@@ -602,7 +602,7 @@ contract MechaPilots2219V1 is
      *
      * @dev Better web3 accessibility that a public variable (includes arrays)
      */
-    function round(uint256 roundId) external view returns (MintRound memory) {
+    function rounds(uint256 roundId) external view returns (MintRound memory) {
         return _rounds[roundId];
     }
 
