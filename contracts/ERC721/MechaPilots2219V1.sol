@@ -196,7 +196,7 @@ contract MechaPilots2219V1 is
     mapping(uint256 => MintRound) internal _rounds;
 
     /// Identifier that can still be minted
-    mapping(uint256 => uint256) internal availableIds;
+    mapping(uint256 => uint256) internal _availableIds;
 
     // Optional mapping for token reveal URIs
     mapping(uint256 => string) internal _tokenURIs;
@@ -787,14 +787,14 @@ contract MechaPilots2219V1 is
         ) % remaining) + 1;
         uint256 value = rand;
 
-        if (availableIds[rand] != 0) {
-            value = availableIds[rand];
+        if (_availableIds[rand] != 0) {
+            value = _availableIds[rand];
         }
 
-        if (availableIds[remaining - 1] == 0) {
-            availableIds[rand] = remaining - 1;
+        if (_availableIds[remaining - 1] == 0) {
+            _availableIds[rand] = remaining - 1;
         } else {
-            availableIds[rand] = availableIds[remaining - 1];
+            _availableIds[rand] = _availableIds[remaining - 1];
         }
 
         return value;
