@@ -48,15 +48,15 @@ contract("MechaPilots2219V1", async (accounts) => {
       // Whitelist tier 1
       roundId: 2,
       supply: [40, 40],
-      startTime: time.duration.days(2), // to add to `testStartTime`
-      duration: time.duration.hours(4),
+      startTime: time.duration.days(4), // to add to `testStartTime`
+      duration: time.duration.hours(10),
       validator: "0x6F76846f7C90EcEC371e1d96cA93bfE9d36eEb83",
       validator_private_key:
         "0xfeae30926cea7dfa8fb803c348aef7f06941b9af7770e6b62c0dcb543d3391a7",
       price: {
         // Fixed to 0.2
-        max: getAmount(0.2),
-        min: getAmount(0.2),
+        max: getAmount(0.002),
+        min: getAmount(0.002),
         decreaseAmount: getAmount(0),
         decreaseTime: time.duration.hours(0),
       },
@@ -65,15 +65,15 @@ contract("MechaPilots2219V1", async (accounts) => {
       // Whitelist tier 2
       roundId: 3,
       supply: [40, 40],
-      startTime: time.duration.days(2), // to add to `testStartTime`
-      duration: time.duration.hours(4),
+      startTime: time.duration.days(4), // to add to `testStartTime`
+      duration: time.duration.hours(10),
       validator: "0x6F76846f7C90EcEC371e1d96cA93bfE9d36eEb83",
       validator_private_key:
         "0xfeae30926cea7dfa8fb803c348aef7f06941b9af7770e6b62c0dcb543d3391a7",
       price: {
-        // Fixed to 0.2
-        max: getAmount(0.2),
-        min: getAmount(0.2),
+        // Fixed to 0.002
+        max: getAmount(0.002),
+        min: getAmount(0.002),
         decreaseAmount: getAmount(0),
         decreaseTime: time.duration.hours(0),
       },
@@ -216,7 +216,7 @@ contract("MechaPilots2219V1", async (accounts) => {
           user,
           payloadExpiration,
           maxMint,
-          factionId,
+          overrideData?.signatureFactionId || factionId,
           roundId,
           instance.address,
           chainid,
@@ -795,7 +795,7 @@ contract("MechaPilots2219V1", async (accounts) => {
         assert.equal(
           round.supply[factionId],
           round.totalMinted[factionId],
-          "Incorrect newMaxMintsPerWallet"
+          "Incorrect totalMinted"
         );
       });
 
@@ -806,6 +806,189 @@ contract("MechaPilots2219V1", async (accounts) => {
         );
       });
     });
+  });
+
+  /**
+   * ROUNDS 2 & 3 - WHITELISTS TIERS 1 & 2
+   */
+  describe("\n ROUNDS 2 & 3 - WHITELISTS TIERS 1 & 2", () => {
+    it(`Round 2 and round 3 started at the same time `, async () => {
+      await time.increaseTo(testStartTime.add(rounds[2].startTime));
+      const latestTime = await time.latest();
+      const round2 = await instance.rounds(2);
+      assert.equal(
+        round2.startTime >= latestTime.toNumber(),
+        true,
+        "Start time not correct"
+      );
+
+      const round3 = await instance.rounds(3);
+      assert.equal(
+        round3.startTime >= latestTime.toNumber(),
+        true,
+        "Start time not correct"
+      );
+    });
+
+    it(`User can't mint in a whitelist round after payload (Reason: Signature expired)`, async () => {
+      const latestTime = await time.latest();
+      await expectRevert(
+        mint({ roundId: 2, amount: 1, factionId: 1, maxMint: 5 }, user1, {
+          payloadExpiration: latestTime.sub(time.duration.seconds(30)),
+        }),
+        `Signature expired`
+      );
+    });
+
+    it(`User can't mint in a whitelist round with an other validator (Reason: Invalid signature)`, async () => {
+      await expectRevert(
+        mint({ roundId: 3, amount: 1, factionId: 1, maxMint: 5 }, user1, {
+          validator_private_key: otherPrivateKey,
+        }),
+        `Invalid signature`
+      );
+    });
+
+    it(`User can't mint in a whitelist round without validator (Reason: Need a sig)`, async () => {
+      await expectRevert(
+        instance.mint(2, 1, 1, {
+          from: user1,
+        }),
+        `Need a sig`
+      );
+    });
+
+    it(`User can't mint more tokens than maximum authorized by the validator (Reason: Max allowed)`, async () => {
+      await expectRevert(
+        mint({ roundId: 3, factionId: 1, amount: 5, maxMint: 4 }, user1),
+        `Max allowed`
+      );
+    });
+
+    it(`User can't mint with a lower price (Reason: Wrong price)`, async () => {
+      await expectRevert(
+        mint({ roundId: 2, factionId: 1, amount: 2, maxMint: 2 }, user1, {
+          price: getAmount(0.001),
+        }),
+        `Wrong price`
+      );
+    });
+
+    it(`User can't mint 0 tokens (Reason: Zero amount)`, async () => {
+      await expectRevert(
+        mint({ roundId: 3, amount: 0, maxMint: 2, factionId: 0 }, user1),
+        `Zero amount`
+      );
+    });
+
+    it(`User can't mint an other faction than the one given in the signature (Reason: Invalid signature)`, async () => {
+      await expectRevert(
+        mint({ roundId: 3, amount: 0, maxMint: 2, factionId: 0 }, user1, {
+          signatureFactionId: 1,
+        }),
+        `Invalid signature`
+      );
+    });
+
+    for (let roundId = 2; roundId <= 3; roundId++) {
+      it(`User1 can mint a token in round ${roundId} with a signature !`, async () => {
+        await mint({ roundId, amount: 2, factionId: 1, maxMint: 2 }, user1);
+      });
+
+      it(`User1 can't mint more tokens in round ${roundId} (Reason: Max allowed)`, async () => {
+        await expectRevert(
+          mint({ roundId, amount: 1, factionId: 1, maxMint: 2 }, user1),
+          `Max allowed`
+        );
+      });
+
+      it(`User1 can mint tokens again in round ${roundId} (validator's choice) !`, async () => {
+        await mint({ roundId, factionId: 1, amount: 3, maxMint: 5 }, user1);
+      });
+    }
+
+    it(`2 hours later, the price has not changed`, async () => {
+      const roundId = 2;
+      const round = rounds[roundId];
+      const oldPrice = await instance.roundPrice(roundId);
+      await time.increase(time.duration.hours(2));
+      const newPrice = await instance.roundPrice(roundId);
+      assert.equal(newPrice.toString(), oldPrice.toString(), "Incorrect price");
+    });
+  });
+
+  /**
+   * ROUND 2 & 3 - SOLD OUT
+   */
+  describe("\n ROUND 2 & 3 - SOLD OUT", () => {
+    for (let roundId = 2; roundId <= 3; roundId++) {
+      ["PURE_GENE", "ASSIMILEE"].forEach((factionName, factionId) => {
+        it(`All remaining tokens are minted for faction ${factionName} in round ${roundId}`, async () => {
+          const round = await instance.rounds(roundId);
+          const supply = round.supply[factionId];
+          const totalMinted = round.totalMinted[factionId];
+
+          const remaining = supply - totalMinted;
+          const batchSize = 10;
+
+          const mintPerBatchNb = Math.floor(remaining / batchSize);
+          const rest = remaining % batchSize;
+
+          // Set progress bar
+          console.log(`\tWait while users mint ${remaining} tokens...`);
+          const progressBar = new cliProgress.SingleBar(
+            {
+              format:
+                "\tMint: [{bar}] {percentage}% | {value}/{total} tokens | ETA: {eta}s | Duration: {duration_formatted}",
+            },
+            cliProgress.Presets.shades_classic
+          );
+          progressBar.start(remaining, 0);
+          for (let i = 0; i < mintPerBatchNb; i++) {
+            await mint(
+              {
+                roundId: roundId,
+                factionId: factionId,
+                amount: batchSize,
+                maxMint: 999999,
+              },
+              users[Math.floor(Math.random() * users.length)]
+            );
+            progressBar.increment(batchSize);
+          }
+          if (rest) {
+            await mint(
+              {
+                roundId: roundId,
+                factionId: factionId,
+                amount: rest,
+                maxMint: 999999,
+              },
+              user2
+            );
+          }
+          progressBar.increment(rest);
+          progressBar.stop();
+        });
+
+        it(`${factionName} is now sold out for round ${roundId}`, async () => {
+          const round = await instance.rounds(roundId);
+
+          assert.equal(
+            round.supply[factionId],
+            round.totalMinted[factionId],
+            "Incorrect totalMinted"
+          );
+        });
+
+        it(`Users can't mint ${factionName} in round ${roundId} anymore (Reason: Round supply exceeded)`, async () => {
+          await expectRevert(
+            mint({ roundId, factionId, amount: 1, maxMint: 99999 }, users[3]),
+            `Round supply exceeded`
+          );
+        });
+      });
+    }
   });
 
   /**
