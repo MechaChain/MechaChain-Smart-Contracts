@@ -1,5 +1,6 @@
 // Load modules
 const { time, expectRevert, snapshot } = require("@openzeppelin/test-helpers");
+const cliProgress = require("cli-progress");
 
 // Load artifacts
 const MechaPilots2219V1 = artifacts.require("MechaPilots2219V1");
@@ -18,7 +19,12 @@ contract("MechaPilots2219V1", async (accounts) => {
   const [owner, user1, user2, ...users] = accounts;
 
   const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
-  let instance, testStartTime, chainid, maxMintsPerWallet, MAX_SUPPLY;
+  let instance,
+    testStartTime,
+    chainid,
+    maxMintsPerWallet,
+    MAX_SUPPLY,
+    lastMintedTokens;
   let contractBalance = getAmount(0);
 
   const rounds = [
@@ -28,7 +34,7 @@ contract("MechaPilots2219V1", async (accounts) => {
       roundId: 1,
       supply: [40, 40],
       startTime: time.duration.days(1), // to add to `testStartTime`
-      duration: time.duration.hours(10),
+      duration: time.duration.days(2),
       // no validator
       price: {
         // Fixed to 2 Eth
@@ -170,6 +176,8 @@ contract("MechaPilots2219V1", async (accounts) => {
   /**
    * Mint tokens according to round data (or `overrideData`)
    * Test data and add cost to `gasTracker`
+   *
+   * @returns array of minted tokens
    */
   const mint = async (
     { roundId, factionId, amount, maxMint },
@@ -282,6 +290,7 @@ contract("MechaPilots2219V1", async (accounts) => {
         "User is not owner of the new token"
       );
     }
+    return mintedTokens;
   };
 
   // TODO
@@ -499,7 +508,7 @@ contract("MechaPilots2219V1", async (accounts) => {
   });
 
   /**
-   * ROUND 1 MINT
+   * ROUND 1 - FDA PUBLIC MINT
    */
   describe("\n ROUND 1 - FDA PUBLIC MINT", () => {
     it(`Round 1 started`, async () => {
@@ -563,32 +572,127 @@ contract("MechaPilots2219V1", async (accounts) => {
       );
     });
 
-    it(`User can't mint (Reason: Wrong price)`, async () => {
+    it(`User can't mint with the minimum price for now (Reason: Wrong price)`, async () => {
       await expectRevert(
         mint({ roundId: 1, amount: 1, factionId: 1 }, user1, {
-          price: getAmount(0.00001),
+          price: rounds[1].price.min,
         }),
         `Wrong price`
       );
     });
 
-    it(`User1 can mint his maximum of tokens in two transaction`, async () => {
+    it(`User can't mint 0 tokens (Reason: Zero amount)`, async () => {
+      await expectRevert(
+        mint({ roundId: 1, amount: 0, factionId: 1 }, user1),
+        `Zero amount`
+      );
+    });
+
+    it(`User can't mint a non-existing faction, like faction 2 or 3  (Reason: Panic: Index out of bounds)`, async () => {
+      await expectRevert(
+        mint({ roundId: 1, amount: 1, factionId: 2 }, user1),
+        `Panic: Index out of bounds`
+      );
+      await expectRevert(
+        mint({ roundId: 1, amount: 1, factionId: 3 }, user1),
+        `Panic: Index out of bounds`
+      );
+    });
+
+    it(`User1 can mint his maximum of tokens in two transaction (faction ASSIMILEE)`, async () => {
       const lastMintAmount = maxMintsPerWallet - 1;
 
       // first mint
-      await mint({ roundId: 1, factionId: 1, amount: 1 }, user1);
+      lastMintedTokens = await mint(
+        { roundId: 1, factionId: 1, amount: 1 },
+        user1
+      );
 
       // last mint
       if (lastMintAmount > 0) {
-        await mint(
-          {
-            roundId: 1,
-            factionId: 1,
-            amount: lastMintAmount,
-          },
-          user1
-        );
+        lastMintedTokens = [
+          ...lastMintedTokens,
+          ...(await mint(
+            {
+              roundId: 1,
+              factionId: 1,
+              amount: lastMintAmount,
+            },
+            user1
+          )),
+        ];
       }
+    });
+
+    it(`Last minted tokens (User1) are all ASSIMILEE`, async () => {
+      for (tokenId of lastMintedTokens) {
+        const tokenFaction = await instance.tokenFaction(tokenId);
+        assert.equal(tokenFaction.toString(), "1", "tokenFaction not valid");
+      }
+    });
+
+    it(`User2 can mint his maximum of tokens in one transaction (faction PURE_GENE)`, async () => {
+      // first mint
+      lastMintedTokens = await mint(
+        { roundId: 1, factionId: 0, amount: maxMintsPerWallet },
+        user2
+      );
+    });
+
+    it(`Last minted tokens (User2) are all PURE_GENE`, async () => {
+      for (tokenId of lastMintedTokens) {
+        const tokenFaction = await instance.tokenFaction(tokenId);
+        assert.equal(tokenFaction.toString(), "0", "tokenFaction not valid");
+      }
+    });
+
+    it("Price should have decreased of 2 decreaseAmount after 2 hours", async () => {
+      const round = rounds[1];
+      await time.increase(round.price.decreaseTime.mul(getBN(2)));
+      const latestTime = await time.latest();
+
+      const actualPrice = await instance.roundPrice(1);
+      const timePassed = latestTime.sub(testStartTime.add(round.startTime));
+      const decreaseNb = timePassed.div(round.price.decreaseTime);
+      const expectedPrice = round.price.max.sub(
+        decreaseNb.mul(round.price.decreaseAmount)
+      );
+      assert.equal(
+        actualPrice.toString(),
+        expectedPrice.toString(),
+        "Incorrect price decrease"
+      );
+    });
+
+    it(`User can mint with the new price`, async () => {
+      const actualPrice = await instance.roundPrice(1);
+      await mint({ roundId: 1, factionId: 0, amount: 1 }, users[0], {
+        price: actualPrice,
+      });
+    });
+
+    it("Price should now be the minimum", async () => {
+      const round = rounds[1];
+
+      const oldPrice = await instance.roundPrice(1);
+      const remainingDecrease = oldPrice
+        .sub(round.price.min)
+        .div(round.price.decreaseAmount)
+        .add(getBN(1));
+
+      await time.increase(round.price.decreaseTime.mul(remainingDecrease));
+      const newPrice = await instance.roundPrice(1);
+      assert.equal(
+        newPrice.toString(),
+        round.price.min.toString(),
+        "Incorrect price decrease"
+      );
+    });
+
+    it(`User can mint with the minimum price`, async () => {
+      await mint({ roundId: 1, factionId: 0, amount: 1 }, users[0], {
+        price: rounds[1].price.min,
+      });
     });
 
     it(`Round 1 ended, users can't mint anymore (Reason: Round not in progress)`, async () => {
@@ -604,9 +708,106 @@ contract("MechaPilots2219V1", async (accounts) => {
         `Round not in progress`
       );
     });
+
+    it(`Owner can edit round 1 for change duration, now infinite for SOLD OUT tests`, async () => {
+      rounds[1].duration = 0;
+      await setupMintRound(rounds[1]);
+    });
   });
 
-  return;
+  /**
+   * ROUND 1 - SOLD OUT
+   */
+  describe("\n ROUND 1 - SOLD OUT", () => {
+    it(`User can't set maxMintsPerWallet for public round (Reason: caller is not the owner)`, async () => {
+      await expectRevert(
+        instance.setMaxMintsPerWallet(99999, {
+          from: user1,
+        }),
+        `Ownable: caller is not the owner`
+      );
+    });
+
+    it("Owner should be able to set maxMintsPerWallet to 99999 for sold out tests", async () => {
+      await instance.setMaxMintsPerWallet(99999, {
+        from: owner,
+      });
+
+      const newMaxMintsPerWallet = await instance.maxMintsPerWallet();
+      assert.equal(
+        newMaxMintsPerWallet.toString(),
+        "99999",
+        "Incorrect newMaxMintsPerWallet"
+      );
+    });
+
+    ["PURE_GENE", "ASSIMILEE"].forEach((factionName, factionId) => {
+      it(`All remaining tokens are minted for faction ${factionName} in round 1`, async () => {
+        const roundId = 1;
+        const round = await instance.rounds(roundId);
+        const supply = round.supply[factionId];
+        const totalMinted = round.totalMinted[factionId];
+
+        const remaining = supply - totalMinted;
+        const batchSize = 10;
+
+        const mintPerBatchNb = Math.floor(remaining / batchSize);
+        const rest = remaining % batchSize;
+
+        // Set progress bar
+        console.log(`\tWait while users mint ${remaining} tokens...`);
+        const progressBar = new cliProgress.SingleBar(
+          {
+            format:
+              "\tMint: [{bar}] {percentage}% | {value}/{total} tokens | ETA: {eta}s | Duration: {duration_formatted}",
+          },
+          cliProgress.Presets.shades_classic
+        );
+        progressBar.start(remaining, 0);
+        for (let i = 0; i < mintPerBatchNb; i++) {
+          await mint(
+            {
+              roundId: roundId,
+              factionId: factionId,
+              amount: batchSize,
+            },
+            users[Math.floor(Math.random() * users.length)]
+          );
+          progressBar.increment(batchSize);
+        }
+        if (rest) {
+          await mint(
+            {
+              roundId: roundId,
+              factionId: factionId,
+              amount: rest,
+            },
+            user2
+          );
+        }
+        progressBar.increment(rest);
+        progressBar.stop();
+      });
+
+      it(`${factionName} is now sold out for round 1`, async () => {
+        const round = await instance.rounds(1);
+
+        assert.equal(
+          round.supply[factionId],
+          round.totalMinted[factionId],
+          "Incorrect newMaxMintsPerWallet"
+        );
+      });
+
+      it(`Users can't mint ${factionName} in round 1 anymore (Reason: Round supply exceeded)`, async () => {
+        await expectRevert(
+          mint({ roundId: 1, factionId, amount: 1 }, users[3]),
+          `Round supply exceeded`
+        );
+      });
+    });
+  });
+
   /**
    * WITHDRAW ETH
    */
