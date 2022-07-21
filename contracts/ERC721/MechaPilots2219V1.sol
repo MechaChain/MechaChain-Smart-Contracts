@@ -293,7 +293,7 @@ contract MechaPilots2219V1 is
         require(_rounds[roundId].validator != address(0), "No round validator");
         require(
             ownerToRoundTotalMinted[msg.sender][roundId] + amount <= maxMint,
-            "Validator max allowed"
+            "Max allowed"
         );
         _checkSignature(
             payloadExpiration,
