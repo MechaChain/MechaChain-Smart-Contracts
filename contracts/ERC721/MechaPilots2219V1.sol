@@ -615,6 +615,17 @@ contract MechaPilots2219V1 is
     }
 
     /**
+     * @notice Returns the total amount of tokens minted for `factionId`.
+     */
+    function totalSupplyByFaction(uint256 factionId)
+        public
+        view
+        returns (uint256)
+    {
+        return _totalMintedByFaction[factionId];
+    }
+
+    /**
      * @notice Returns the total amount of tokens minted by `wallet` for `roundId`.
      */
     function totalMintedBy(address wallet, uint256 roundId)
@@ -712,10 +723,8 @@ contract MechaPilots2219V1 is
             "Round supply exceeded"
         );
 
-        // Increase `totalMinted` if needed
-        if (round.supply[factionId] != 0) {
-            round.totalMinted[factionId] += uint32(amount);
-        }
+        // Increase `totalMinted`
+        round.totalMinted[factionId] += uint32(amount);
 
         // Safe mint
         _safeMint(wallet, factionId, amount);
@@ -735,7 +744,7 @@ contract MechaPilots2219V1 is
      * - `faction` must exist
      * - The supply of the faction must not be exceeded with amount
      *
-     * @dev Increase `_totalMinted`
+     * @dev Increase `_totalMinted` and `_totalMintedByFaction`
      *
      * @param wallet The wallet to transfer new tokens
      * @param factionId The faction
@@ -785,7 +794,7 @@ contract MechaPilots2219V1 is
                     remaining
                 )
             )
-        ) % remaining) + 1;
+        ) % remaining);
         uint256 value = rand;
 
         if (_availableIds[rand] != 0) {
@@ -798,7 +807,7 @@ contract MechaPilots2219V1 is
             _availableIds[rand] = _availableIds[remaining - 1];
         }
 
-        return value;
+        return value + 1;
     }
 
     /**
