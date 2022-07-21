@@ -507,7 +507,7 @@ contract MechaPilots2219V1 is
     }
 
     /**
-     * @notice Change number of tokens that a wallet can mint in a public wave
+     * @notice Change number of tokens that a wallet can mint in a public round
      */
     function setMaxMintsPerWallet(uint256 newMaxMints)
         external
@@ -709,7 +709,7 @@ contract MechaPilots2219V1 is
             (round.supply[factionId] == 0 ||
                 round.totalMinted[factionId] + amount <=
                 round.supply[factionId]),
-            "Wave supply exceeded"
+            "Round supply exceeded"
         );
 
         // Increase `totalMinted` if needed

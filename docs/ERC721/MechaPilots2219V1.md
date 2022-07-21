@@ -51,6 +51,7 @@ MechaPilots2219 - TODO
     - [`withdraw`](#MechaPilots2219V1-withdraw-address-payable-uint256-) 
     - [`withdrawTokens`](#MechaPilots2219V1-withdrawTokens-address-address-uint256-) 
     - [`tokenURI`](#MechaPilots2219V1-tokenURI-uint256-) 
+    - [`rounds`](#MechaPilots2219V1-rounds-uint256-) 
     - [`totalSupply`](#MechaPilots2219V1-totalSupply--) 
     - [`totalMintedBy`](#MechaPilots2219V1-totalMintedBy-address-uint256-) 
     - [`roundPrice`](#MechaPilots2219V1-roundPrice-uint256-) 
@@ -550,7 +551,7 @@ Parameters:
 
 
 ### `setMaxMintsPerWallet(uint256 newMaxMints)` (external) <a name="MechaPilots2219V1-setMaxMintsPerWallet-uint256-" id="MechaPilots2219V1-setMaxMintsPerWallet-uint256-"></a>
-Change number of tokens that a wallet can mint in a public wave
+Change number of tokens that a wallet can mint in a public round
 
 
 
@@ -598,6 +599,15 @@ Parameters:
 ### `tokenURI(uint256 tokenId) → string` (public) <a name="MechaPilots2219V1-tokenURI-uint256-" id="MechaPilots2219V1-tokenURI-uint256-"></a>
 Returns the URI of `tokenId`, according to its condition (revealed or not)
 
+
+
+
+
+### `rounds(uint256 roundId) → struct MechaPilots2219V1.MintRound` (external) <a name="MechaPilots2219V1-rounds-uint256-" id="MechaPilots2219V1-rounds-uint256-"></a>
+Returns the MintRound structure of `roundId`
+
+
+Better web3 accessibility that a public variable (includes arrays)
 
 
 
