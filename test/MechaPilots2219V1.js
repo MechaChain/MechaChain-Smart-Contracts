@@ -4,14 +4,16 @@ const cliProgress = require("cli-progress");
 
 // Load artifacts
 const MechaPilots2219V1 = artifacts.require("MechaPilots2219V1");
+const DummyMintConstructor = artifacts.require("DummyMintConstructor");
+const MechaPilots2219V2 = artifacts.require("MechaPilots2219V2");
 
 // Load utils
 const {
   getAmount,
   getBN,
-  getBNRange,
   gasTracker,
   getSignature,
+  getRandom,
 } = require("../utils");
 const { upgradeProxy, deployProxy } = require("@openzeppelin/truffle-upgrades");
 
@@ -25,15 +27,17 @@ contract("MechaPilots2219V1", async (accounts) => {
     maxMintsPerWallet,
     MAX_SUPPLY_BY_FACTION,
     MAX_SUPPLY,
+    URI_UPDATER_ROLE,
     lastMintedTokens;
   let contractBalance = getAmount(0);
   let mintedTokens = [];
   let usersTokens = {};
+  let tpmData = {};
 
   const rounds = [
     {}, // 0 not possible
     {
-      // Public sale (with FDA)
+      name: "Public (FDA)",
       roundId: 1,
       supply: [40, 40],
       startTime: time.duration.days(1), // to add to `testStartTime`
@@ -48,7 +52,7 @@ contract("MechaPilots2219V1", async (accounts) => {
       },
     },
     {
-      // Whitelist tier 1
+      name: "Whitelist 1",
       roundId: 2,
       supply: [40, 40],
       startTime: time.duration.days(4), // to add to `testStartTime`
@@ -65,7 +69,7 @@ contract("MechaPilots2219V1", async (accounts) => {
       },
     },
     {
-      // Whitelist tier 2
+      name: "Whitelist 2",
       roundId: 3,
       supply: [40, 40],
       startTime: time.duration.days(4), // to add to `testStartTime`
@@ -82,7 +86,7 @@ contract("MechaPilots2219V1", async (accounts) => {
       },
     },
     {
-      // Free for sold out tests
+      name: "Free (tests)",
       roundId: 4,
       supply: [0, 0],
       startTime: time.duration.hours(0), // to add to `testStartTime`
@@ -100,11 +104,15 @@ contract("MechaPilots2219V1", async (accounts) => {
   ];
 
   const baseURI = "ipfs://xxxxxxxxxx/";
-  const notRevealedUri = "ipfs://yyyyyyyyyy/";
   const baseExtension = ".json";
+  const URIForRevealed = (id) => "ipfs://xxxxxxxxxx/revealed/" + id;
 
   const otherPrivateKey =
     "0x253d7333eba154ef8fc973ee4ae2e5f35d4cc8da5db8a9e6aaa51417902c2501";
+
+  const tokenURIUpdater = "0x6F76846f7C90EcEC371e1d96cA93bfE9d36eEb83";
+  const tokenURIUpdaterPrivateKey =
+    "0xfeae30926cea7dfa8fb803c348aef7f06941b9af7770e6b62c0dcb543d3391a7";
 
   /**
    * ========================
@@ -403,6 +411,49 @@ contract("MechaPilots2219V1", async (accounts) => {
   };
 
   /**
+   * Reveal token with signature according to round data (or `overrideData`)
+   * Test data and add cost to `gasTracker`
+   */
+  const reveal = async (tokenId, user, overrideData = {}) => {
+    const uri = URIForRevealed(tokenId);
+    const latestTime = await time.latest();
+    const payloadExpiration = latestTime.add(time.duration.minutes(30));
+    const signature = getSignature(
+      overrideData.updater_private_key || tokenURIUpdaterPrivateKey,
+      [user, payloadExpiration, tokenId, uri, instance.address, chainid]
+    );
+
+    const tx = await instance.revealToken(
+      tokenId,
+      overrideData.uri || uri,
+      payloadExpiration,
+      signature,
+      {
+        from: user1,
+      }
+    );
+    await gasTracker.addCost(`Reveal Token x1`, tx);
+
+    const newUri = await instance.tokenURI(tokenId);
+    assert.equal(newUri, uri, "Bad URI");
+
+    const isRevealed = await instance.isRevealed(tokenId);
+    assert.equal(isRevealed, true, "Not revealed");
+  };
+
+  /**
+   * Get random minted token
+   */
+  const getRandomToken = () =>
+    mintedTokens[getRandom(0, mintedTokens.length - 1)];
+
+  /**
+   * Get random token of an user
+   */
+  const getUserRandomToken = (user) =>
+    usersTokens[user][getRandom(0, usersTokens[user].length - 1)];
+
+  /**
    * ========================
    *          TESTS
    * ========================
@@ -429,6 +480,35 @@ contract("MechaPilots2219V1", async (accounts) => {
         await instance.MAX_SUPPLY_BY_FACTION(0),
         await instance.MAX_SUPPLY_BY_FACTION(1),
       ];
+      URI_UPDATER_ROLE = await instance.URI_UPDATER_ROLE();
+    });
+  });
+
+  describe("\n CONFIG", () => {
+    it(`Show test config`, async () => {
+      console.table({
+        MAX_SUPPLY: MAX_SUPPLY.toNumber(),
+        MAX_SUPPLY_BY_FACTION: `[${MAX_SUPPLY_BY_FACTION.map((e) =>
+          e.toNumber()
+        ).toString()}]`,
+        // ROUNDS
+        ...rounds.reduce(
+          (acc, e, idx) =>
+            idx > 0
+              ? {
+                  ...acc,
+                  [`ROUND ${idx}: ${e.name}`]: JSON.stringify({
+                    supply: `[${e.supply.toString()}]`,
+                    hasValidator: !!e.validator,
+                  }),
+                }
+              : acc,
+          {}
+        ),
+        // OTHER
+        ACCOUNTS_NUMBER: accounts.length,
+        DATE: new Date().toLocaleString(),
+      });
     });
   });
 
@@ -853,6 +933,27 @@ contract("MechaPilots2219V1", async (accounts) => {
   });
 
   /**
+   * MINT SECURITY
+   */
+  describe("\n MINT SECURITY", () => {
+    it(`Can't mint with a smart contract`, async () => {
+      await expectRevert(
+        DummyMintConstructor.new(instance.address, 1, 1, 2),
+        `Minting from smart contracts is disallowed`
+      );
+    });
+
+    it("Owner is able to change supply bellow the total minted without errors at the mint", async () => {
+      rounds[1].supply = [2, 2];
+      await setupMintRound(rounds[1]);
+      await expectRevert(
+        mint({ roundId: 1, amount: 1, factionId: 1 }, users[3]),
+        `Round supply exceeded`
+      );
+    });
+  });
+
+  /**
    * ROUNDS 2 & 3 - WHITELISTS TIERS 1 & 2
    */
   describe("\n ROUNDS 2 & 3 - WHITELISTS TIERS 1 & 2", () => {
@@ -1219,6 +1320,194 @@ contract("MechaPilots2219V1", async (accounts) => {
   });
 
   /**
+   * TOKEN DATA AND REVEAL
+   */
+  describe("\n TOKEN DATA AND REVEAL", () => {
+    it(`User can't set baseURI (Reason: caller is not the owner)`, async () => {
+      await expectRevert(
+        instance.setBaseURI(baseURI, {
+          from: user1,
+        }),
+        `Ownable: caller is not the owner`
+      );
+    });
+
+    it("Owner should be able to set baseURI", async () => {
+      await instance.setBaseURI(baseURI, {
+        from: owner,
+      });
+    });
+
+    it("tokenURI refers to the correct URI", async () => {
+      const tokenId = getRandomToken();
+      const uri = await instance.tokenURI(tokenId);
+      assert.equal(uri, baseURI + tokenId + baseExtension);
+    });
+
+    it(`User can't set TokenURI (Reason: missing role URI_UPDATER_ROLE)`, async () => {
+      const tokenId = getUserRandomToken(user1);
+      await expectRevert(
+        instance.setTokenURI(tokenId, URIForRevealed(tokenId), {
+          from: user1,
+        }),
+        `AccessControl:`
+      );
+    });
+
+    it(`User can't set TokenURI per batch (Reason: missing role URI_UPDATER_ROLE)`, async () => {
+      const tokenIds = Array(10)
+        .fill()
+        .map(() => getRandomToken());
+      const uri = tokenIds.map((id) => URIForRevealed(id));
+      await expectRevert(
+        instance.setTokenURIPerBatch(tokenIds, uri, {
+          from: user1,
+        }),
+        `AccessControl:`
+      );
+    });
+
+    it("Admin should be able to set URI_UPDATER_ROLE", async () => {
+      await instance.grantRole(URI_UPDATER_ROLE, tokenURIUpdater);
+      const hasRole = await instance.hasRole(URI_UPDATER_ROLE, tokenURIUpdater);
+      assert(hasRole);
+    });
+
+    it(`User can't reveal a token with a signature not signed by URI_UPDATER_ROLE (Reason: invalid signature)`, async () => {
+      const tokenId = getUserRandomToken(user1);
+
+      await expectRevert(
+        reveal(tokenId, user1, {
+          updater_private_key: otherPrivateKey,
+        }),
+        `Invalid signature`
+      );
+    });
+
+    it(`User can't change the uri provide by the signature of URI_UPDATER_ROLE (Reason: invalid signature)`, async () => {
+      const tokenId = getUserRandomToken(user1);
+
+      await expectRevert(
+        reveal(tokenId, user1, {
+          uri: "https://fake-data.hack/my-super-nft",
+        }),
+        `Invalid signature`
+      );
+    });
+
+    it(`User can't reveal a token for an other wallet (Reason: not owner nor approved)`, async () => {
+      const tokenId = getUserRandomToken(user2);
+      await expectRevert(reveal(tokenId, user1), `Not owner nor approved`);
+    });
+
+    it(`User can reveal a token with a URI_UPDATER_ROLE signature`, async () => {
+      tpmData.tokenId = getUserRandomToken(user1);
+
+      const isRevealed = await instance.isRevealed(tpmData.tokenId);
+      assert.equal(isRevealed, false, "Already revealed");
+      await reveal(tpmData.tokenId, user1);
+    });
+
+    it("tokenURI refers to the new reveal URI", async () => {
+      const newUri = await instance.tokenURI(tpmData.tokenId);
+      const uri = URIForRevealed(tpmData.tokenId);
+      assert.equal(newUri, uri, "Bad URI");
+    });
+
+    it(`Owner can set TokenURI`, async () => {
+      const tokenId = getRandomToken(user1);
+      const uri = URIForRevealed(tokenId);
+      const tx = await instance.setTokenURI(tokenId, uri);
+      await gasTracker.addCost(`Set Token URI x1`, tx);
+
+      const newUri = await instance.tokenURI(tokenId);
+      assert.equal(newUri, uri, "Bad URI");
+
+      const isRevealed = await instance.isRevealed(tokenId);
+      assert.equal(isRevealed, true, "Not revealed");
+    });
+
+    it(`Owner can set TokenURI per batch`, async () => {
+      const tokenIds = Array(10)
+        .fill()
+        .map(() => getRandomToken().toNumber());
+      const uriList = tokenIds.map((id) => URIForRevealed(id));
+      const tx = await instance.setTokenURIPerBatch(tokenIds, uriList);
+      await gasTracker.addCost(`Set Token URI x${tokenIds.length}`, tx);
+
+      for (const [tokenId, uri] in uriList.entries()) {
+        const newUri = await instance.tokenURI(tokenId);
+        assert.equal(newUri, uri, "Bad URI");
+
+        const isRevealed = await instance.isRevealed(tokenId);
+        assert.equal(isRevealed, true, "Not revealed");
+      }
+    });
+  });
+
+  /**
+   * BURNS
+   */
+  describe("\n BURNS", () => {
+    it(`Users can't burn tokens (Reason: Not burnable)`, async () => {
+      await expectRevert(
+        instance.burn(getUserRandomToken(user1), {
+          from: user1,
+        }),
+        `Not burnable`
+      );
+    });
+
+    it(`Users can't enabled the burn function (Reason: caller is not owner)`, async () => {
+      await expectRevert(
+        instance.setBurnable(true, {
+          from: user1,
+        }),
+        `Ownable: caller is not the owner`
+      );
+    });
+
+    it(`Owner can enabled the burn function`, async () => {
+      const tx = await instance.setBurnable(true, {
+        from: owner,
+      });
+      await gasTracker.addCost(`setBurnable`, tx);
+      const burnable = await instance.burnable();
+      assert.equal(burnable, true, "Burnable not activated");
+    });
+
+    it(`User1 can burn tokens !`, async () => {
+      const oldSupply = await instance.totalSupply();
+      const tokenId = getUserRandomToken(user1);
+      const tx = await instance.burn(tokenId, {
+        from: user1,
+      });
+      getTokensFromTransferEvent(tx, true);
+      await gasTracker.addCost(`Burn x1`, tx);
+      const newSupply = await instance.totalSupply();
+
+      // Token not exist anymore
+      await expectRevert(instance.ownerOf(tokenId), "ERC721: invalid token ID");
+
+      // Supply
+      assert.equal(
+        newSupply.toNumber(),
+        oldSupply.toNumber() - 1,
+        "Incorrect supply"
+      );
+    });
+
+    it(`Owner can't burn a token of an user (Reason: not owner nor approved)`, async () => {
+      await expectRevert(
+        instance.burn(getUserRandomToken(user1), {
+          from: owner,
+        }),
+        `ERC721: caller is not token owner nor approved`
+      );
+    });
+  });
+
+  /**
    * WITHDRAW ETH
    */
   describe("\n WITHDRAW ETH", () => {
@@ -1286,6 +1575,35 @@ contract("MechaPilots2219V1", async (accounts) => {
       );
 
       contractBalance = balance;
+    });
+  });
+
+  /**
+   * UPGRADE CONTRACT
+   */
+  describe("\n UPGRADE CONTRACT", () => {
+    it(`Upgrade Smart Contract for v2 (draft)`, async () => {
+      const oldUserBalance = getBN(await instance.balanceOf(user1));
+
+      instanceV2 = await upgradeProxy(instance.address, MechaPilots2219V2, {
+        call: "initializeV2",
+      });
+
+      const newUserBalance = getBN(await instanceV2.balanceOf(user1));
+
+      assert.equal(
+        newUserBalance.toString(),
+        oldUserBalance.toString(),
+        "Incorrect balance after upgrading contract"
+      );
+      assert.equal((await instanceV2.version()).toString(), "2", `Bad version`);
+    });
+
+    it(`Owner can't recall initializeV2 (reason: contract is already initialized)`, async () => {
+      await expectRevert(
+        instanceV2.initializeV2(),
+        `Initializable: contract is already initialized`
+      );
     });
   });
 
