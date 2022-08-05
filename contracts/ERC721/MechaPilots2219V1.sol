@@ -599,6 +599,14 @@ contract MechaPilots2219V1 is
     }
 
     /**
+     * @notice Returns true if the `tokenId` is not revealed yet
+     */
+    function isRevealed(uint256 tokenId) public view virtual returns (bool) {
+        string memory _tokenURI = _tokenURIs[tokenId];
+        return bytes(_tokenURI).length > 0;
+    }
+
+    /**
      * @notice Returns the MintRound structure of `roundId`
      *
      * @dev Better web3 accessibility that a public variable (includes arrays)
