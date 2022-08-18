@@ -1,7 +1,8 @@
-import { Signer } from "ethers";
+import { json } from "stream/consumers";
 
 class Refund {
   async startRefund(): Promise<void> {
+    const readline = require('readline');
     const fs = require('fs')
     const { ethers, VoidSigner } = require('ethers')
     require("dotenv").config()
@@ -72,6 +73,30 @@ class Refund {
           provider = new ethers.providers.WebSocketProvider(`wss://eth-rinkeby.alchemyapi.io/v2/${ALCHEMY_KEY_RINKEBY}`)
       }
 
+      let gasPrice: string = String(await provider.getGasPrice())
+      const maxGasFee: number = 30000000000
+      const nbWallets: number = jsonFile.totalWalletToRefund - jsonFile.totalWalletRefund
+      const amountToRefund: number = jsonFile.totalPayementToRefund - jsonFile.totalRefund
+      const totalGasFee: number = parseInt(gasPrice) * nbWallets
+      const nbTxsPerBatch: number = Math.floor(maxGasFee / parseInt(gasPrice))
+
+      const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout
+      })
+      
+      rl.question(`You have ${nbWallets} wallets left to refund, for ${amountToRefund/10^16} ETH and ${totalGasFee} gas fees. Continue? [y/n]`, (answer: string) => {
+        switch(answer.toLowerCase()) {
+          case 'y':
+          case 'Y':
+            console.log('Ok we\'ll proced')
+            break;
+          default:
+            process.exit(0)
+        }
+        rl.close()
+      })
+
       const walletEOA = new ethers.Wallet(SERVER_PRIVATE_KEY, provider)
       const relayer = new RpcRelayer({url: URL_RPC_RELAYER})
       const wallet = (await Wallet.singleOwner(walletEOA)).connect(provider, relayer)
@@ -95,7 +120,7 @@ class Refund {
               jsonFile.totalRefund += jsonFile.wallets[walletAddress].totalToRefund
             }
             countTxs++
-            if (countTxs === 50) {
+            if (countTxs === nbTxsPerBatch) {
               const txnResponse = await signer.sendTransaction(txs, undefined, undefined)
 
               const txnReceipt = await txnResponse.wait()
