@@ -5,8 +5,8 @@ class ListenEvent {
         require("dotenv").config()
         const { ALCHEMY_KEY_MAINNET, ALCHEMY_KEY_RINKEBY, DEPLOY_BLOCK_ID } = process.env
     
+        //we get the script args to start the search
         const myArgs = process.argv.slice(2)
-
         if (myArgs.length == 4) {
             const network: string = myArgs[0]
             const contractAddress: string = myArgs[1]
@@ -14,6 +14,7 @@ class ListenEvent {
             const finaleMintPrice: string = myArgs[3]
             const finaleMintPriceGwei: number = ethers.utils.parseUnits(finaleMintPrice, "ether").toNumber()
     
+            //get the right provider according to the network
             let provider
             if (network == "mainnet") {
                 provider = new ethers.providers.WebSocketProvider(`wss://eth-mainnet.alchemyapi.io/v2/${ALCHEMY_KEY_MAINNET}`)
@@ -28,14 +29,7 @@ class ListenEvent {
     
             const contract = new ethers.Contract(contractAddress, abi, provider)
     
-            //listen the new events
-            /*contract.on("MintPaid", (roundId, wallet, amount, payement) => {
-                console.log(BigNumber.toNumber(roundId));
-                console.log(wallet);
-                console.log(BigNumber.toNumber(amount));
-                console.log(BigNumber.toNumber(payement));
-            });*/
-    
+            //variables init
             let totalMinted = 0
             let totalWallet = 0
             let totalWalletPayement = 0
@@ -57,7 +51,7 @@ class ListenEvent {
             }
             let wallets: {[key: string]: Wallet} = {}
     
-            //working code to get all the events from a given block number
+            //get all the events from a given block number
             let eventFilter = contract.filters.MintPaid(roundId)
             let events = await contract.queryFilter(eventFilter, Number(DEPLOY_BLOCK_ID))
             events.forEach((event: any) => {
@@ -70,11 +64,13 @@ class ListenEvent {
                 totalWalletPayement += payement
                 totalPayementToRefund += payement - (amount * finaleMintPriceGwei)
     
+                //if we already saw the wallet we add the informations on the first occurence
                 if (wallet in wallets) {
                     wallets[wallet].totalMinted += amount
                     wallets[wallet].totalPayement += payement
                     wallets[wallet].totalToRefund += payement - (amount * finaleMintPriceGwei)
                 }
+                //otherwise we add a new row in the array
                 else {
                     wallets[wallet] = {
                         totalMinted: amount,
@@ -90,7 +86,7 @@ class ListenEvent {
                     amount : amount,
                     payment : payement
                 })
-    
+                //remember the last block seen
                 lastBlock = lastBlock > event.blockNumber ? lastBlock : event.blockNumber
             })
     
@@ -100,6 +96,7 @@ class ListenEvent {
                 }
             })
     
+            //init the json object to create the file
             let jsonData: any = {
                 'smartContract': contractAddress,
                 'network': network,
@@ -119,6 +116,7 @@ class ListenEvent {
             let data = JSON.stringify(jsonData)
     
             try {
+                //json file creation
                 fs.mkdirSync('./build', { recursive: true })
                 fs.writeFileSync(`./build/refund_round_${roundId}_output.json`, data)
                 process.exit(0)

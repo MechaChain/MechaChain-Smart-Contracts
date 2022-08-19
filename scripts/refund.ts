@@ -1,18 +1,17 @@
-import { json } from "stream/consumers";
-
 class Refund {
   async startRefund(): Promise<void> {
     const readline = require('readline');
     const fs = require('fs')
-    const { ethers, VoidSigner } = require('ethers')
+    const { ethers } = require('ethers')
     require("dotenv").config()
-    const { PRIVATE_KEY, ALCHEMY_KEY_MAINNET, ALCHEMY_KEY_RINKEBY, SEQUENCE_WALLET, SERVER_PRIVATE_KEY, URL_RPC_RELAYER } = process.env
+    const { ALCHEMY_KEY_MAINNET, ALCHEMY_KEY_RINKEBY, SEQUENCE_WALLET, SERVER_PRIVATE_KEY, URL_RPC_RELAYER } = process.env
     const RpcRelayer = require('@0xsequence/relayer')
     const Wallet = require('@0xsequence/wallet')
-    const encodeNonce = require('@0xsequence/transactions')
 
+    // get the script args to find the json file
     const myArgs = process.argv.slice(2);
     if (myArgs.length == 1) {
+      //variabls init
       type Transaction = {
         txnHash: string;
         amount: number;
@@ -65,6 +64,7 @@ class Refund {
       let wallets: string[] = []
       let countTxs: number = 0
       
+      //get the right provider according to the ethereum network
       let provider;
       if (network == "mainnet") {
           provider = new ethers.providers.WebSocketProvider(`wss://eth-mainnet.alchemyapi.io/v2/${ALCHEMY_KEY_MAINNET}`)
@@ -73,6 +73,7 @@ class Refund {
           provider = new ethers.providers.WebSocketProvider(`wss://eth-rinkeby.alchemyapi.io/v2/${ALCHEMY_KEY_RINKEBY}`)
       }
 
+      //get the actual gas fees
       let gasPrice: string = String(await provider.getGasPrice())
       const maxGasFee: number = 30000000000
       const nbWallets: number = jsonFile.totalWalletToRefund - jsonFile.totalWalletRefund
@@ -85,6 +86,7 @@ class Refund {
         output: process.stdout
       })
       
+      //asking with a prompt if the user is agree to start the refund
       rl.question(`You have ${nbWallets} wallets left to refund, for ${amountToRefund/10^16} ETH and ${totalGasFee} gas fees. Continue? [y/n]`, (answer: string) => {
         switch(answer.toLowerCase()) {
           case 'y':
@@ -104,12 +106,15 @@ class Refund {
       const signer = wallet.getSigner()
 
       try {
+        //loop on all the wallets
         for (const walletAddress in jsonFile.wallets) {
           if (jsonFile.wallets.hasOwnProperty(walletAddress)) {
             if (jsonFile.wallets[walletAddress].refunded !== null) {
+              //if we already refund the wallet do we do something ?
               console.log(jsonFile.wallets[walletAddress].refunded);
             }
             else {
+              //here we add the refund transaction in the batch array
               txs.push({
                 to: walletAddress,
                 value: String(jsonFile.wallets[walletAddress].totalToRefund)
@@ -120,6 +125,7 @@ class Refund {
               jsonFile.totalRefund += jsonFile.wallets[walletAddress].totalToRefund
             }
             countTxs++
+            //if we have the max number of transactions we start a batch
             if (countTxs === nbTxsPerBatch) {
               const txnResponse = await signer.sendTransaction(txs, undefined, undefined)
 
@@ -128,6 +134,7 @@ class Refund {
               fs.mkdirSync('./build', { recursive: true })
               fs.writeFileSync(`./build/transaction_refund_log.json`, JSON.stringify(txnReceipt))
 
+              //we update the given file with the new informations
               for (const walletAddress in jsonFile.wallets) {
                 if (jsonFile.wallets.hasOwnProperty(walletAddress) && walletAddress in wallets) {
                   jsonFile.wallets[walletAddress].refunded = txnReceipt.txnHash
