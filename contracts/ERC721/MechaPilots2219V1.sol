@@ -332,7 +332,7 @@ contract MechaPilots2219V1 is
         uint256 payloadExpiration,
         bytes memory sig
     ) external whenNotPaused {
-        require( // TODO usefull ?
+        require(
             _isApprovedOrOwner(_msgSender(), tokenId),
             "Not owner nor approved"
         );
@@ -681,6 +681,7 @@ contract MechaPilots2219V1 is
 
     /**
      * @notice Safely mint the `amount` of token for `wallet` in a `round`
+     * If `faction` is sold out, automatically mint the other
      *
      * @dev Call {MechaPilots2219V1-_safeMint}.
      * @dev Requirements:
@@ -723,13 +724,19 @@ contract MechaPilots2219V1 is
         // Correct price
         require(roundPrice(roundId) * amount <= msg.value, "Wrong price");
 
-        // Round supply requirements
-        require(
-            (round.supply[factionId] == 0 ||
-                round.totalMinted[factionId] + amount <=
-                round.supply[factionId]),
-            "Round supply exceeded"
-        );
+        // If faction supply is sold out, try the other supply
+        if (
+            round.supply[factionId] != 0 &&
+            round.totalMinted[factionId] + amount > round.supply[factionId]
+        ) {
+            factionId = factionId == 1 ? 0 : 1;
+            require(
+                (round.supply[factionId] == 0 ||
+                    round.totalMinted[factionId] + amount <=
+                    round.supply[factionId]),
+                "Round supply exceeded"
+            );
+        }
 
         // Increase `totalMinted`
         round.totalMinted[factionId] += uint32(amount);
@@ -745,7 +752,8 @@ contract MechaPilots2219V1 is
     }
 
     /**
-     * @notice Safely mint the `amount` of token for `wallet`
+     * @notice Safely mint the `amount` of token for `wallet`.
+     * If `faction` is sold out, automatically mint the other
      *
      * @dev Requirements:
      * - `amount` must be above 0
@@ -766,11 +774,19 @@ contract MechaPilots2219V1 is
         Faction faction = Faction(factionId);
         require(amount > 0, "Zero amount");
         require(_totalMinted + amount <= MAX_SUPPLY, "Supply exceeded");
-        require(
-            _totalMintedByFaction[factionId] + amount <=
-                MAX_SUPPLY_BY_FACTION[factionId],
-            "Faction supply exceeded"
-        );
+
+        // If faction supply is sold out, try the other supply
+        if (
+            _totalMintedByFaction[factionId] + amount >
+            MAX_SUPPLY_BY_FACTION[factionId]
+        ) {
+            factionId = factionId == 1 ? 0 : 1;
+            require(
+                _totalMintedByFaction[factionId] + amount <=
+                    MAX_SUPPLY_BY_FACTION[factionId],
+                "All factions supply exceeded"
+            );
+        }
 
         // Mint
         for (uint256 i = 0; i < amount; i++) {
