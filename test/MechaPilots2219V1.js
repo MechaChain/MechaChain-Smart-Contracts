@@ -226,7 +226,8 @@ contract("MechaPilots2219V1", async (accounts) => {
   const mint = async (
     { roundId, factionId, amount, maxMint },
     user,
-    overrideData = {}
+    overrideData = {},
+    expectedOtherFaction = false
   ) => {
     const round = await instance.rounds(roundId);
     const oldBalance = await instance.balanceOf(user);
@@ -234,12 +235,19 @@ contract("MechaPilots2219V1", async (accounts) => {
       oldUserRoundTotalMinted,
       oldTotalSupply,
       oldTotalSupplyByFaction;
-    if (factionId < round.totalMinted.length) {
-      oldRoundTotalMinted = round.totalMinted[factionId];
+    let expectedFactionId = expectedOtherFaction
+      ? factionId === 1
+        ? 0
+        : 1
+      : factionId;
+    if (expectedFactionId < round.totalMinted.length) {
+      oldRoundTotalMinted = round.totalMinted[expectedFactionId];
 
       oldUserRoundTotalMinted = await instance.totalMintedBy(user, roundId);
       oldTotalSupply = await instance.totalSupply();
-      oldTotalSupplyByFaction = await instance.totalSupplyByFaction(factionId);
+      oldTotalSupplyByFaction = await instance.totalSupplyByFaction(
+        expectedFactionId
+      );
     }
     const unitPrice = await instance.roundPrice(roundId);
     const price = overrideData?.price || unitPrice.mul(getBN(amount));
@@ -295,11 +303,11 @@ contract("MechaPilots2219V1", async (accounts) => {
     // Balances tests
     const newBalance = await instance.balanceOf(user);
 
-    const newRoundTotalMinted = newRound.totalMinted[factionId];
+    const newRoundTotalMinted = newRound.totalMinted[expectedFactionId];
     const newUserRoundTotalMinted = await instance.totalMintedBy(user, roundId);
     const newTotalSupply = await instance.totalSupply();
     const newTotalSupplyByFaction = await instance.totalSupplyByFaction(
-      factionId
+      expectedFactionId
     );
 
     assert.equal(
@@ -338,7 +346,7 @@ contract("MechaPilots2219V1", async (accounts) => {
       const tokenFaction = await instance.tokenFaction(tokenId);
       assert.equal(
         tokenFaction.toString(),
-        factionId,
+        expectedFactionId,
         "tokenFaction not valid"
       );
 
@@ -865,7 +873,7 @@ contract("MechaPilots2219V1", async (accounts) => {
       );
     });
 
-    ["PURE_GENE", "ASSIMILEE"].forEach((factionName, factionId) => {
+    ["PURE_GENE", "ASSIMILEE"].forEach((factionName, factionId, arr) => {
       it(`All remaining tokens are minted for faction ${factionName} in round 1`, async () => {
         const roundId = 1;
         const round = await instance.rounds(roundId);
@@ -923,12 +931,33 @@ contract("MechaPilots2219V1", async (accounts) => {
         );
       });
 
-      it(`Users can't mint ${factionName} in round 1 anymore (Reason: Round supply exceeded)`, async () => {
-        await expectRevert(
-          mint({ roundId: 1, factionId, amount: 1 }, users[3]),
-          `Round supply exceeded`
-        );
-      });
+      if (factionId == 0) {
+        it(`Users can ask to mint ${factionName} (sold out), but will receive a ${
+          arr[factionId + 1]
+        }`, async () => {
+          const mintedTokens = await mint(
+            { roundId: 1, factionId, amount: 1 },
+            users[3],
+            {},
+            true
+          );
+          for (tokenId of mintedTokens) {
+            const tokenFaction = await instance.tokenFaction(tokenId);
+            assert.equal(
+              tokenFaction.toString(),
+              factionId + 1,
+              "tokenFaction not valid"
+            );
+          }
+        });
+      } else if (factionId == arr.length - 1) {
+        it(`Users can't mint in round 1 anymore (Reason: Round supply exceeded)`, async () => {
+          await expectRevert(
+            mint({ roundId: 1, factionId, amount: 1 }, users[3]),
+            `Round supply exceeded`
+          );
+        });
+      }
     });
   });
 
@@ -1067,7 +1096,16 @@ contract("MechaPilots2219V1", async (accounts) => {
    */
   describe("\n ROUND 2 & 3 - SOLD OUT", () => {
     for (let roundId = 2; roundId <= 3; roundId++) {
-      ["PURE_GENE", "ASSIMILEE"].forEach((factionName, factionId) => {
+      let factions = [
+        { factionName: "PURE_GENE", factionId: 0 },
+        { factionName: "ASSIMILEE", factionId: 1 },
+      ];
+      if (roundId === 2) {
+        // Reverse factions mint once for test a different config
+        factions.reverse();
+      }
+
+      factions.forEach(({ factionName, factionId }, idx, arr) => {
         it(`All remaining tokens are minted for faction ${factionName} in round ${roundId}`, async () => {
           const round = await instance.rounds(roundId);
           const supply = round.supply[factionId];
@@ -1126,12 +1164,36 @@ contract("MechaPilots2219V1", async (accounts) => {
           );
         });
 
-        it(`Users can't mint ${factionName} in round ${roundId} anymore (Reason: Round supply exceeded)`, async () => {
-          await expectRevert(
-            mint({ roundId, factionId, amount: 1, maxMint: 99999 }, users[3]),
-            `Round supply exceeded`
-          );
-        });
+        if (idx == 0) {
+          it(`Users can ask to mint ${factionName} (sold out), but will receive a ${
+            arr[idx + 1].factionName
+          }`, async () => {
+            const mintedTokens = await mint(
+              { roundId, factionId, amount: 1, maxMint: 999999 },
+              users[3],
+              {},
+              true
+            );
+            for (tokenId of mintedTokens) {
+              const tokenFaction = await instance.tokenFaction(tokenId);
+              assert.equal(
+                tokenFaction.toString(),
+                arr[idx + 1].factionId,
+                "tokenFaction not valid"
+              );
+            }
+          });
+        } else if (idx == arr.length - 1) {
+          it(`Users can't mint in round ${roundId} anymore (Reason: Round supply exceeded)`, async () => {
+            await expectRevert(
+              mint(
+                { roundId, factionId, amount: 1, maxMint: 999999 },
+                users[3]
+              ),
+              `Round supply exceeded`
+            );
+          });
+        }
       });
     }
   });
@@ -1174,13 +1236,13 @@ contract("MechaPilots2219V1", async (accounts) => {
       );
     });
 
-    it(`Owner can't airdrop more tokens than the faction total remaining supply (Reason: Faction supply exceeded)`, async () => {
+    it(`Owner can't airdrop more tokens than the faction total remaining supply (Reason: All factions supply exceeded)`, async () => {
       const supply = await instance.totalSupplyByFaction(1);
       const factionMaxSupply = MAX_SUPPLY_BY_FACTION[1];
       const amount = factionMaxSupply.sub(supply).toNumber() + 1;
       await expectRevert(
         airdrop({ factionId: 1, amount }, user1),
-        `Faction supply exceeded`
+        `All factions supply exceeded`
       );
     });
 
