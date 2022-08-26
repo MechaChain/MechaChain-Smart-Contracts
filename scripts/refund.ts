@@ -77,7 +77,7 @@ class Refund {
       let gasPrice: string = String(await provider.getGasPrice())
       const maxGasFee: number = 30000000000
       const nbWallets: number = jsonFile.totalWalletToRefund - jsonFile.totalWalletRefund
-      const amountToRefund: number = jsonFile.totalPayementToRefund - jsonFile.totalRefund
+      const amountToRefund: number = jsonFile.totalPayementToRefund - jsonFile.totalRefund // FIXME: overflow
       const totalGasFee: number = parseInt(gasPrice) * nbWallets
       const nbTxsPerBatch: number = Math.floor(maxGasFee / parseInt(gasPrice))
 
@@ -87,8 +87,9 @@ class Refund {
       })
       
       //asking with a prompt if the user is agree to start the refund
-      rl.question(`You have ${nbWallets} wallets left to refund, for ${amountToRefund/10^16} ETH and ${totalGasFee} gas fees. Continue? [y/n]`, (answer: string) => {
-        switch(answer.toLowerCase()) {
+      // FIXME: ${amountToRefund / 10 ^ 16} => overflow, use ethers.utils.formatEther(amountToRefund);
+      rl.question(`You have ${nbWallets} wallets left to refund, for ${amountToRefund / 10 ^ 16} ETH and ${totalGasFee} gas fees. Continue? [y/n]`, (answer: string) => {
+        switch (answer.toLowerCase()) {
           case 'y':
           case 'Y':
             console.log('Ok we\'ll proced')
@@ -122,7 +123,7 @@ class Refund {
               wallets.push(walletAddress)
               //jsonFile.wallets[walletAddress].refunded = jsonFile.wallets[walletAddress].totalToRefund
               jsonFile.totalWalletRefund++
-              jsonFile.totalRefund += jsonFile.wallets[walletAddress].totalToRefund
+              jsonFile.totalRefund += jsonFile.wallets[walletAddress].totalToRefund // FIXME: overflow
             }
             countTxs++
             //if we have the max number of transactions we start a batch
@@ -144,20 +145,23 @@ class Refund {
 
               txs = []
               wallets = []
+              // FIXME: Reset countTxs for the next batch ???
             }
           }
         }
 
         fs.writeFileSync(myArgs[0], JSON.stringify(jsonFile))
-
+        // TODO: success message with path
         process.exit(0)
       }
       catch(error) {
         console.log(error);
       }
+      // TODO: Print 'totalRefunded'
+      // TODO: Print 'totalWalletRefund' 
     }
     else {
-        console.log("Param is missing, please give the json file to parse.");
+      console.log("Param is missing, please give the json file to parse.");
     }
   }
 }

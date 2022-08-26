@@ -32,9 +32,9 @@ class ListenEvent {
             //variables init
             let totalMinted = 0
             let totalWallet = 0
-            let totalWalletPayement = 0
-            let totalWalletToRefund = 0
-            let totalPayementToRefund = 0
+            let totalWalletPayement = 0 // FIXME: danger of overflow, have to use BN
+            let totalWalletToRefund = 0 // FIXME: overflow
+            let totalPayementToRefund = 0 // FIXME: overflow
             let lastBlock = 0
 
             type Transaction = {
@@ -49,33 +49,35 @@ class ListenEvent {
                 txs: Transaction[];
                 refunded: any;
             }
-            let wallets: {[key: string]: Wallet} = {}
-    
+            let wallets: { [key: string]: Wallet } = {}
+
             //get all the events from a given block number
             let eventFilter = contract.filters.MintPaid(roundId)
             let events = await contract.queryFilter(eventFilter, Number(DEPLOY_BLOCK_ID))
             events.forEach((event: any) => {
                 const wallet: string = event.args['wallet']
                 const amount: number = event.args['amount'].toNumber()
-                const payement: number = event.args['payement'].toNumber()
+                const payement: number = event.args['payement'].toNumber() // FIXME: overflow
                 const txnHash: string = event.transactionHash
     
                 totalMinted += amount
-                totalWalletPayement += payement
-                totalPayementToRefund += payement - (amount * finaleMintPriceGwei)
-    
+                totalWalletPayement += payement // FIXME: overflow
+                totalPayementToRefund += payement - (amount * finaleMintPriceGwei) // FIXME: overflow
+
                 //if we already saw the wallet we add the informations on the first occurence
                 if (wallet in wallets) {
                     wallets[wallet].totalMinted += amount
-                    wallets[wallet].totalPayement += payement
-                    wallets[wallet].totalToRefund += payement - (amount * finaleMintPriceGwei)
+                    wallets[wallet].totalPayement += payement // FIXME: overflow
+                    wallets[wallet].totalToRefund += payement - (amount * finaleMintPriceGwei) // FIXME: overflow
                 }
                 //otherwise we add a new row in the array
                 else {
                     wallets[wallet] = {
                         totalMinted: amount,
                         totalPayement: payement,
-                        totalToRefund: payement - (amount * finaleMintPriceGwei),
+                        // TODO: add totalPayementEth (total in eth) for humain ?
+                        totalToRefund: payement - (amount * finaleMintPriceGwei), // FIXME: overflow
+                        // TODO: add totalToRefundEth (total in eth) for humain ?
                         txs: [],
                         refunded: null
                     }
@@ -95,19 +97,22 @@ class ListenEvent {
                     totalWalletToRefund++
                 }
             })
-    
+
             //init the json object to create the file
             let jsonData: any = {
                 'smartContract': contractAddress,
                 'network': network,
                 'finalPrice': finaleMintPriceGwei,
-                'createdAt': Date.now(),
+                // TODO: add finalPriceEth (price in eth) for humain ?
+                'createdAt': Date.now(), // TODO: human readable date
                 'lastBlock': lastBlock,
                 'totalMinted': totalMinted,
                 'totalPayement': totalWalletPayement,
+                // TODO: add totalPayementEth (total in eth) for humain ?
                 'totalWallet': totalWallet,
                 'totalWalletToRefund': totalWalletToRefund,
                 'totalPayementToRefund': totalPayementToRefund,
+                // TODO: add totalPayementToRefundEth (total in eth) for humain ?
                 'totalWalletRefund': null,
                 'totalRefund': null,
                 'totalRefundFees': null,
@@ -119,6 +124,7 @@ class ListenEvent {
                 //json file creation
                 fs.mkdirSync('./build', { recursive: true })
                 fs.writeFileSync(`./build/refund_round_${roundId}_output.json`, data)
+                // TODO: success message with path
                 process.exit(0)
             }
             catch(error) {
