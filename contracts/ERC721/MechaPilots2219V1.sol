@@ -446,7 +446,7 @@ contract MechaPilots2219V1 is
 
         // Create a new round
         if (roundId == roundsLength + 1) {
-            roundsLength += 1;
+            roundsLength++;
         }
 
         MintRound storage round = _rounds[roundId];
