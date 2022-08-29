@@ -479,7 +479,7 @@ contract("MechaPilots2219V1", async (accounts) => {
 
       const version = await instance.version();
       assert.equal(version.toString(), "1", "Bad version");
-      chainid = 1;
+      chainid = await web3.eth.getChainId();;
 
       maxMintsPerWallet = await instance.maxMintsPerWallet();
       maxMintsPerWallet = maxMintsPerWallet.toNumber();
