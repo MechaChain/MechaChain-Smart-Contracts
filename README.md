@@ -114,7 +114,7 @@ To verify contracts use either [Remix Etherscan Plugin](https://remix-etherscan-
 
 **Verify contract on polygonscan with Truffle**
 
-  1. Configure `.env` with a `POLYGONSCAN_API_KEYS` which can be found here [found here](https://polygonscan.com/apis).
+  1. Configure `.env` with a `POLYGONSCAN_API_KEY` and `ETHERSCAN_API_KEY` which can be found here [found here](https://polygonscan.com/apis).
   2. Check that the compilers config used for the deployment is the same as registered in `truffle-config.js`
   3. Encode constructors arguments with a [ABI Encoding Service](https://abi.hashex.org/) if necessary
   4. Run the command
