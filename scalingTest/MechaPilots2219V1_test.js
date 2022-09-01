@@ -50,7 +50,11 @@ contract("MechaPilots2219V1", async (accounts) => {
     price: getAmount(0.2), // Fixed
   };
 
-  const MINT_AMOUNTS_ARRAY = [1, 2, 3, 4, 5, 10];
+  // Table of mints to be performed randomly
+  const mintsAmountsArray = [1, 2, 3, 4, 5, 10];
+
+  // Number of transfers that will be made to the same user
+  const transfersNumber = 500;
 
   const URIForRevealed = (id) => "ipfs://xxxxxxxxxx/revealed/" + id;
 
@@ -92,9 +96,15 @@ contract("MechaPilots2219V1", async (accounts) => {
 
           if (from !== ZERO_ADDRESS) {
             // Update usersTokens for `from`
-            usersTokens[from] = usersTokens[from].filter(
-              (id) => id.toString() !== tokenId.toString()
-            );
+            usersTokens[from] = [
+              ...usersTokens[from].filter(
+                (id) => id.toString() !== tokenId.toString()
+              ),
+            ];
+
+            if (!usersTokens[from].length) {
+              delete usersTokens[from];
+            }
           }
         }
       }
@@ -186,7 +196,7 @@ contract("MechaPilots2219V1", async (accounts) => {
       payloadExpiration,
       signature,
       {
-        from: user1,
+        from: user,
       }
     );
     await gasTracker.addCost(`Reveal Token x1`, tx);
@@ -225,8 +235,8 @@ contract("MechaPilots2219V1", async (accounts) => {
 
       const version = await instance.version();
       assert.equal(version.toString(), "1", "Bad version");
-      chainid = await web3.eth.getChainId();
-
+      // chainid = await web3.eth.getChainId();
+      chainid = 1;
       maxMintsPerWallet = await instance.maxMintsPerWallet();
       maxMintsPerWallet = maxMintsPerWallet.toNumber();
       MAX_SUPPLY = await instance.MAX_SUPPLY();
@@ -241,7 +251,7 @@ contract("MechaPilots2219V1", async (accounts) => {
           - MAX_SUPPLY_BY_FACTION = [${MAX_SUPPLY_BY_FACTION.map((e) =>
             e.toNumber()
           ).join(", ")}]
-          - USERS = ${users.length}`);
+          - USERS = ${accounts.length}`);
     });
 
     it(`Create the public FDA round`, async () => {
@@ -357,9 +367,9 @@ contract("MechaPilots2219V1", async (accounts) => {
 
           // Mint all supply
           while (remainingTokens > 0) {
-            const user = accounts[getRandom(0, accounts.length - 1)];
+            const user = accounts[getRandom(1, accounts.length - 1)];
             let amount =
-              MINT_AMOUNTS_ARRAY[getRandom(0, MINT_AMOUNTS_ARRAY.length - 1)];
+              mintsAmountsArray[getRandom(0, mintsAmountsArray.length - 1)];
 
             if (amount > remainingTokens) {
               amount = remainingTokens;
@@ -394,7 +404,7 @@ contract("MechaPilots2219V1", async (accounts) => {
       });
 
       // Decrease price
-      if (i !== defaultPublicRound.decreaseNumbe) {
+      if (i !== defaultPublicRound.decreaseNumber) {
         it(`Decrease Price of ${web3Utils.fromWei(
           defaultPublicRound.price.decreaseAmount
         )} Eth`, async () => {
@@ -458,6 +468,218 @@ contract("MechaPilots2219V1", async (accounts) => {
         Total user to refound = ${userToRefound}
         Total user who minted = ${Object.keys(usersFDAData).length}
       `);
+    });
+  });
+
+  /**
+   * WHITELIST MINT
+   */
+  describe("\n WHITELIST MINT", () => {
+    // Mint all decreased batch by faction
+    ["PURE_GENE", "ASSIMILEE"].forEach((factionName, factionId, arr) => {
+      it(`Mint ${factionName} tokens for ${web3Utils.fromWei(
+        defaultWhitelistRound.price
+      )} Eth`, async () => {
+        const supply = defaultWhitelistRound.supply[factionId];
+        let remainingTokens = supply;
+
+        // Progress bar
+        const progressBar = new cliProgress.SingleBar(
+          {
+            clearOnComplete: true,
+            format:
+              "\tMint in whitelist (" +
+              factionName +
+              "): [{bar}] {percentage}% | {value}/{total} tokens | ETA: {eta}s | Duration: {duration_formatted}",
+          },
+          cliProgress.Presets.shades_classic
+        );
+        progressBar.start(supply, 0);
+
+        // Mint all supply
+        while (remainingTokens > 0) {
+          const user = accounts[getRandom(1, accounts.length - 1)];
+          let amount =
+            mintsAmountsArray[getRandom(0, mintsAmountsArray.length - 1)];
+
+          if (amount > remainingTokens) {
+            amount = remainingTokens;
+          }
+
+          // Mint
+          await mint({ roundId: 2, factionId, amount, maxMint: 99999 }, user);
+
+          // Progress
+          progressBar.increment(amount);
+          remainingTokens -= amount;
+        }
+
+        progressBar.stop();
+      });
+    });
+
+    it(`All factions are now sold out for the round`, async () => {
+      const round = await instance.rounds(2);
+
+      assert.equal(
+        round.supply[0],
+        round.totalMinted[0],
+        "Incorrect totalMinted"
+      );
+
+      assert.equal(
+        round.supply[1],
+        round.totalMinted[1],
+        "Incorrect totalMinted"
+      );
+    });
+
+    it(`All factions and contract are totally sold out`, async () => {
+      const totalSupplyByFaction = [
+        await instance.totalSupplyByFaction(0),
+        await instance.totalSupplyByFaction(1),
+      ];
+
+      const totalSupply = await instance.totalSupply();
+
+      assert.equal(
+        totalSupplyByFaction[0].toNumber(),
+        MAX_SUPPLY_BY_FACTION[0].toNumber(),
+        "Incorrect totalSupplyByFaction 0"
+      );
+
+      assert.equal(
+        totalSupplyByFaction[1].toNumber(),
+        MAX_SUPPLY_BY_FACTION[1].toNumber(),
+        "Incorrect totalSupplyByFaction 1"
+      );
+
+      assert.equal(
+        totalSupply.toNumber(),
+        MAX_SUPPLY.toNumber(),
+        "Incorrect totalSupply"
+      );
+    });
+  });
+
+  /**
+   * TOKEN REVEAL
+   */
+  describe("\n TOKEN REVEAL", () => {
+    it("Admin set URI_UPDATER_ROLE", async () => {
+      await instance.grantRole(URI_UPDATER_ROLE, tokenURIUpdater);
+      const hasRole = await instance.hasRole(URI_UPDATER_ROLE, tokenURIUpdater);
+      assert(hasRole);
+    });
+
+    it(`All users reveal their tokens 1 by 1`, async () => {
+      const totalSupply = await instance.totalSupply();
+      const progressBar = new cliProgress.SingleBar(
+        {
+          clearOnComplete: true,
+          format:
+            "\tReveals: [{bar}] {percentage}% | {value}/{total} reveals | ETA: {eta}s | Duration: {duration_formatted}",
+        },
+        cliProgress.Presets.shades_classic
+      );
+      progressBar.start(totalSupply.toNumber(), 0);
+
+      for (const user in usersTokens) {
+        for (const tokenId of usersTokens[user]) {
+          await reveal(tokenId, user);
+
+          // Progress
+          progressBar.increment();
+        }
+      }
+      progressBar.stop();
+    });
+  });
+
+  /**
+   * TRANSFERS
+   */
+  describe("\n TRANSFERS", () => {
+    it(`${transfersNumber} tokens are transfered to the first address by random users`, async () => {
+      const to = accounts[0];
+      const progressBar = new cliProgress.SingleBar(
+        {
+          clearOnComplete: true,
+          format:
+            "\tTransfers: [{bar}] {percentage}% | {value}/{total} transfers | ETA: {eta}s | Duration: {duration_formatted}",
+        },
+        cliProgress.Presets.shades_classic
+      );
+      progressBar.start(transfersNumber, 0);
+      for (let i = 0; i < transfersNumber; i++) {
+        const usersWithoutFirst = Object.keys(usersTokens).filter(
+          (address) => address !== to && address && usersTokens[address].length
+        );
+        const user =
+          usersWithoutFirst[getRandom(0, usersWithoutFirst.length - 1)];
+
+        const tokenId =
+          usersTokens[user].length > 1
+            ? usersTokens[user][getRandom(0, usersTokens[user].length - 1)]
+            : usersTokens[user][0];
+
+        const txData = await instance.transferFrom(user, to, tokenId, {
+          from: user,
+        });
+        getTokensFromTransferEvent(txData);
+        await gasTracker.addCost(`Transfer x1`, txData);
+
+        // Progress
+        progressBar.increment();
+      }
+      progressBar.stop();
+    });
+  });
+
+  /**
+   * TOKENS NUMBER AND ORDER
+   */
+  describe("\n TOKENS NUMBER AND ORDER", () => {
+    it("Tokens are minted randomly (less than 10% of coherency)", async () => {
+      let coherencesNb = 0;
+      for (let i = 0; i++; i < mintedTokens.length) {
+        if (mintedTokens[i] === i || mintedTokens[i] === i + 1) {
+          coherencesNb++;
+        }
+      }
+      assert.equal(
+        coherencesNb < mintedTokens.length * 0.1,
+        true,
+        `More than 10% of coherency (${coherencesNb} for ${mintedTokens.length})`
+      );
+    });
+
+    it("First token is 1", async () => {
+      const min = Math.min(...mintedTokens);
+      assert.equal(min, 1, `Minimum is ${min} not 1`);
+    });
+
+    it(`Last token is MAX_SUPPLY`, async () => {
+      const max = Math.max(...mintedTokens);
+      assert.equal(
+        max,
+        MAX_SUPPLY.toNumber(),
+        `Maximum is ${max} not ${MAX_SUPPLY.toNumber()}`
+      );
+    });
+  });
+
+  /**
+   * WITHDRAW ETH
+   */
+  describe("\n WITHDRAW ETH", () => {
+    it(`Contract has the correct eth amount according to the mints`, async () => {
+      const balance = await web3.eth.getBalance(instance.address);
+      assert.equal(
+        balance.toString(),
+        contractBalance.toString(),
+        "Incorrect ETH balance"
+      );
     });
   });
 
