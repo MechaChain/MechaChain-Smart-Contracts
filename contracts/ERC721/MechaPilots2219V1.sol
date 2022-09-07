@@ -792,7 +792,9 @@ contract MechaPilots2219V1 is
         for (uint256 i = 0; i < amount; i++) {
             uint256 tokenId = _getRandomToken(wallet, _totalMinted + i);
             _mint(wallet, tokenId);
-            tokenFaction[tokenId] = faction;
+            if (factionId != 0) {
+                tokenFaction[tokenId] = faction;
+            }
         }
         _totalMinted += amount;
         _totalMintedByFaction[factionId] += amount;
@@ -829,6 +831,7 @@ contract MechaPilots2219V1 is
             _availableIds[rand] = remaining - 1;
         } else {
             _availableIds[rand] = _availableIds[remaining - 1];
+            delete _availableIds[remaining - 1];
         }
 
         return value + 1;
