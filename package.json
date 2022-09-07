@@ -18,6 +18,10 @@
     "truffle-plugin-verify": "^0.5.26"
   },
   "dependencies": {
+    "@0xsequence/relayer": "^0.40.5",
+    "@0xsequence/transactions": "^0.40.5",
+    "@0xsequence/wallet": "^0.40.5",
+    "@alch/alchemy-web3": "^1.4.6",
     "@maticnetwork/pos-portal": "^1.5.2",
     "@openzeppelin/contracts": "^4.7.0",
     "@openzeppelin/contracts-upgradeable": "^4.7.0",
@@ -25,12 +29,9 @@
     "@truffle/hdwallet-provider": "^2.0.10",
     "@typechain/ethers-v5": "^10.1.0",
     "dotenv": "^16.0.1",
+    "ethers": "^5.6.9",
+    "seedrandom": "^3.0.5",
     "typechain": "^8.1.0",
-    "web3-utils": "^1.7.4",
-    "@0xsequence/relayer": "^0.40.5",
-    "@0xsequence/transactions": "^0.40.5",
-    "@0xsequence/wallet": "^0.40.5",
-    "@alch/alchemy-web3": "^1.4.6",
-    "ethers": "^5.6.9"
+    "web3-utils": "^1.7.4"
   }
 }

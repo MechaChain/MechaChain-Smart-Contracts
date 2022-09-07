@@ -1,6 +1,7 @@
 // Load modules
 const { time, expectRevert, snapshot } = require("@openzeppelin/test-helpers");
 const cliProgress = require("cli-progress");
+const seedrandom = require("seedrandom");
 
 // Load artifacts
 const MechaPilots2219V1 = artifacts.require("MechaPilots2219V1");
@@ -64,6 +65,9 @@ contract("MechaPilots2219V1", async (accounts) => {
   const tokenURIUpdater = "0x6F76846f7C90EcEC371e1d96cA93bfE9d36eEb83";
   const tokenURIUpdaterPrivateKey =
     "0xfeae30926cea7dfa8fb803c348aef7f06941b9af7770e6b62c0dcb543d3391a7";
+
+  // Set a random seed
+  seedrandom("MechaChain is the best P2E project !", { global: true });
 
   /**
    * ========================
