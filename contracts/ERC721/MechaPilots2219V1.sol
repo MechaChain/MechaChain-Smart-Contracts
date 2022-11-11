@@ -49,16 +49,6 @@ contract MechaPilots2219V1 is
     );
 
     /**
-     * @notice Event emitted when a user mint for the Fair Dutch Auction
-     */
-    event MintPaid(
-        uint256 indexed roundId,
-        address indexed wallet,
-        uint256 amount,
-        uint256 payement
-    );
-
-    /**
      * @notice Event emitted when a token has been revealed
      */
     event TokenRevealed(
@@ -743,9 +733,6 @@ contract MechaPilots2219V1 is
 
         // Safe mint
         _safeMint(wallet, factionId, amount);
-
-        // Emit paid event for Fair Dutch Auction script
-        emit MintPaid(roundId, wallet, amount, msg.value);
 
         // Increase round total minted
         ownerToRoundTotalMinted[msg.sender][roundId] += amount;

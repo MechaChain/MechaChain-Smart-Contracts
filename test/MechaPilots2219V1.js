@@ -37,7 +37,7 @@ contract("MechaPilots2219V1", async (accounts) => {
   const rounds = [
     {}, // 0 not possible
     {
-      name: "Public (FDA)",
+      name: "Public",
       roundId: 1,
       supply: [40, 40],
       startTime: time.duration.days(1), // to add to `testStartTime`
@@ -553,7 +553,7 @@ contract("MechaPilots2219V1", async (accounts) => {
       );
     });
 
-    it(`Owner can create round 1 (public FDA)`, async () => {
+    it(`Owner can create round 1 (public)`, async () => {
       await setupMintRound(rounds[1]);
     });
 
@@ -640,9 +640,9 @@ contract("MechaPilots2219V1", async (accounts) => {
   });
 
   /**
-   * ROUND 1 - FDA PUBLIC MINT
+   * ROUND 1 - PUBLIC MINT
    */
-  describe("\n ROUND 1 - FDA PUBLIC MINT", () => {
+  describe("\n ROUND 1 - PUBLIC MINT", () => {
     it(`Round 1 started`, async () => {
       await time.increaseTo(testStartTime.add(rounds[1].startTime));
       const latestTime = await time.latest();

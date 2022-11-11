@@ -33,7 +33,7 @@ contract("MechaPilots2219V1", async (accounts) => {
   let contractBalance = getAmount(0);
   let mintedTokens = [];
   let usersTokens = {};
-  let usersFDAData = {};
+  let usersData = {};
 
   const defaultPublicRound = {
     supplyInPercentage: 80, // Percentage of the total supply in %
@@ -258,7 +258,7 @@ contract("MechaPilots2219V1", async (accounts) => {
           - USERS = ${accounts.length}`);
     });
 
-    it(`Create the public FDA round`, async () => {
+    it(`Create the public round`, async () => {
       defaultPublicRound.supply = MAX_SUPPLY_BY_FACTION.map((supply) =>
         Math.ceil(
           (supply.toNumber() * defaultPublicRound.supplyInPercentage) / 100
@@ -279,7 +279,7 @@ contract("MechaPilots2219V1", async (accounts) => {
       );
 
       console.log(`
-        PUBLIC FDA ROUND
+        PUBLIC ROUND
           - RoundId = 1
           - Supply = [${defaultPublicRound.supply.join(", ")}] (${
         defaultPublicRound.supplyInPercentage
@@ -327,9 +327,9 @@ contract("MechaPilots2219V1", async (accounts) => {
   });
 
   /**
-   * PUBLIC FDA MINT
+   * PUBLIC MINT
    */
-  describe("\n PUBLIC FDA MINT", () => {
+  describe("\n PUBLIC MINT", () => {
     for (let i = 0; i < defaultPublicRound.decreaseNumber; i++) {
       const price = defaultPublicRound.price.max.sub(
         defaultPublicRound.price.decreaseAmount.mul(getBN(i))
@@ -386,16 +386,16 @@ contract("MechaPilots2219V1", async (accounts) => {
               price: payement,
             });
 
-            // Add to FDA data
-            if (!usersFDAData[user]) {
-              usersFDAData[user] = {
+            // Add to data
+            if (!usersData[user]) {
+              usersData[user] = {
                 totalMinted: amount,
                 totalPayement: payement,
               };
             } else {
-              usersFDAData[user].totalMinted += amount;
-              usersFDAData[user].totalPayement =
-                usersFDAData[user].totalPayement.add(payement);
+              usersData[user].totalMinted += amount;
+              usersData[user].totalPayement =
+                usersData[user].totalPayement.add(payement);
             }
 
             // Progress
@@ -456,11 +456,11 @@ contract("MechaPilots2219V1", async (accounts) => {
       let userToRefound = 0;
 
       // totalToRefound by user and count
-      Object.keys(usersFDAData).forEach(function (key) {
-        const toRefound = usersFDAData[key].totalPayement.sub(
-          lastPrice.mul(getBN(usersFDAData[key].totalMinted))
+      Object.keys(usersData).forEach(function (key) {
+        const toRefound = usersData[key].totalPayement.sub(
+          lastPrice.mul(getBN(usersData[key].totalMinted))
         );
-        usersFDAData[key].totalToRefound = toRefound;
+        usersData[key].totalToRefound = toRefound;
         if (toRefound.toString() !== "0") {
           userToRefound++;
         }
@@ -470,7 +470,7 @@ contract("MechaPilots2219V1", async (accounts) => {
         Sold out Price = ${web3Utils.fromWei(lastPrice)} Eth
         Total to refound = ${web3Utils.fromWei(totalToRefound)} Eth
         Total user to refound = ${userToRefound}
-        Total user who minted = ${Object.keys(usersFDAData).length}
+        Total user who minted = ${Object.keys(usersData).length}
       `);
     });
   });
