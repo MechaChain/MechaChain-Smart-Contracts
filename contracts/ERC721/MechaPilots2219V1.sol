@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.15;
+pragma solidity 0.8.17;
 
 import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721BurnableUpgradeable.sol";
@@ -882,16 +882,13 @@ contract MechaPilots2219V1 is
     function _beforeTokenTransfer(
         address from,
         address to,
-        uint256 tokenId
+        uint256 tokenId,
+        uint256 batchSize
     ) internal override whenNotPaused {
-        super._beforeTokenTransfer(from, to, tokenId);
+        super._beforeTokenTransfer(from, to, tokenId, batchSize);
     }
 
-    function _authorizeUpgrade(address newImplementation)
-        internal
-        override
-        onlyOwner
-    {
+    function _authorizeUpgrade(address) internal override onlyOwner {
         version++;
     }
 
