@@ -109,14 +109,18 @@
       "date": "04/04/2022, 13:09:38"
     },
     "MechaLandsV1": {
-      "address": "0xF284b93bdc7F5db531a846B14F029eDfF151eD99",
-      "date": "14/04/2022, 14:53:22"
+      "address": "0x6B15922CD0119f7AB08e3EdD85C1a84A6B193721",
+      "date": "11/04/2022, 14:54:22"
+    },
+    "MechaPilots2219V1": {
+      "address": "0x2B9017C07fB918158Df4e6A777ae4fEC861fED8e",
+      "date": "20/07/2022, 17:11:39"
     }
   },
   "dashboard": {
-    "Mechanium": {
-      "address": "0xacd4e2d936be9b16c01848a3742a34b3d5a5bdfa",
-      "date": "24/11/2021, 18:39:18"
+    "MechaPilots2219V1": {
+      "address": "0xe1d21f3b83C6CF18A34443d9e4c8360fC3EA731A",
+      "date": "01/09/2022, 12:12:50"
     }
   }
 }

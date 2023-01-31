@@ -878,17 +878,14 @@ contract MechaLandsV1 is
     function _beforeTokenTransfer(
         address from,
         address to,
-        uint256 tokenId
+        uint256 tokenId,
+        uint256 batchSize
     ) internal override whenNotPaused {
-        super._beforeTokenTransfer(from, to, tokenId);
+        super._beforeTokenTransfer(from, to, tokenId, batchSize);
     }
 
-    function _authorizeUpgrade(address newImplementation)
-        internal
-        override
-        onlyOwner
-    {
-        version ++;
+    function _authorizeUpgrade(address) internal override onlyOwner {
+        version++;
     }
 
     receive() external payable {}
