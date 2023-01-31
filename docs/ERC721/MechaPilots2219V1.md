@@ -1,20 +1,22 @@
-# `MechaLandsV1`
-**Documentation of `ERC721/MechaLandsV1.sol`.**
+# `MechaPilots2219V1`
+**Documentation of `ERC721/MechaPilots2219V1.sol`.**
 
-MechaLands - Collection of unique lands on the surface of the planets of the MechaChain universe ; at the heart of space colonization
+MechaPilots2219 - TODO
 
 
 
 
 ## TABLE OF CONTENTS
 - [Events](#events)
-    - [`PlanetSetup`](#MechaLandsV1-PlanetSetup-uint256-uint16-uint32---string---) 
-    - [`PlanetMintRoundSetup`](#MechaLandsV1-PlanetMintRoundSetup-uint256-uint256-uint64-uint64-address-bool-uint256---uint256---uint256---) 
-    - [`PlanetRevealed`](#MechaLandsV1-PlanetRevealed-uint256-string-string-) 
-    - [`PlanetBaseURIChanged`](#MechaLandsV1-PlanetBaseURIChanged-uint256-string-string-) 
-    - [`PlanetBurnableChanged`](#MechaLandsV1-PlanetBurnableChanged-uint256-bool-) 
-    - [`Withdrawn`](#MechaLandsV1-Withdrawn-address-uint256-) 
-    - [`TokenWithdrawn`](#MechaLandsV1-TokenWithdrawn-address-address-uint256-) 
+    - [`MintRoundSetup`](#MechaPilots2219V1-MintRoundSetup-uint256-uint32-2--uint64-uint64-address-) 
+    - [`MintPaid`](#MechaPilots2219V1-MintPaid-uint256-address-uint256-uint256-) 
+    - [`TokenRevealed`](#MechaPilots2219V1-TokenRevealed-uint256-address-string-) 
+    - [`BaseURIChanged`](#MechaPilots2219V1-BaseURIChanged-string-) 
+    - [`BaseExtensionChanged`](#MechaPilots2219V1-BaseExtensionChanged-string-) 
+    - [`BurnableChanged`](#MechaPilots2219V1-BurnableChanged-bool-) 
+    - [`MaxMintsPerWalletChanged`](#MechaPilots2219V1-MaxMintsPerWalletChanged-uint256-) 
+    - [`Withdrawn`](#MechaPilots2219V1-Withdrawn-address-uint256-) 
+    - [`TokenWithdrawn`](#MechaPilots2219V1-TokenWithdrawn-address-address-uint256-) 
     - [`Upgraded`](#ERC1967UpgradeUpgradeable-Upgraded-address-) (inherited)
     - [`AdminChanged`](#ERC1967UpgradeUpgradeable-AdminChanged-address-address-) (inherited)
     - [`BeaconUpgraded`](#ERC1967UpgradeUpgradeable-BeaconUpgraded-address-) (inherited)
@@ -24,46 +26,49 @@ MechaLands - Collection of unique lands on the surface of the planets of the Mec
     - [`Transfer`](#IERC721Upgradeable-Transfer-address-address-uint256-) (inherited)
     - [`Approval`](#IERC721Upgradeable-Approval-address-address-uint256-) (inherited)
     - [`ApprovalForAll`](#IERC721Upgradeable-ApprovalForAll-address-address-bool-) (inherited)
+    - [`RoleAdminChanged`](#IAccessControlUpgradeable-RoleAdminChanged-bytes32-bytes32-bytes32-) (inherited)
+    - [`RoleGranted`](#IAccessControlUpgradeable-RoleGranted-bytes32-address-address-) (inherited)
+    - [`RoleRevoked`](#IAccessControlUpgradeable-RoleRevoked-bytes32-address-address-) (inherited)
     - [`Initialized`](#Initializable-Initialized-uint8-) (inherited)
 
 - [Public Functions](#public-functions)
-    - [`constructor`](#MechaLandsV1-constructor--) 
-    - [`initialize`](#MechaLandsV1-initialize--) 
-    - [`mint`](#MechaLandsV1-mint-uint256-uint256-uint256-) 
-    - [`mintWithValidation`](#MechaLandsV1-mintWithValidation-uint256-uint256-uint256-uint256-uint256-bytes-) 
-    - [`airdrop`](#MechaLandsV1-airdrop-address-uint256-uint256-uint256-) 
-    - [`setupPlanet`](#MechaLandsV1-setupPlanet-uint256-uint16-uint32---string---) 
-    - [`revealPlanet`](#MechaLandsV1-revealPlanet-uint256-string-string-) 
-    - [`setPlanetBaseURI`](#MechaLandsV1-setPlanetBaseURI-uint256-string-string-) 
-    - [`setPlanetBurnable`](#MechaLandsV1-setPlanetBurnable-uint256-bool-) 
-    - [`setPlanetDistributor`](#MechaLandsV1-setPlanetDistributor-uint256-address-) 
-    - [`setupMintRound`](#MechaLandsV1-setupMintRound-uint256-uint64-uint64-uint64-address-bool-uint256---uint256---uint256---) 
-    - [`pause`](#MechaLandsV1-pause--) 
-    - [`unpause`](#MechaLandsV1-unpause--) 
-    - [`burn`](#MechaLandsV1-burn-uint256-) 
-    - [`withdraw`](#MechaLandsV1-withdraw-address-payable-uint256-) 
-    - [`withdrawTokens`](#MechaLandsV1-withdrawTokens-address-address-uint256-) 
-    - [`tokenURI`](#MechaLandsV1-tokenURI-uint256-) 
-    - [`totalSupply`](#MechaLandsV1-totalSupply--) 
-    - [`planetSupplyByType`](#MechaLandsV1-planetSupplyByType-uint256-uint256-) 
-    - [`planetTotalMintedByType`](#MechaLandsV1-planetTotalMintedByType-uint256-uint256-) 
-    - [`planetNotRevealUriByType`](#MechaLandsV1-planetNotRevealUriByType-uint256-uint256-) 
-    - [`roundSupplyByType`](#MechaLandsV1-roundSupplyByType-uint256-uint256-) 
-    - [`roundPriceByType`](#MechaLandsV1-roundPriceByType-uint256-uint256-) 
-    - [`roundMaxMintByType`](#MechaLandsV1-roundMaxMintByType-uint256-uint256-) 
-    - [`roundTotalMintedByType`](#MechaLandsV1-roundTotalMintedByType-uint256-uint256-) 
-    - [`roundTotalMintedByTypeForUser`](#MechaLandsV1-roundTotalMintedByTypeForUser-address-uint256-uint256-) 
-    - [`roundTotalMintedForUser`](#MechaLandsV1-roundTotalMintedForUser-address-uint256-) 
-    - [`chainid`](#MechaLandsV1-chainid--) 
-    - [`receive`](#MechaLandsV1-receive--) 
+    - [`constructor`](#MechaPilots2219V1-constructor--) 
+    - [`initialize`](#MechaPilots2219V1-initialize--) 
+    - [`mint`](#MechaPilots2219V1-mint-uint256-uint256-uint256-) 
+    - [`mintWithValidation`](#MechaPilots2219V1-mintWithValidation-uint256-uint256-uint256-uint256-uint256-bytes-) 
+    - [`revealToken`](#MechaPilots2219V1-revealToken-uint256-string-uint256-bytes-) 
+    - [`setTokenURI`](#MechaPilots2219V1-setTokenURI-uint256-string-) 
+    - [`setTokenURIPerBatch`](#MechaPilots2219V1-setTokenURIPerBatch-uint256---string---) 
+    - [`airdrop`](#MechaPilots2219V1-airdrop-address-uint256-uint256-) 
+    - [`setupMintRound`](#MechaPilots2219V1-setupMintRound-uint256-uint32-2--uint64-uint64-address-uint256-uint256-uint256-uint256-) 
+    - [`pause`](#MechaPilots2219V1-pause--) 
+    - [`unpause`](#MechaPilots2219V1-unpause--) 
+    - [`setBaseURI`](#MechaPilots2219V1-setBaseURI-string-) 
+    - [`setBaseExtension`](#MechaPilots2219V1-setBaseExtension-string-) 
+    - [`setBurnable`](#MechaPilots2219V1-setBurnable-bool-) 
+    - [`setMaxMintsPerWallet`](#MechaPilots2219V1-setMaxMintsPerWallet-uint256-) 
+    - [`burn`](#MechaPilots2219V1-burn-uint256-) 
+    - [`withdraw`](#MechaPilots2219V1-withdraw-address-payable-uint256-) 
+    - [`withdrawTokens`](#MechaPilots2219V1-withdrawTokens-address-address-uint256-) 
+    - [`tokenURI`](#MechaPilots2219V1-tokenURI-uint256-) 
+    - [`rounds`](#MechaPilots2219V1-rounds-uint256-) 
+    - [`totalSupply`](#MechaPilots2219V1-totalSupply--) 
+    - [`totalMintedBy`](#MechaPilots2219V1-totalMintedBy-address-uint256-) 
+    - [`roundPrice`](#MechaPilots2219V1-roundPrice-uint256-) 
+    - [`supportsInterface`](#MechaPilots2219V1-supportsInterface-bytes4-) 
+    - [`receive`](#MechaPilots2219V1-receive--) 
     - [`proxiableUUID`](#UUPSUpgradeable-proxiableUUID--) (inherited)
     - [`upgradeTo`](#UUPSUpgradeable-upgradeTo-address-) (inherited)
     - [`upgradeToAndCall`](#UUPSUpgradeable-upgradeToAndCall-address-bytes-) (inherited)
+    - [`hasRole`](#AccessControlUpgradeable-hasRole-bytes32-address-) (inherited)
+    - [`getRoleAdmin`](#AccessControlUpgradeable-getRoleAdmin-bytes32-) (inherited)
+    - [`grantRole`](#AccessControlUpgradeable-grantRole-bytes32-address-) (inherited)
+    - [`revokeRole`](#AccessControlUpgradeable-revokeRole-bytes32-address-) (inherited)
+    - [`renounceRole`](#AccessControlUpgradeable-renounceRole-bytes32-address-) (inherited)
     - [`owner`](#OwnableUpgradeable-owner--) (inherited)
     - [`renounceOwnership`](#OwnableUpgradeable-renounceOwnership--) (inherited)
     - [`transferOwnership`](#OwnableUpgradeable-transferOwnership-address-) (inherited)
     - [`paused`](#PausableUpgradeable-paused--) (inherited)
-    - [`supportsInterface`](#ERC721Upgradeable-supportsInterface-bytes4-) (inherited)
     - [`balanceOf`](#ERC721Upgradeable-balanceOf-address-) (inherited)
     - [`ownerOf`](#ERC721Upgradeable-ownerOf-uint256-) (inherited)
     - [`name`](#ERC721Upgradeable-name--) (inherited)
@@ -77,11 +82,13 @@ MechaLands - Collection of unique lands on the surface of the planets of the Mec
     - [`safeTransferFrom`](#ERC721Upgradeable-safeTransferFrom-address-address-uint256-bytes-) (inherited)
 
 - [Internal Functions](#internal-functions)
-    - [`_roundMint`](#MechaLandsV1-_roundMint-address-uint256-uint256-uint256-) 
-    - [`_safeMint`](#MechaLandsV1-_safeMint-address-uint256-uint256-uint256-) 
-    - [`_checkSignature`](#MechaLandsV1-_checkSignature-address-uint256-uint256-uint256-uint256-bytes-address-) 
-    - [`_beforeTokenTransfer`](#MechaLandsV1-_beforeTokenTransfer-address-address-uint256-) 
-    - [`_authorizeUpgrade`](#MechaLandsV1-_authorizeUpgrade-address-) 
+    - [`_roundMint`](#MechaPilots2219V1-_roundMint-address-uint256-uint256-uint256-) 
+    - [`_safeMint`](#MechaPilots2219V1-_safeMint-address-uint256-uint256-) 
+    - [`_getRandomToken`](#MechaPilots2219V1-_getRandomToken-address-uint256-) 
+    - [`_checkSignature`](#MechaPilots2219V1-_checkSignature-uint256-bytes-bytes-address-) 
+    - [`_checkSignatureFromRole`](#MechaPilots2219V1-_checkSignatureFromRole-uint256-bytes-bytes-bytes32-) 
+    - [`_beforeTokenTransfer`](#MechaPilots2219V1-_beforeTokenTransfer-address-address-uint256-) 
+    - [`_authorizeUpgrade`](#MechaPilots2219V1-_authorizeUpgrade-address-) 
     - [`__UUPSUpgradeable_init`](#UUPSUpgradeable-__UUPSUpgradeable_init--) (inherited)
     - [`__UUPSUpgradeable_init_unchained`](#UUPSUpgradeable-__UUPSUpgradeable_init_unchained--) (inherited)
     - [`__ERC1967Upgrade_init`](#ERC1967UpgradeUpgradeable-__ERC1967Upgrade_init--) (inherited)
@@ -94,8 +101,14 @@ MechaLands - Collection of unique lands on the surface of the planets of the Mec
     - [`_changeAdmin`](#ERC1967UpgradeUpgradeable-_changeAdmin-address-) (inherited)
     - [`_getBeacon`](#ERC1967UpgradeUpgradeable-_getBeacon--) (inherited)
     - [`_upgradeBeaconToAndCall`](#ERC1967UpgradeUpgradeable-_upgradeBeaconToAndCall-address-bytes-bool-) (inherited)
-    - [`__ReentrancyGuard_init`](#ReentrancyGuardUpgradeable-__ReentrancyGuard_init--) (inherited)
-    - [`__ReentrancyGuard_init_unchained`](#ReentrancyGuardUpgradeable-__ReentrancyGuard_init_unchained--) (inherited)
+    - [`__AccessControl_init`](#AccessControlUpgradeable-__AccessControl_init--) (inherited)
+    - [`__AccessControl_init_unchained`](#AccessControlUpgradeable-__AccessControl_init_unchained--) (inherited)
+    - [`_checkRole`](#AccessControlUpgradeable-_checkRole-bytes32-) (inherited)
+    - [`_checkRole`](#AccessControlUpgradeable-_checkRole-bytes32-address-) (inherited)
+    - [`_setupRole`](#AccessControlUpgradeable-_setupRole-bytes32-address-) (inherited)
+    - [`_setRoleAdmin`](#AccessControlUpgradeable-_setRoleAdmin-bytes32-bytes32-) (inherited)
+    - [`_grantRole`](#AccessControlUpgradeable-_grantRole-bytes32-address-) (inherited)
+    - [`_revokeRole`](#AccessControlUpgradeable-_revokeRole-bytes32-address-) (inherited)
     - [`__Ownable_init`](#OwnableUpgradeable-__Ownable_init--) (inherited)
     - [`__Ownable_init_unchained`](#OwnableUpgradeable-__Ownable_init_unchained--) (inherited)
     - [`_checkOwner`](#OwnableUpgradeable-_checkOwner--) (inherited)
@@ -136,7 +149,7 @@ MechaLands - Collection of unique lands on the surface of the planets of the Mec
 - [Modifiers](#modifiers)
     - [`onlyProxy`](#UUPSUpgradeable-onlyProxy--) (inherited)
     - [`notDelegated`](#UUPSUpgradeable-notDelegated--) (inherited)
-    - [`nonReentrant`](#ReentrancyGuardUpgradeable-nonReentrant--) (inherited)
+    - [`onlyRole`](#AccessControlUpgradeable-onlyRole-bytes32-) (inherited)
     - [`onlyOwner`](#OwnableUpgradeable-onlyOwner--) (inherited)
     - [`whenNotPaused`](#PausableUpgradeable-whenNotPaused--) (inherited)
     - [`whenPaused`](#PausableUpgradeable-whenPaused--) (inherited)
@@ -145,56 +158,73 @@ MechaLands - Collection of unique lands on the surface of the planets of the Mec
     - [`onlyInitializing`](#Initializable-onlyInitializing--) (inherited)
 
 - [Structs](#structs)
-    - [`Planet`](#MechaLandsV1-Planet) 
-    - [`MintRound`](#MechaLandsV1-MintRound) 
+    - [`MintRound`](#MechaPilots2219V1-MintRound) 
+    - [`MintPrice`](#MechaPilots2219V1-MintPrice) 
+    - [`RoleData`](#AccessControlUpgradeable-RoleData) (inherited)
 
+- [Enums](#enums)
+    - [`Faction`](#MechaPilots2219V1-Faction) 
 
 
 ## EVENTS
 
-### `PlanetSetup(uint256 planetId, uint16 typesNumber, uint32[] supplyPerType, string[] notRevealUriPerType)`  <a name="MechaLandsV1-PlanetSetup-uint256-uint16-uint32---string---" id="MechaLandsV1-PlanetSetup-uint256-uint16-uint32---string---"></a>
-Event emitted when a planet is created or edited
+### `MintRoundSetup(uint256 roundId, uint32[2] supply, uint64 startTime, uint64 duration, address validator)`  <a name="MechaPilots2219V1-MintRoundSetup-uint256-uint32-2--uint64-uint64-address-" id="MechaPilots2219V1-MintRoundSetup-uint256-uint32-2--uint64-uint64-address-"></a>
+Event emitted when a mint round is created or edited
 
 
 
 
 
-### `PlanetMintRoundSetup(uint256 roundId, uint256 planetId, uint64 startTime, uint64 duration, address validator, bool limitedPerType, uint256[] pricePerType, uint256[] supplyPerType, uint256[] maxMintPerType)`  <a name="MechaLandsV1-PlanetMintRoundSetup-uint256-uint256-uint64-uint64-address-bool-uint256---uint256---uint256---" id="MechaLandsV1-PlanetMintRoundSetup-uint256-uint256-uint64-uint64-address-bool-uint256---uint256---uint256---"></a>
-Event emitted when a mint round of a planet is created or edited
+### `MintPaid(uint256 roundId, address wallet, uint256 amount, uint256 payement)`  <a name="MechaPilots2219V1-MintPaid-uint256-address-uint256-uint256-" id="MechaPilots2219V1-MintPaid-uint256-address-uint256-uint256-"></a>
+Event emitted when a user mint for the Fair Dutch Auction
 
 
 
 
 
-### `PlanetRevealed(uint256 planetId, string baseURI, string baseExtension)`  <a name="MechaLandsV1-PlanetRevealed-uint256-string-string-" id="MechaLandsV1-PlanetRevealed-uint256-string-string-"></a>
-Event emitted when a planet has been revealed
+### `TokenRevealed(uint256 tokenId, address by, string uri)`  <a name="MechaPilots2219V1-TokenRevealed-uint256-address-string-" id="MechaPilots2219V1-TokenRevealed-uint256-address-string-"></a>
+Event emitted when a token has been revealed
 
 
 
 
 
-### `PlanetBaseURIChanged(uint256 planetId, string baseURI, string baseExtension)`  <a name="MechaLandsV1-PlanetBaseURIChanged-uint256-string-string-" id="MechaLandsV1-PlanetBaseURIChanged-uint256-string-string-"></a>
-Event emitted when the baseURI of all lands of a planet has been changed
+### `BaseURIChanged(string newBaseURI)`  <a name="MechaPilots2219V1-BaseURIChanged-string-" id="MechaPilots2219V1-BaseURIChanged-string-"></a>
+Event emitted when `baseURI` has been modified
 
 
 
 
 
-### `PlanetBurnableChanged(uint256 planetId, bool burnable)`  <a name="MechaLandsV1-PlanetBurnableChanged-uint256-bool-" id="MechaLandsV1-PlanetBurnableChanged-uint256-bool-"></a>
-Event emitted when the burnable option of a planet has been changed
+### `BaseExtensionChanged(string newBaseExtension)`  <a name="MechaPilots2219V1-BaseExtensionChanged-string-" id="MechaPilots2219V1-BaseExtensionChanged-string-"></a>
+Event emitted when `baseExtension` has been modified
 
 
 
 
 
-### `Withdrawn(address to, uint256 amount)`  <a name="MechaLandsV1-Withdrawn-address-uint256-" id="MechaLandsV1-Withdrawn-address-uint256-"></a>
+### `BurnableChanged(bool newBurnable)`  <a name="MechaPilots2219V1-BurnableChanged-bool-" id="MechaPilots2219V1-BurnableChanged-bool-"></a>
+Event emitted when `burnable` option has been modified
+
+
+
+
+
+### `MaxMintsPerWalletChanged(uint256 newMaxMintsPerWallet)`  <a name="MechaPilots2219V1-MaxMintsPerWalletChanged-uint256-" id="MechaPilots2219V1-MaxMintsPerWalletChanged-uint256-"></a>
+Event emitted when `maxMintsPerWallet` has been modified
+
+
+
+
+
+### `Withdrawn(address to, uint256 amount)`  <a name="MechaPilots2219V1-Withdrawn-address-uint256-" id="MechaPilots2219V1-Withdrawn-address-uint256-"></a>
 Event emitted when native coin were removed from the contract
 
 
 
 
 
-### `TokenWithdrawn(address to, address token, uint256 amount)`  <a name="MechaLandsV1-TokenWithdrawn-address-address-uint256-" id="MechaLandsV1-TokenWithdrawn-address-address-uint256-"></a>
+### `TokenWithdrawn(address to, address token, uint256 amount)`  <a name="MechaPilots2219V1-TokenWithdrawn-address-address-uint256-" id="MechaPilots2219V1-TokenWithdrawn-address-address-uint256-"></a>
 Event emitted when some ERC20 were removed from the contract
 
 
@@ -273,6 +303,38 @@ Emitted when `owner` enables or disables (`approved`) `operator` to manage all o
 _Inherited from `../@openzeppelin/contracts-upgradeable/token/ERC721/IERC721Upgradeable.sol`_.
 
 
+### `RoleAdminChanged(bytes32 role, bytes32 previousAdminRole, bytes32 newAdminRole)` (inherited) <a name="IAccessControlUpgradeable-RoleAdminChanged-bytes32-bytes32-bytes32-" id="IAccessControlUpgradeable-RoleAdminChanged-bytes32-bytes32-bytes32-"></a>
+
+Emitted when `newAdminRole` is set as ``role``'s admin role, replacing `previousAdminRole`
+`DEFAULT_ADMIN_ROLE` is the starting admin for all roles, despite
+{RoleAdminChanged} not being emitted signaling this.
+_Available since v3.1._
+
+
+_Inherited from `../@openzeppelin/contracts-upgradeable/access/IAccessControlUpgradeable.sol`_.
+
+
+### `RoleGranted(bytes32 role, address account, address sender)` (inherited) <a name="IAccessControlUpgradeable-RoleGranted-bytes32-address-address-" id="IAccessControlUpgradeable-RoleGranted-bytes32-address-address-"></a>
+
+Emitted when `account` is granted `role`.
+`sender` is the account that originated the contract call, an admin role
+bearer except when using {AccessControl-_setupRole}.
+
+
+_Inherited from `../@openzeppelin/contracts-upgradeable/access/IAccessControlUpgradeable.sol`_.
+
+
+### `RoleRevoked(bytes32 role, address account, address sender)` (inherited) <a name="IAccessControlUpgradeable-RoleRevoked-bytes32-address-address-" id="IAccessControlUpgradeable-RoleRevoked-bytes32-address-address-"></a>
+
+Emitted when `account` is revoked `role`.
+`sender` is the account that originated the contract call:
+  - if using `revokeRole`, it is the admin role bearer
+  - if using `renounceRole`, it is the role bearer (i.e. `account`)
+
+
+_Inherited from `../@openzeppelin/contracts-upgradeable/access/IAccessControlUpgradeable.sol`_.
+
+
 ### `Initialized(uint8 version)` (inherited) <a name="Initializable-Initialized-uint8-" id="Initializable-Initialized-uint8-"></a>
 
 Triggered when the contract has been initialized or reinitialized.
@@ -284,61 +346,60 @@ _Inherited from `../@openzeppelin/contracts-upgradeable/proxy/utils/Initializabl
 
 ## PUBLIC FUNCTIONS
 
-### `constructor()` (public) <a name="MechaLandsV1-constructor--" id="MechaLandsV1-constructor--"></a>
+### `constructor()` (public) <a name="MechaPilots2219V1-constructor--" id="MechaPilots2219V1-constructor--"></a>
 
 
 
 
 
 
-### `initialize()` (public) <a name="MechaLandsV1-initialize--" id="MechaLandsV1-initialize--"></a>
+### `initialize()` (public) <a name="MechaPilots2219V1-initialize--" id="MechaPilots2219V1-initialize--"></a>
 Initialize contract
 
 
 
 
 
-### `mint(uint256 roundId, uint256 landType, uint256 amount)` (external) <a name="MechaLandsV1-mint-uint256-uint256-uint256-" id="MechaLandsV1-mint-uint256-uint256-uint256-"></a>
-Mint the `amount` of planet land type in a round without validator
+### `mint(uint256 roundId, uint256 factionId, uint256 amount)` (external) <a name="MechaPilots2219V1-mint-uint256-uint256-uint256-" id="MechaPilots2219V1-mint-uint256-uint256-uint256-"></a>
+Mint the `amount` of `factionId` token in a round without validator
 
 
-Call {MechaLandsV1-_roundMint}.
+Call {MechaPilots2219V1-_roundMint}.
 Requirements:
 - Round must not have a validator
-- View {MechaLandsV1-_roundMint} requirements
+- View {MechaPilots2219V1-_roundMint} requirements
 
 
 
 Parameters:
 - `roundId`: The mint round index
 
-- `landType`: The type of the land
+- `factionId`: The token faction
 
-- `amount`: The number of lands to mint
+- `amount`: The number of tokens to mint
 
 
 
-### `mintWithValidation(uint256 roundId, uint256 landType, uint256 amount, uint256 maxMint, uint256 payloadExpiration, bytes sig)` (external) <a name="MechaLandsV1-mintWithValidation-uint256-uint256-uint256-uint256-uint256-bytes-" id="MechaLandsV1-mintWithValidation-uint256-uint256-uint256-uint256-uint256-bytes-"></a>
-Mint the `amount` of planet land type with the signature of the round validator.
+### `mintWithValidation(uint256 roundId, uint256 factionId, uint256 amount, uint256 maxMint, uint256 payloadExpiration, bytes sig)` (external) <a name="MechaPilots2219V1-mintWithValidation-uint256-uint256-uint256-uint256-uint256-bytes-" id="MechaPilots2219V1-mintWithValidation-uint256-uint256-uint256-uint256-uint256-bytes-"></a>
+Mint the `amount` of tokens with the signature of the round validator.
 
 
 Requirements:
 - Total minted for the user during this round must be less than `maxMint`.
-  If round is `limitedPerType`, the condition is only for the `landType` total.
 - `sig` must be signed by the validator of the round and contains all information to check.
 - `payloadExpiration` must be less than the block timestamp.
-- View {MechaLandsV1-_roundMint} requirements.
+- View {MechaPilots2219V1-_roundMint} requirements.
 
 
 
 Parameters:
 - `roundId`: The mint round index (verified in `sig`)
 
-- `landType`: The type of the land (verified in `sig`)
+- `factionId`: The token faction (verified in `sig`)
 
-- `amount`: The number of lands to mint
+- `amount`: The number of tokens to mint
 
-- `maxMint`: The maximum token that the user is allowed to mint in the round for this landType (verified in `sig`)
+- `maxMint`: The maximum token that the user is allowed to mint in the round (verified in `sig`)
 
 - `payloadExpiration`: The maximum timestamp before the signature is considered invalid (verified in `sig`)
 
@@ -346,131 +407,94 @@ Parameters:
 
 
 
-### `airdrop(address wallet, uint256 planetId, uint256 landType, uint256 amount)` (external) <a name="MechaLandsV1-airdrop-address-uint256-uint256-uint256-" id="MechaLandsV1-airdrop-address-uint256-uint256-uint256-"></a>
-Mint the `amount` of planet land type and transfers it to `wallet`.
+### `revealToken(uint256 tokenId, string uri, uint256 payloadExpiration, bytes sig)` (external) <a name="MechaPilots2219V1-revealToken-uint256-string-uint256-bytes-" id="MechaPilots2219V1-revealToken-uint256-string-uint256-bytes-"></a>
+Reveals a user's token using the signature of a URI_UPDATER_ROLE
 
 
-Call {MechaLandsV1-_safeMint}.
 Requirements:
-- Only owner or the `distributor` of the planet.
-- View {MechaLandsV1-_safeMint} requirements.
+- The caller must own `tokenId` or be an approved operator.
+- `sig` must be signed by a URI_UPDATER_ROLE of the round and contains all information to check.
+- `payloadExpiration` must be less than the block timestamp.
+
+
+
+Parameters:
+- `tokenId`: The tokenId (verified in `sig`)
+
+- `uri`: The revealed token uri (verified in `sig`)
+
+- `payloadExpiration`: The maximum timestamp before the signature is considered invalid (verified in `sig`)
+
+- `sig`: The EC signature generated by the round validator
+
+
+
+### `setTokenURI(uint256 tokenId, string uri)` (external) <a name="MechaPilots2219V1-setTokenURI-uint256-string-" id="MechaPilots2219V1-setTokenURI-uint256-string-"></a>
+Change the tokenURI of a token
+
+
+Requirements:
+- Only for URI_UPDATER_ROLE.
+
+
+
+Parameters:
+- `tokenId`: The tokenId
+
+- `uri`: The new token uri
+
+
+
+### `setTokenURIPerBatch(uint256[] tokenIds, string[] uri)` (external) <a name="MechaPilots2219V1-setTokenURIPerBatch-uint256---string---" id="MechaPilots2219V1-setTokenURIPerBatch-uint256---string---"></a>
+Change tokenURI of each token
+
+
+Requirements:
+- Only for URI_UPDATER_ROLE.
+
+
+
+Parameters:
+- `tokenIds`: List of tokenIds
+
+- `uri`: List of new token URI
+
+
+
+### `airdrop(address wallet, uint256 factionId, uint256 amount)` (external) <a name="MechaPilots2219V1-airdrop-address-uint256-uint256-" id="MechaPilots2219V1-airdrop-address-uint256-uint256-"></a>
+Mint the `amount` of token and transfers it to `wallet`.
+
+
+Call {MechaPilots2219V1-_safeMint}.
+Requirements:
+- Only owner.
+- View {MechaPilots2219V1-_safeMint} requirements.
 
 
 
 Parameters:
 - `wallet`: The wallet to transfer new tokens
 
-- `planetId`: The planet index
+- `factionId`: The faction
 
-- `landType`: The type of the land
-
-- `amount`: The number of lands to mint
+- `amount`: The number of tokens to mint
 
 
 
-### `setupPlanet(uint256 planetId, uint16 typesNumber, uint32[] supplyPerType, string[] notRevealUriPerType)` (public) <a name="MechaLandsV1-setupPlanet-uint256-uint16-uint32---string---" id="MechaLandsV1-setupPlanet-uint256-uint16-uint32---string---"></a>
-Create or edit a planet.
+### `setupMintRound(uint256 roundId, uint32[2] supply, uint64 startTime, uint64 duration, address validator, uint256 maxPrice, uint256 minPrice, uint256 priceDecreaseTime, uint256 priceDecreaseAmount)` (public) <a name="MechaPilots2219V1-setupMintRound-uint256-uint32-2--uint64-uint64-address-uint256-uint256-uint256-uint256-" id="MechaPilots2219V1-setupMintRound-uint256-uint32-2--uint64-uint64-address-uint256-uint256-uint256-uint256-"></a>
+Create or edit a mint round
 
-
-Requirements:
-- `planetId` must exist or increment `planetsLength` for create one.
-- `planetId` can be 0.
-- The number of types cannot be lower than the previous one.
-- `supplyPerType` and `notRevealUriPerType` must have a length of `typesNumber`.
-- A supply can by lower than the number of mint for the same type.
-
-
-
-Parameters:
-- `planetId`: The index of the planet.
-
-- `typesNumber`: Number of land types for this planet.
-
-- `supplyPerType`: Maximum number of land by type.
-
-- `notRevealUriPerType`: The base token URI by land type (or all the not reveal URI if not revealed).
-
-
-
-### `revealPlanet(uint256 planetId, string baseURI, string baseExtension)` (public) <a name="MechaLandsV1-revealPlanet-uint256-string-string-" id="MechaLandsV1-revealPlanet-uint256-string-string-"></a>
-Activate token revelation for a planet and set his base URI
-
-
-Can be called only once per planet
-
-
-
-Parameters:
-- `planetId`: The index of the planet.
-
-- `baseURI`: The baseURI for all lands on this planet.
-
-- `baseExtension`: The base extension for the end of token id.
-
-
-
-### `setPlanetBaseURI(uint256 planetId, string baseURI, string baseExtension)` (public) <a name="MechaLandsV1-setPlanetBaseURI-uint256-string-string-" id="MechaLandsV1-setPlanetBaseURI-uint256-string-string-"></a>
-Change the base URI and extension of a planet
-
-
-
-
-Parameters:
-- `planetId`: The index of the planet.
-
-- `baseURI`: The baseURI for all lands on this planet.
-
-- `baseExtension`: The base extension for the end of token id.
-
-
-
-### `setPlanetBurnable(uint256 planetId, bool burnable)` (public) <a name="MechaLandsV1-setPlanetBurnable-uint256-bool-" id="MechaLandsV1-setPlanetBurnable-uint256-bool-"></a>
-Activate burnable option for a planet
-
-
-
-
-Parameters:
-- `planetId`: The index of the planet.
-
-- `burnable`: If users are authorized to burn their tokens for this planet.
-
-
-
-### `setPlanetDistributor(uint256 planetId, address distributor)` (public) <a name="MechaLandsV1-setPlanetDistributor-uint256-address-" id="MechaLandsV1-setPlanetDistributor-uint256-address-"></a>
-Set a distributor that has the right to perform airdrops for this planet.
-
-
-
-
-Parameters:
-- `planetId`: The index of the planet.
-
-- `distributor`: The distributor address.
-
-
-
-### `setupMintRound(uint256 roundId, uint64 planetId, uint64 startTime, uint64 duration, address validator, bool limitedPerType, uint256[] pricePerType, uint256[] supplyPerType, uint256[] maxMintPerType)` (public) <a name="MechaLandsV1-setupMintRound-uint256-uint64-uint64-uint64-address-bool-uint256---uint256---uint256---" id="MechaLandsV1-setupMintRound-uint256-uint64-uint64-uint64-address-bool-uint256---uint256---uint256---"></a>
-Create or edit a mint round for a planet
-
-
-`supplyPerType` of the round can be greater than the one of the planet. In this case,
-      it is the supply of the planet that will be taken into account.
 
 Requirements:
 - `roundId` must exist or increment `roundsLength` for create one.
 - `roundId` can be 0.
-- The number of types cannot be lower than the previous one.
-- `supplyPerType` and `pricePerType` must have a length of planet's `typesNumber`.
-- A supply can by lower than the number of round mint for the same type.
-- If `roundId` already exist, we can't change the `planetId` to avoid forgotten minted count mapping.
 
 
 
 Parameters:
-- `roundId`: The index of the planet mint round.
+- `roundId`: The index of the mint round.
 
-- `planetId`: The index of the planet.
+- `supply`: Number of tokens that can be minted in this round by faction. Can be 0 for use the total faction supply
 
 - `startTime`: The start time of the round in unix seconds timestamp. 0 if not set.
 
@@ -478,31 +502,62 @@ Parameters:
 
 - `validator`: The address of the whitelist validator. Can be 'address(0)' for no whitelist.
 
-- `limitedPerType`: If the max mint limitation per wallet is defined par type or far all types.
+- `maxPrice`: The maximum price which will be decreasing in wei
 
-- `pricePerType`: The price by land type of the round in wei.
+- `minPrice`: The minimum price after which it no longer decreases in wei
 
-- `supplyPerType`: The round supply by land type.
+- `priceDecreaseTime`: The number of wei that will be subtracted from the price every `decreaseTime` (0 if no decrease)
 
-- `maxMintPerType`: The maximum number of tokens that a user can mint per type during the round. If `limitedPerType`, all values should be the same.
+- `priceDecreaseAmount`: The number of seconds to wait between each decreasing (must be > 900)
 
 
 
-### `pause()` (public) <a name="MechaLandsV1-pause--" id="MechaLandsV1-pause--"></a>
+### `pause()` (public) <a name="MechaPilots2219V1-pause--" id="MechaPilots2219V1-pause--"></a>
 Pause the contract : disables mints, transactions and burns until `unpause`
 
 
 
 
 
-### `unpause()` (public) <a name="MechaLandsV1-unpause--" id="MechaLandsV1-unpause--"></a>
+### `unpause()` (public) <a name="MechaPilots2219V1-unpause--" id="MechaPilots2219V1-unpause--"></a>
 Unpause the contract
 
 
 
 
 
-### `burn(uint256 tokenId)` (public) <a name="MechaLandsV1-burn-uint256-" id="MechaLandsV1-burn-uint256-"></a>
+### `setBaseURI(string newBaseURI)` (external) <a name="MechaPilots2219V1-setBaseURI-string-" id="MechaPilots2219V1-setBaseURI-string-"></a>
+Change the baseURI for unrevealed tokens
+
+
+
+
+
+### `setBaseExtension(string newBaseExtension)` (external) <a name="MechaPilots2219V1-setBaseExtension-string-" id="MechaPilots2219V1-setBaseExtension-string-"></a>
+Change the URI base extension for unrevealed tokens
+
+
+
+
+
+### `setBurnable(bool newBurnable)` (public) <a name="MechaPilots2219V1-setBurnable-bool-" id="MechaPilots2219V1-setBurnable-bool-"></a>
+Activate burnable option
+
+
+
+Parameters:
+- `newBurnable`: If users are authorized to burn their tokens or not
+
+
+
+### `setMaxMintsPerWallet(uint256 newMaxMints)` (external) <a name="MechaPilots2219V1-setMaxMintsPerWallet-uint256-" id="MechaPilots2219V1-setMaxMintsPerWallet-uint256-"></a>
+Change number of tokens that a wallet can mint in a public round
+
+
+
+
+
+### `burn(uint256 tokenId)` (public) <a name="MechaPilots2219V1-burn-uint256-" id="MechaPilots2219V1-burn-uint256-"></a>
 
 Burns `tokenId`. See {ERC721-_burn}.
 
@@ -513,7 +568,7 @@ Requirements:
 
 
 
-### `withdraw(address payable to, uint256 amount)` (public) <a name="MechaLandsV1-withdraw-address-payable-uint256-" id="MechaLandsV1-withdraw-address-payable-uint256-"></a>
+### `withdraw(address payable to, uint256 amount)` (public) <a name="MechaPilots2219V1-withdraw-address-payable-uint256-" id="MechaPilots2219V1-withdraw-address-payable-uint256-"></a>
 Withdraw network native coins
 
 
@@ -526,7 +581,7 @@ Parameters:
 
 
 
-### `withdrawTokens(address to, address token, uint256 amount)` (public) <a name="MechaLandsV1-withdrawTokens-address-address-uint256-" id="MechaLandsV1-withdrawTokens-address-address-uint256-"></a>
+### `withdrawTokens(address to, address token, uint256 amount)` (public) <a name="MechaPilots2219V1-withdrawTokens-address-address-uint256-" id="MechaPilots2219V1-withdrawTokens-address-address-uint256-"></a>
 Withdraw ERC20
 
 
@@ -541,91 +596,54 @@ Parameters:
 
 
 
-### `tokenURI(uint256 tokenId) → string` (public) <a name="MechaLandsV1-tokenURI-uint256-" id="MechaLandsV1-tokenURI-uint256-"></a>
-Returns the URI of `tokenId` or the not revealed uri, according to its planet and land type
+### `tokenURI(uint256 tokenId) → string` (public) <a name="MechaPilots2219V1-tokenURI-uint256-" id="MechaPilots2219V1-tokenURI-uint256-"></a>
+Returns the URI of `tokenId`, according to its condition (revealed or not)
 
 
 
 
 
-### `totalSupply() → uint256` (public) <a name="MechaLandsV1-totalSupply--" id="MechaLandsV1-totalSupply--"></a>
+### `rounds(uint256 roundId) → struct MechaPilots2219V1.MintRound` (external) <a name="MechaPilots2219V1-rounds-uint256-" id="MechaPilots2219V1-rounds-uint256-"></a>
+Returns the MintRound structure of `roundId`
+
+
+Better web3 accessibility that a public variable (includes arrays)
+
+
+
+
+### `totalSupply() → uint256` (public) <a name="MechaPilots2219V1-totalSupply--" id="MechaPilots2219V1-totalSupply--"></a>
 Returns the total amount of tokens minted.
 
 
 
 
 
-### `planetSupplyByType(uint256 planetId, uint256 landType) → uint256` (public) <a name="MechaLandsV1-planetSupplyByType-uint256-uint256-" id="MechaLandsV1-planetSupplyByType-uint256-uint256-"></a>
-Return the supply of `landType` for `planetId`
+### `totalMintedBy(address wallet, uint256 roundId) → uint256` (public) <a name="MechaPilots2219V1-totalMintedBy-address-uint256-" id="MechaPilots2219V1-totalMintedBy-address-uint256-"></a>
+Returns the total amount of tokens minted by `wallet` for `roundId`.
 
 
 
 
 
-### `planetTotalMintedByType(uint256 planetId, uint256 landType) → uint256` (public) <a name="MechaLandsV1-planetTotalMintedByType-uint256-uint256-" id="MechaLandsV1-planetTotalMintedByType-uint256-uint256-"></a>
-Return the total minted of `landType` for `planetId`
+### `roundPrice(uint256 roundId) → uint256` (public) <a name="MechaPilots2219V1-roundPrice-uint256-" id="MechaPilots2219V1-roundPrice-uint256-"></a>
+Get the round price according to the Dutch Auction configuration
 
 
 
-
-
-### `planetNotRevealUriByType(uint256 planetId, uint256 landType) → string` (public) <a name="MechaLandsV1-planetNotRevealUriByType-uint256-uint256-" id="MechaLandsV1-planetNotRevealUriByType-uint256-uint256-"></a>
-Return the not reveal URI of `landType` for `planetId`
-
+Parameters:
+- `roundId`: The round index
 
 
 
-
-### `roundSupplyByType(uint256 roundId, uint256 landType) → uint256` (public) <a name="MechaLandsV1-roundSupplyByType-uint256-uint256-" id="MechaLandsV1-roundSupplyByType-uint256-uint256-"></a>
-Return the supply of `landType` for `roundId`
-
-
-
-
-
-### `roundPriceByType(uint256 roundId, uint256 landType) → uint256` (public) <a name="MechaLandsV1-roundPriceByType-uint256-uint256-" id="MechaLandsV1-roundPriceByType-uint256-uint256-"></a>
-Return the price of a single `landType` for `roundId`
-
-
-
-
-
-### `roundMaxMintByType(uint256 roundId, uint256 landType) → uint256` (public) <a name="MechaLandsV1-roundMaxMintByType-uint256-uint256-" id="MechaLandsV1-roundMaxMintByType-uint256-uint256-"></a>
-Return the maximum number of `landType` tokens that a user can mint for `roundId`
-
-
-
-
-
-### `roundTotalMintedByType(uint256 roundId, uint256 landType) → uint256` (public) <a name="MechaLandsV1-roundTotalMintedByType-uint256-uint256-" id="MechaLandsV1-roundTotalMintedByType-uint256-uint256-"></a>
-Return the total minted of `landType` for `roundId`
-
-
-
-
-
-### `roundTotalMintedByTypeForUser(address user, uint256 roundId, uint256 landType) → uint256` (public) <a name="MechaLandsV1-roundTotalMintedByTypeForUser-address-uint256-uint256-" id="MechaLandsV1-roundTotalMintedByTypeForUser-address-uint256-uint256-"></a>
-Return the total minted of `landType` for `user` in `roundId`
-
-
-
-
-
-### `roundTotalMintedForUser(address user, uint256 roundId) → uint256` (public) <a name="MechaLandsV1-roundTotalMintedForUser-address-uint256-" id="MechaLandsV1-roundTotalMintedForUser-address-uint256-"></a>
-Return the total minted for `user` in `roundId` for all lands
-
-
-
-
-
-### `chainid() → uint256` (public) <a name="MechaLandsV1-chainid--" id="MechaLandsV1-chainid--"></a>
+### `supportsInterface(bytes4 interfaceId) → bool` (public) <a name="MechaPilots2219V1-supportsInterface-bytes4-" id="MechaPilots2219V1-supportsInterface-bytes4-"></a>
 
 
 
 
 
 
-### `receive()` (external) <a name="MechaLandsV1-receive--" id="MechaLandsV1-receive--"></a>
+### `receive()` (external) <a name="MechaPilots2219V1-receive--" id="MechaPilots2219V1-receive--"></a>
 
 
 
@@ -665,6 +683,65 @@ Emits an {Upgraded} event.
 _Inherited from `../@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol`_.
 
 
+### `hasRole(bytes32 role, address account) → bool` (public) (inherited)<a name="AccessControlUpgradeable-hasRole-bytes32-address-" id="AccessControlUpgradeable-hasRole-bytes32-address-"></a>
+
+Returns `true` if `account` has been granted `role`.
+
+
+_Inherited from `../@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol`_.
+
+
+### `getRoleAdmin(bytes32 role) → bytes32` (public) (inherited)<a name="AccessControlUpgradeable-getRoleAdmin-bytes32-" id="AccessControlUpgradeable-getRoleAdmin-bytes32-"></a>
+
+Returns the admin role that controls `role`. See {grantRole} and
+{revokeRole}.
+To change a role's admin, use {_setRoleAdmin}.
+
+
+_Inherited from `../@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol`_.
+
+
+### `grantRole(bytes32 role, address account)` (public) (inherited)<a name="AccessControlUpgradeable-grantRole-bytes32-address-" id="AccessControlUpgradeable-grantRole-bytes32-address-"></a>
+
+Grants `role` to `account`.
+If `account` had not been already granted `role`, emits a {RoleGranted}
+event.
+Requirements:
+- the caller must have ``role``'s admin role.
+May emit a {RoleGranted} event.
+
+
+_Inherited from `../@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol`_.
+
+
+### `revokeRole(bytes32 role, address account)` (public) (inherited)<a name="AccessControlUpgradeable-revokeRole-bytes32-address-" id="AccessControlUpgradeable-revokeRole-bytes32-address-"></a>
+
+Revokes `role` from `account`.
+If `account` had been granted `role`, emits a {RoleRevoked} event.
+Requirements:
+- the caller must have ``role``'s admin role.
+May emit a {RoleRevoked} event.
+
+
+_Inherited from `../@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol`_.
+
+
+### `renounceRole(bytes32 role, address account)` (public) (inherited)<a name="AccessControlUpgradeable-renounceRole-bytes32-address-" id="AccessControlUpgradeable-renounceRole-bytes32-address-"></a>
+
+Revokes `role` from the calling account.
+Roles are often managed via {grantRole} and {revokeRole}: this function's
+purpose is to provide a mechanism for accounts to lose their privileges
+if they are compromised (such as when a trusted device is misplaced).
+If the calling account had been revoked `role`, emits a {RoleRevoked}
+event.
+Requirements:
+- the caller must be `account`.
+May emit a {RoleRevoked} event.
+
+
+_Inherited from `../@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol`_.
+
+
 ### `owner() → address` (public) (inherited)<a name="OwnableUpgradeable-owner--" id="OwnableUpgradeable-owner--"></a>
 
 Returns the address of the current owner.
@@ -699,14 +776,6 @@ Returns true if the contract is paused, and false otherwise.
 
 
 _Inherited from `../@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol`_.
-
-
-### `supportsInterface(bytes4 interfaceId) → bool` (public) (inherited)<a name="ERC721Upgradeable-supportsInterface-bytes4-" id="ERC721Upgradeable-supportsInterface-bytes4-"></a>
-
-See {IERC165-supportsInterface}.
-
-
-_Inherited from `../@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol`_.
 
 
 ### `balanceOf(address owner) → uint256` (public) (inherited)<a name="ERC721Upgradeable-balanceOf-address-" id="ERC721Upgradeable-balanceOf-address-"></a>
@@ -799,18 +868,19 @@ _Inherited from `../@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgra
 
 ## INTERNAL FUNCTIONS
 
-### `_roundMint(address wallet, uint256 roundId, uint256 landType, uint256 amount)` (internal)  <a name="MechaLandsV1-_roundMint-address-uint256-uint256-uint256-" id="MechaLandsV1-_roundMint-address-uint256-uint256-uint256-"></a>
-Safely mint the `amount` of planet land type for `wallet` in a `round`
+### `_roundMint(address wallet, uint256 roundId, uint256 factionId, uint256 amount)` (internal)  <a name="MechaPilots2219V1-_roundMint-address-uint256-uint256-uint256-" id="MechaPilots2219V1-_roundMint-address-uint256-uint256-uint256-"></a>
+Safely mint the `amount` of token for `wallet` in a `round`
 
 
-Call {MechaLandsV1-_safeMint}.
+Call {MechaPilots2219V1-_safeMint}.
 Requirements:
 - round must be active
 - msg.value must contain the price
-- The supply of the round for the land type must not be exceeded with amount
-- View {MechaLandsV1-_safeMint} Requirements
+- The supply of the round for the `faction` must not be exceeded with amount
+- msg.sender must not be a smart contract
+- View {MechaPilots2219V1-_safeMint} Requirements
 
-Increase `totalMintedPerType` and `totalMintedPerTypePerUser` of the round
+Increase `ownerToRoundTotalMinted`
 
 
 
@@ -819,57 +889,62 @@ Parameters:
 
 - `roundId`: The mint round index
 
-- `landType`: The type of the land
+- `factionId`: The faction
 
-- `amount`: The number of lands to mint
+- `amount`: The number of tokens to mint
 
 
 
-### `_safeMint(address wallet, uint256 planetId, uint256 landType, uint256 amount)` (internal)  <a name="MechaLandsV1-_safeMint-address-uint256-uint256-uint256-" id="MechaLandsV1-_safeMint-address-uint256-uint256-uint256-"></a>
-Safely mint the `amount` of planet land type for `wallet`
+### `_safeMint(address wallet, uint256 factionId, uint256 amount)` (internal)  <a name="MechaPilots2219V1-_safeMint-address-uint256-uint256-" id="MechaPilots2219V1-_safeMint-address-uint256-uint256-"></a>
+Safely mint the `amount` of token for `wallet`
 
 
 Requirements:
 - `amount` must be above 0
-- `landType` must exist
-- The supply of the planet's land type must not be exceeded with amount
+- `faction` must exist
+- The supply of the faction must not be exceeded with amount
 
-Increase `totalMintedPerType` of the planet
+Increase `_totalMinted`
 
 
 
 Parameters:
 - `wallet`: The wallet to transfer new tokens
 
-- `planetId`: The planet index
+- `factionId`: The faction
 
-- `landType`: The type of the land
-
-- `amount`: The number of lands to mint
+- `amount`: The number of tokens to mint
 
 
 
-### `_checkSignature(address wallet, uint256 payloadExpiration, uint256 maxMint, uint256 landType, uint256 roundId, bytes sig, address signer)` (internal)  <a name="MechaLandsV1-_checkSignature-address-uint256-uint256-uint256-uint256-bytes-address-" id="MechaLandsV1-_checkSignature-address-uint256-uint256-uint256-uint256-bytes-address-"></a>
-Reverts if the data does not correspond to the signature, to the correct validator or if it has expired
+### `_getRandomToken(address wallet, uint256 totalMinted) → uint256` (internal)  <a name="MechaPilots2219V1-_getRandomToken-address-uint256-" id="MechaPilots2219V1-_getRandomToken-address-uint256-"></a>
+Gives a identifier from a pseudo random function (inspired by Cyberkongs VX)
+
+
+
+
+Parameters:
+- `wallet`: The wallet to complexify the random
+
+- `totalMinted`: Updated total minted
+
+
+
+### `_checkSignature(uint256 payloadExpiration, bytes data, bytes sig, address signer)` (internal)  <a name="MechaPilots2219V1-_checkSignature-uint256-bytes-bytes-address-" id="MechaPilots2219V1-_checkSignature-uint256-bytes-bytes-address-"></a>
+Reverts if the data does not correspond to the signature, to the correct signer or if it has expired
 
 
 Requirements:
 - `payloadExpiration` must be less than the block timestamp
-- `sig` must be a hash of the concatenation of `wallet`, `payloadExpiration`, contract's address and contract's chainid
+- `sig` must be a hash of `data`
 - `sig` must be signed by `signer`
 
 
 
 Parameters:
-- `wallet`: The user wallet
-
 - `payloadExpiration`: The maximum timestamp before the signature is considered invalid
 
-- `maxMint`: The maximum token that the user is allowed to mint in the round
-
-- `landType`: The landType that is allowed to mint
-
-- `roundId`: The roundId that is allowed to mint
+- `data`: All encoded pack data in order
 
 - `sig`: The EC signature generated by the signatory
 
@@ -877,14 +952,36 @@ Parameters:
 
 
 
-### `_beforeTokenTransfer(address from, address to, uint256 tokenId)` (internal)  <a name="MechaLandsV1-_beforeTokenTransfer-address-address-uint256-" id="MechaLandsV1-_beforeTokenTransfer-address-address-uint256-"></a>
+### `_checkSignatureFromRole(uint256 payloadExpiration, bytes data, bytes sig, bytes32 role)` (internal)  <a name="MechaPilots2219V1-_checkSignatureFromRole-uint256-bytes-bytes-bytes32-" id="MechaPilots2219V1-_checkSignatureFromRole-uint256-bytes-bytes-bytes32-"></a>
+Reverts if the data does not correspond to the signature, the signer has not corresponding `role` or if it has expired
+
+
+Requirements:
+- `payloadExpiration` must be less than the block timestamp
+- `sig` must be a hash of `data`
+- `sig` must be signed by `signer`
+
+
+
+Parameters:
+- `payloadExpiration`: The maximum timestamp before the signature is considered invalid
+
+- `data`: All encoded pack data in order
+
+- `sig`: The EC signature generated by the signatory
+
+- `role`: The role that the signer must have
+
+
+
+### `_beforeTokenTransfer(address from, address to, uint256 tokenId)` (internal)  <a name="MechaPilots2219V1-_beforeTokenTransfer-address-address-uint256-" id="MechaPilots2219V1-_beforeTokenTransfer-address-address-uint256-"></a>
 
 
 
 
 
 
-### `_authorizeUpgrade(address newImplementation)` (internal)  <a name="MechaLandsV1-_authorizeUpgrade-address-" id="MechaLandsV1-_authorizeUpgrade-address-"></a>
+### `_authorizeUpgrade(address newImplementation)` (internal)  <a name="MechaPilots2219V1-_authorizeUpgrade-address-" id="MechaPilots2219V1-_authorizeUpgrade-address-"></a>
 
 
 
@@ -993,20 +1090,90 @@ Emits a {BeaconUpgraded} event.
 _Inherited from `../@openzeppelin/contracts-upgradeable/proxy/ERC1967/ERC1967UpgradeUpgradeable.sol`_.
 
 
-### `__ReentrancyGuard_init()` (internal) (inherited) <a name="ReentrancyGuardUpgradeable-__ReentrancyGuard_init--" id="ReentrancyGuardUpgradeable-__ReentrancyGuard_init--"></a>
+### `__AccessControl_init()` (internal) (inherited) <a name="AccessControlUpgradeable-__AccessControl_init--" id="AccessControlUpgradeable-__AccessControl_init--"></a>
 
 
 
 
-_Inherited from `../@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol`_.
+_Inherited from `../@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol`_.
 
 
-### `__ReentrancyGuard_init_unchained()` (internal) (inherited) <a name="ReentrancyGuardUpgradeable-__ReentrancyGuard_init_unchained--" id="ReentrancyGuardUpgradeable-__ReentrancyGuard_init_unchained--"></a>
+### `__AccessControl_init_unchained()` (internal) (inherited) <a name="AccessControlUpgradeable-__AccessControl_init_unchained--" id="AccessControlUpgradeable-__AccessControl_init_unchained--"></a>
 
 
 
 
-_Inherited from `../@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol`_.
+_Inherited from `../@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol`_.
+
+
+### `_checkRole(bytes32 role)` (internal) (inherited) <a name="AccessControlUpgradeable-_checkRole-bytes32-" id="AccessControlUpgradeable-_checkRole-bytes32-"></a>
+
+Revert with a standard message if `_msgSender()` is missing `role`.
+Overriding this function changes the behavior of the {onlyRole} modifier.
+Format of the revert message is described in {_checkRole}.
+_Available since v4.6._
+
+
+_Inherited from `../@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol`_.
+
+
+### `_checkRole(bytes32 role, address account)` (internal) (inherited) <a name="AccessControlUpgradeable-_checkRole-bytes32-address-" id="AccessControlUpgradeable-_checkRole-bytes32-address-"></a>
+
+Revert with a standard message if `account` is missing `role`.
+The format of the revert reason is given by the following regular expression:
+ /^AccessControl: account (0x[0-9a-f]{40}) is missing role (0x[0-9a-f]{64})$/
+
+
+_Inherited from `../@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol`_.
+
+
+### `_setupRole(bytes32 role, address account)` (internal) (inherited) <a name="AccessControlUpgradeable-_setupRole-bytes32-address-" id="AccessControlUpgradeable-_setupRole-bytes32-address-"></a>
+
+Grants `role` to `account`.
+If `account` had not been already granted `role`, emits a {RoleGranted}
+event. Note that unlike {grantRole}, this function doesn't perform any
+checks on the calling account.
+May emit a {RoleGranted} event.
+[WARNING]
+====
+This function should only be called from the constructor when setting
+up the initial roles for the system.
+Using this function in any other way is effectively circumventing the admin
+system imposed by {AccessControl}.
+====
+NOTE: This function is deprecated in favor of {_grantRole}.
+
+
+_Inherited from `../@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol`_.
+
+
+### `_setRoleAdmin(bytes32 role, bytes32 adminRole)` (internal) (inherited) <a name="AccessControlUpgradeable-_setRoleAdmin-bytes32-bytes32-" id="AccessControlUpgradeable-_setRoleAdmin-bytes32-bytes32-"></a>
+
+Sets `adminRole` as ``role``'s admin role.
+Emits a {RoleAdminChanged} event.
+
+
+_Inherited from `../@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol`_.
+
+
+### `_grantRole(bytes32 role, address account)` (internal) (inherited) <a name="AccessControlUpgradeable-_grantRole-bytes32-address-" id="AccessControlUpgradeable-_grantRole-bytes32-address-"></a>
+
+Grants `role` to `account`.
+Internal function without access restriction.
+May emit a {RoleGranted} event.
+
+
+_Inherited from `../@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol`_.
+
+
+### `_revokeRole(bytes32 role, address account)` (internal) (inherited) <a name="AccessControlUpgradeable-_revokeRole-bytes32-address-" id="AccessControlUpgradeable-_revokeRole-bytes32-address-"></a>
+
+Revokes `role` from `account`.
+Internal function without access restriction.
+May emit a {RoleRevoked} event.
+
+
+_Inherited from `../@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol`_.
 
 
 ### `__Ownable_init()` (internal) (inherited) <a name="OwnableUpgradeable-__Ownable_init--" id="OwnableUpgradeable-__Ownable_init--"></a>
@@ -1358,17 +1525,17 @@ callable on the implementing contract but not through proxies.
 _Inherited from `../@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol`_.
 
 
-### `nonReentrant()` (inherited) <a name="ReentrancyGuardUpgradeable-nonReentrant--" id="ReentrancyGuardUpgradeable-nonReentrant--"></a>
+### `onlyRole(bytes32 role)` (inherited) <a name="AccessControlUpgradeable-onlyRole-bytes32-" id="AccessControlUpgradeable-onlyRole-bytes32-"></a>
 
 
-Prevents a contract from calling itself, directly or indirectly.
-Calling a `nonReentrant` function from another `nonReentrant`
-function is not supported. It is possible to prevent this from happening
-by making the `nonReentrant` function external, and making it call a
-`private` function that does the actual work.
+Modifier that checks that an account has a specific role. Reverts
+with a standardized message including the required role.
+The format of the revert reason is given by the following regular expression:
+ /^AccessControl: account (0x[0-9a-f]{40}) is missing role (0x[0-9a-f]{64})$/
+_Available since v4.1._
 
 
-_Inherited from `../@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol`_.
+_Inherited from `../@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol`_.
 
 
 ### `onlyOwner()` (inherited) <a name="OwnableUpgradeable-onlyOwner--" id="OwnableUpgradeable-onlyOwner--"></a>
@@ -1440,31 +1607,35 @@ _Inherited from `../@openzeppelin/contracts-upgradeable/proxy/utils/Initializabl
 
 ## STRUCTS
 
-### `Planet`  <a name="MechaLandsV1-Planet" id="MechaLandsV1-Planet"></a>
-- bool revealed
-- bool burnable
-- uint16 typesNumber
-- string baseURI
-- string baseExtension
-- address distributor
-- mapping(uint256 => uint256) supplyPerType
-- mapping(uint256 => uint256) totalMintedPerType
-- mapping(uint256 => string) notRevealUriPerType
-
-
-
-### `MintRound`  <a name="MechaLandsV1-MintRound" id="MechaLandsV1-MintRound"></a>
-- bool limitedPerType
-- uint64 planetId
+### `MintRound`  <a name="MechaPilots2219V1-MintRound" id="MechaPilots2219V1-MintRound"></a>
 - uint64 startTime
 - uint64 duration
+- uint32[2] supply
+- uint32[2] totalMinted
 - address validator
-- mapping(uint256 => uint256) pricePerType
-- mapping(uint256 => uint256) supplyPerType
-- mapping(uint256 => uint256) maxMintPerType
-- mapping(uint256 => uint256) totalMintedPerType
-- mapping(address => uint256) totalMintedPerUser
-- mapping(address => mapping(uint256 => uint256)) totalMintedPerTypePerUser
+- struct MechaPilots2219V1.MintPrice price
+
+
+
+### `MintPrice`  <a name="MechaPilots2219V1-MintPrice" id="MechaPilots2219V1-MintPrice"></a>
+- uint256 max
+- uint256 min
+- uint256 decreaseTime
+- uint256 decreaseAmount
+
+
+
+### `RoleData` (inherited) <a name="AccessControlUpgradeable-RoleData" id="AccessControlUpgradeable-RoleData"></a>
+- mapping(address => bool) members
+- bytes32 adminRole
+
+_Inherited from `../@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol`_.
+
+
+## ENUMS
+
+### `Faction`  <a name="MechaPilots2219V1-Faction" id="MechaPilots2219V1-Faction"></a>
+
 
 
 

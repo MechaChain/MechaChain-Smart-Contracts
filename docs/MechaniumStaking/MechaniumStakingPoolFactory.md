@@ -37,6 +37,7 @@ MechaniumStakingPoolFactory - Staking pool factory smart contract
 - [Internal Functions](#internal-functions)
     - [`_transferTokens`](#MechaniumStakingPoolFactory-_transferTokens-address-uint256-) 
     - [`_addLockedToken`](#MechaniumCanReleaseUnintendedOwnable-_addLockedToken-address-) (inherited)
+    - [`_checkOwner`](#Ownable-_checkOwner--) (inherited)
     - [`_transferOwnership`](#Ownable-_transferOwnership-address-) (inherited)
     - [`_msgSender`](#Context-_msgSender--) (inherited)
     - [`_msgData`](#Context-_msgData--) (inherited)
@@ -321,6 +322,14 @@ Add a locked `token_` ( can't be released )
 
 
 _Inherited from `MechaniumUtils/MechaniumCanReleaseUnintendedOwnable.sol`_.
+
+
+### `_checkOwner()` (internal) (inherited) <a name="Ownable-_checkOwner--" id="Ownable-_checkOwner--"></a>
+
+Throws if the sender is not the owner.
+
+
+_Inherited from `../@openzeppelin/contracts/access/Ownable.sol`_.
 
 
 ### `_transferOwnership(address newOwner)` (internal) (inherited) <a name="Ownable-_transferOwnership-address-" id="Ownable-_transferOwnership-address-"></a>

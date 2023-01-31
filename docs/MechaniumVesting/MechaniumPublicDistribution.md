@@ -1,14 +1,16 @@
-# `MechaniumTeamDistribution`
-**Documentation of `MechaniumVesting/MechaniumTeamDistribution.sol`.**
+# `MechaniumPublicDistribution`
+**Documentation of `MechaniumVesting/MechaniumPublicDistribution.sol`.**
 
-MechaniumTeamDistribution - Vesting and distribution smart contract for the MechaChain team
+MechaniumPublicDistribution - Public distribution smart contract
 
-Can manage multiple allocations with a specific schedule to each
 
 
 
 ## TABLE OF CONTENTS
 - [Events](#events)
+    - [`VestingStartingTimeChanged`](#MechaniumPublicDistribution-VestingStartingTimeChanged-uint256-) 
+    - [`TransferUnsoldToPTEPool`](#MechaniumPublicDistribution-TransferUnsoldToPTEPool-uint256-) 
+    - [`TransferToStakingPool`](#MechaniumPublicDistribution-TransferToStakingPool-address-uint256-uint256-) 
     - [`Allocated`](#MechaniumVesting-Allocated-address-uint256-) (inherited)
     - [`ClaimedTokens`](#MechaniumVesting-ClaimedTokens-address-address-uint256-) (inherited)
     - [`ClaimedTokensToAll`](#MechaniumVesting-ClaimedTokensToAll-address-uint256-uint256-) (inherited)
@@ -20,17 +22,24 @@ Can manage multiple allocations with a specific schedule to each
     - [`RoleRevoked`](#IAccessControl-RoleRevoked-bytes32-address-address-) (inherited)
 
 - [Public Functions](#public-functions)
-    - [`constructor`](#MechaniumTeamDistribution-constructor-contract-IERC20-uint256-uint256-uint256-) 
-    - [`allocateTokens`](#MechaniumTeamDistribution-allocateTokens-address-uint256-) 
-    - [`allocatedTokensOf`](#MechaniumTeamDistribution-allocatedTokensOf-address-) 
-    - [`pendingTokensOf`](#MechaniumTeamDistribution-pendingTokensOf-address-) 
-    - [`unlockableTokens`](#MechaniumTeamDistribution-unlockableTokens-address-) 
-    - [`allocationCount`](#MechaniumTeamDistribution-allocationCount--) 
-    - [`allocationTokens`](#MechaniumTeamDistribution-allocationTokens-uint256-) 
-    - [`allocationOwner`](#MechaniumTeamDistribution-allocationOwner-uint256-) 
-    - [`allocationStartingTime`](#MechaniumTeamDistribution-allocationStartingTime-uint256-) 
-    - [`allocationsOf`](#MechaniumTeamDistribution-allocationsOf-address-) 
-    - [`timeBeforeStarting`](#MechaniumTeamDistribution-timeBeforeStarting--) 
+    - [`constructor`](#MechaniumPublicDistribution-constructor-contract-IERC20-) 
+    - [`allocateTokens`](#MechaniumPublicDistribution-allocateTokens-address-uint256-) 
+    - [`allocateMultipleTokens`](#MechaniumPublicDistribution-allocateMultipleTokens-address---uint256---) 
+    - [`startVesting`](#MechaniumPublicDistribution-startVesting--) 
+    - [`startVesting`](#MechaniumPublicDistribution-startVesting-uint256-) 
+    - [`setStakingPool`](#MechaniumPublicDistribution-setStakingPool-address-) 
+    - [`setStakingTransferTimeLimit`](#MechaniumPublicDistribution-setStakingTransferTimeLimit-uint256-) 
+    - [`setMinimumStakingTime`](#MechaniumPublicDistribution-setMinimumStakingTime-uint256-) 
+    - [`transferToStakingPool`](#MechaniumPublicDistribution-transferToStakingPool-uint256-uint256-) 
+    - [`allocatedTokensOf`](#MechaniumPublicDistribution-allocatedTokensOf-address-) 
+    - [`pendingTokensOf`](#MechaniumPublicDistribution-pendingTokensOf-address-) 
+    - [`unlockableTokens`](#MechaniumPublicDistribution-unlockableTokens-address-) 
+    - [`hasVestingStarted`](#MechaniumPublicDistribution-hasVestingStarted--) 
+    - [`vestingStartingTime`](#MechaniumPublicDistribution-vestingStartingTime--) 
+    - [`maxVestingStartingTime`](#MechaniumPublicDistribution-maxVestingStartingTime--) 
+    - [`getStakingPoolAddress`](#MechaniumPublicDistribution-getStakingPoolAddress--) 
+    - [`getStrakingTransferTimeLimit`](#MechaniumPublicDistribution-getStrakingTransferTimeLimit--) 
+    - [`getMinimumStakingTime`](#MechaniumPublicDistribution-getMinimumStakingTime--) 
     - [`claimTokens`](#MechaniumVesting-claimTokens-address-) (inherited)
     - [`claimTokens`](#MechaniumVesting-claimTokens--) (inherited)
     - [`claimTokensForAll`](#MechaniumVesting-claimTokensForAll--) (inherited)
@@ -72,6 +81,8 @@ Can manage multiple allocations with a specific schedule to each
 
 
 - [Modifiers](#modifiers)
+    - [`vestingStarted`](#MechaniumPublicDistribution-vestingStarted--) 
+    - [`vestingNotStarted`](#MechaniumPublicDistribution-vestingNotStarted--) 
     - [`tokensAvailable`](#MechaniumVesting-tokensAvailable-uint256-) (inherited)
     - [`onlyRole`](#AccessControl-onlyRole-bytes32-) (inherited)
 
@@ -81,6 +92,27 @@ Can manage multiple allocations with a specific schedule to each
 
 
 ## EVENTS
+
+### `VestingStartingTimeChanged(uint256 vestingStartingTime)`  <a name="MechaniumPublicDistribution-VestingStartingTimeChanged-uint256-" id="MechaniumPublicDistribution-VestingStartingTimeChanged-uint256-"></a>
+Event emitted when the `vestingStartingTime` has changed
+
+
+
+
+
+### `TransferUnsoldToPTEPool(uint256 amount)`  <a name="MechaniumPublicDistribution-TransferUnsoldToPTEPool-uint256-" id="MechaniumPublicDistribution-TransferUnsoldToPTEPool-uint256-"></a>
+Event emitted when `amount` tokens has been transferred to the play to earn pool
+
+
+
+
+
+### `TransferToStakingPool(address account, uint256 amount, uint256 stakingTime)`  <a name="MechaniumPublicDistribution-TransferToStakingPool-address-uint256-uint256-" id="MechaniumPublicDistribution-TransferToStakingPool-address-uint256-uint256-"></a>
+Event emitted when `account` has transferred `amount` tokens to the staking pool
+
+
+
+
 
 ### `Allocated(address to, uint256 amount)` (inherited) <a name="MechaniumVesting-Allocated-address-uint256-" id="MechaniumVesting-Allocated-address-uint256-"></a>
 Event emitted when `amount` tokens have been allocated for `to` address
@@ -165,23 +197,17 @@ _Inherited from `../@openzeppelin/contracts/access/IAccessControl.sol`_.
 
 ## PUBLIC FUNCTIONS
 
-### `constructor(contract IERC20 token_, uint256 timeBeforeStarting_, uint256 vestingPerClock_, uint256 vestingClockTime_)` (public) <a name="MechaniumTeamDistribution-constructor-contract-IERC20-uint256-uint256-uint256-" id="MechaniumTeamDistribution-constructor-contract-IERC20-uint256-uint256-uint256-"></a>
+### `constructor(contract IERC20 token_)` (public) <a name="MechaniumPublicDistribution-constructor-contract-IERC20-" id="MechaniumPublicDistribution-constructor-contract-IERC20-"></a>
 
-Contract constructor sets the configuration of the vesting schedule
+Contract constructor
 
 
 Parameters:
-- `token_`: Address of the ERC20 token contract, this address cannot be changed later
-
-- `timeBeforeStarting_`: Number of seconds to wait between allocation and the start of the schedule
-
-- `vestingPerClock_`: Percentage of unlocked tokens per _vestingClockTime once the vesting schedule has started
-
-- `vestingClockTime_`: Number of seconds between two _vestingPerClock
+- `token_`: address of the ERC20 token contract, this address cannot be changed later
 
 
 
-### `allocateTokens(address to, uint256 amount) → bool` (public) <a name="MechaniumTeamDistribution-allocateTokens-address-uint256-" id="MechaniumTeamDistribution-allocateTokens-address-uint256-"></a>
+### `allocateTokens(address to, uint256 amount) → bool` (public) <a name="MechaniumPublicDistribution-allocateTokens-address-uint256-" id="MechaniumPublicDistribution-allocateTokens-address-uint256-"></a>
 Allocate `amount` token `to` address
 
 
@@ -193,65 +219,131 @@ Parameters:
 
 
 
-### `allocatedTokensOf(address account) → uint256` (public) <a name="MechaniumTeamDistribution-allocatedTokensOf-address-" id="MechaniumTeamDistribution-allocatedTokensOf-address-"></a>
+### `allocateMultipleTokens(address[] addresses, uint256[] amounts) → bool` (public) <a name="MechaniumPublicDistribution-allocateMultipleTokens-address---uint256---" id="MechaniumPublicDistribution-allocateMultipleTokens-address---uint256---"></a>
+Process multiple allocation by matching the input arrays one-on-one
+
+
+
+Parameters:
+- `addresses`: Addresses of the beneficiaries
+
+- `amounts`: Total tokens to be allocated to each beneficiary
+
+
+
+### `startVesting() → bool` (public) <a name="MechaniumPublicDistribution-startVesting--" id="MechaniumPublicDistribution-startVesting--"></a>
+Start the vesting immediately
+
+
+
+
+
+### `startVesting(uint256 startTime) → bool` (public) <a name="MechaniumPublicDistribution-startVesting-uint256-" id="MechaniumPublicDistribution-startVesting-uint256-"></a>
+Set the vesting start time
+
+
+
+Parameters:
+- `startTime`: vesting start time
+
+
+
+### `setStakingPool(address stakingPoolAddress) → bool` (public) <a name="MechaniumPublicDistribution-setStakingPool-address-" id="MechaniumPublicDistribution-setStakingPool-address-"></a>
+Set staking pool address
+
+
+
+Parameters:
+- `stakingPoolAddress`: The staking pool address
+
+
+
+### `setStakingTransferTimeLimit(uint256 stakingTransferTimeLimit) → bool` (public) <a name="MechaniumPublicDistribution-setStakingTransferTimeLimit-uint256-" id="MechaniumPublicDistribution-setStakingTransferTimeLimit-uint256-"></a>
+Set staking transfer time limit
+
+
+
+Parameters:
+- `stakingTransferTimeLimit`: The staking transfer time limit
+
+
+
+### `setMinimumStakingTime(uint256 minimumStakingTime) → bool` (public) <a name="MechaniumPublicDistribution-setMinimumStakingTime-uint256-" id="MechaniumPublicDistribution-setMinimumStakingTime-uint256-"></a>
+Set minimum staking time
+
+
+
+Parameters:
+- `minimumStakingTime`: The minimum staking time
+
+
+
+### `transferToStakingPool(uint256 amount, uint256 stakingTime) → bool` (public) <a name="MechaniumPublicDistribution-transferToStakingPool-uint256-uint256-" id="MechaniumPublicDistribution-transferToStakingPool-uint256-uint256-"></a>
+Transfer tokens balance ( allocated but not claimed ) to the staking pool
+
+
+
+
+
+### `allocatedTokensOf(address account) → uint256` (public) <a name="MechaniumPublicDistribution-allocatedTokensOf-address-" id="MechaniumPublicDistribution-allocatedTokensOf-address-"></a>
 
 Return the amount of allocated tokens for `account` from the beginning
 
 
 
 
-### `pendingTokensOf(address account) → uint256` (public) <a name="MechaniumTeamDistribution-pendingTokensOf-address-" id="MechaniumTeamDistribution-pendingTokensOf-address-"></a>
+### `pendingTokensOf(address account) → uint256` (public) <a name="MechaniumPublicDistribution-pendingTokensOf-address-" id="MechaniumPublicDistribution-pendingTokensOf-address-"></a>
 
 Return the amount of tokens that the `account` can unlock in real time
 
 
 
 
-### `unlockableTokens(address account) → uint256` (public) <a name="MechaniumTeamDistribution-unlockableTokens-address-" id="MechaniumTeamDistribution-unlockableTokens-address-"></a>
+### `unlockableTokens(address account) → uint256` (public) <a name="MechaniumPublicDistribution-unlockableTokens-address-" id="MechaniumPublicDistribution-unlockableTokens-address-"></a>
 
 Return the amount of tokens that the `account` can unlock per month
 
 
 
 
-### `allocationCount() → uint256` (public) <a name="MechaniumTeamDistribution-allocationCount--" id="MechaniumTeamDistribution-allocationCount--"></a>
+### `hasVestingStarted() → bool` (public) <a name="MechaniumPublicDistribution-hasVestingStarted--" id="MechaniumPublicDistribution-hasVestingStarted--"></a>
 
-Return the amount of tokens of the allocation
-
-
-
-
-### `allocationTokens(uint256 allocationId) → uint256` (public) <a name="MechaniumTeamDistribution-allocationTokens-uint256-" id="MechaniumTeamDistribution-allocationTokens-uint256-"></a>
-
-Return the amount of tokens of the allocation
+Return true if the vesting schedule has started
 
 
 
 
-### `allocationOwner(uint256 allocationId) → address` (public) <a name="MechaniumTeamDistribution-allocationOwner-uint256-" id="MechaniumTeamDistribution-allocationOwner-uint256-"></a>
+### `vestingStartingTime() → uint256` (public) <a name="MechaniumPublicDistribution-vestingStartingTime--" id="MechaniumPublicDistribution-vestingStartingTime--"></a>
 
-Return the address of the allocation owner
-
-
-
-
-### `allocationStartingTime(uint256 allocationId) → uint256` (public) <a name="MechaniumTeamDistribution-allocationStartingTime-uint256-" id="MechaniumTeamDistribution-allocationStartingTime-uint256-"></a>
-
-Return the starting time of the allocation
+Return the starting time of the vesting schedule
 
 
 
 
-### `allocationsOf(address wallet) → uint256[]` (public) <a name="MechaniumTeamDistribution-allocationsOf-address-" id="MechaniumTeamDistribution-allocationsOf-address-"></a>
+### `maxVestingStartingTime() → uint256` (public) <a name="MechaniumPublicDistribution-maxVestingStartingTime--" id="MechaniumPublicDistribution-maxVestingStartingTime--"></a>
 
-Return the array of allocationId owned by `wallet`
-
-
+Return the unchangeable maximum vesting starting time
 
 
-### `timeBeforeStarting() → uint256` (public) <a name="MechaniumTeamDistribution-timeBeforeStarting--" id="MechaniumTeamDistribution-timeBeforeStarting--"></a>
 
-Return the number of seconds to wait between allocation and the start of the schedule
+
+### `getStakingPoolAddress() → address` (public) <a name="MechaniumPublicDistribution-getStakingPoolAddress--" id="MechaniumPublicDistribution-getStakingPoolAddress--"></a>
+
+Return the staking pool address
+
+
+
+
+### `getStrakingTransferTimeLimit() → uint256` (public) <a name="MechaniumPublicDistribution-getStrakingTransferTimeLimit--" id="MechaniumPublicDistribution-getStrakingTransferTimeLimit--"></a>
+
+Return the staking transfer time limit
+
+
+
+
+### `getMinimumStakingTime() → uint256` (public) <a name="MechaniumPublicDistribution-getMinimumStakingTime--" id="MechaniumPublicDistribution-getMinimumStakingTime--"></a>
+
+Return the minimum staking time
 
 
 
@@ -598,6 +690,22 @@ _Inherited from `../@openzeppelin/contracts/utils/Context.sol`_.
 
 
 ## MODIFIERS
+
+### `vestingStarted()`  <a name="MechaniumPublicDistribution-vestingStarted--" id="MechaniumPublicDistribution-vestingStarted--"></a>
+
+
+Check if the vesting has started
+
+
+
+
+### `vestingNotStarted()`  <a name="MechaniumPublicDistribution-vestingNotStarted--" id="MechaniumPublicDistribution-vestingNotStarted--"></a>
+
+
+Check if the vesting has not started
+
+
+
 
 ### `tokensAvailable(uint256 amount)` (inherited) <a name="MechaniumVesting-tokensAvailable-uint256-" id="MechaniumVesting-tokensAvailable-uint256-"></a>
 

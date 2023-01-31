@@ -22,6 +22,7 @@ MechaniumCanReleaseUnintendedOwnable - Abstract class for util can release unint
 - [Internal Functions](#internal-functions)
     - [`_addLockedToken`](#MechaniumCanReleaseUnintendedOwnable-_addLockedToken-address-) 
     - [`constructor`](#Ownable-constructor--) (inherited)
+    - [`_checkOwner`](#Ownable-_checkOwner--) (inherited)
     - [`_transferOwnership`](#Ownable-_transferOwnership-address-) (inherited)
     - [`_msgSender`](#Context-_msgSender--) (inherited)
     - [`_msgData`](#Context-_msgData--) (inherited)
@@ -123,6 +124,14 @@ Add a locked `token_` ( can't be released )
 ### `constructor()` (internal) (inherited) <a name="Ownable-constructor--" id="Ownable-constructor--"></a>
 
 Initializes the contract setting the deployer as the initial owner.
+
+
+_Inherited from `../@openzeppelin/contracts/access/Ownable.sol`_.
+
+
+### `_checkOwner()` (internal) (inherited) <a name="Ownable-_checkOwner--" id="Ownable-_checkOwner--"></a>
+
+Throws if the sender is not the owner.
 
 
 _Inherited from `../@openzeppelin/contracts/access/Ownable.sol`_.
