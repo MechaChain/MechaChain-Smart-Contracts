@@ -4,12 +4,12 @@ pragma solidity ^0.8.2;
 import "./MechaniumVestingWallet.sol";
 
 /**
- * @title MechaniumGrowthVestingWallet - Hold $MECHA allocated to the growth and marketing operations with a vesting schedule
+ * @title MechaniumGrowthVestingWallet - Hold $MECHA allocated to the P2E pool with a vesting schedule
  * @author EthernalHorizons - <https://ethernalhorizons.com/>
  * @custom:project-website  https://mechachain.io/
  * @custom:security-contact contracts@ethernalhorizons.com
  */
-contract MechaniumGrowthVestingWallet is MechaniumVestingWallet {
+contract MechaniumP2EVestingWallet is MechaniumVestingWallet {
     
     /**
      * @dev Contract constructor sets the configuration of the vesting schedule
@@ -18,9 +18,9 @@ contract MechaniumGrowthVestingWallet is MechaniumVestingWallet {
     constructor(IERC20 token_)
         MechaniumVestingWallet(
             token_,
-            15, // Initially unlock 15%
-            15, // then unlock 15%
-            180 days // every 6 months
+            0, // Initially unlock 0%
+            50, // then unlock 50%
+            270 days // every 9 months
         )
     {}
 }

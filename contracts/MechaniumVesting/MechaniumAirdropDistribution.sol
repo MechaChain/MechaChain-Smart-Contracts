@@ -7,12 +7,12 @@ import "./MechaniumVesting.sol";
 import "../MechaniumStaking/IStakingPool.sol";
 
 /**
- * @title MechaniumPublicDistribution - Public distribution smart contract
+ * @title MechaniumAirdropDistribution - Airdrop distribution smart contract
  * @author EthernalHorizons - <https://ethernalhorizons.com/>
  * @custom:project-website  https://mechachain.io/
  * @custom:security-contact contracts@ethernalhorizons.com
  */
-contract MechaniumPublicDistribution is MechaniumVesting {
+contract MechaniumAirdropDistribution is MechaniumVesting {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
 
@@ -113,8 +113,8 @@ contract MechaniumPublicDistribution is MechaniumVesting {
     constructor(IERC20 token_)
         MechaniumVesting(
             token_,
-            25, // once the schedule has started, unlock 25%
-            30 days // and repeat every month
+            100, // once the schedule has started, unlock 100%
+            100 days // ignored - irrelevant
         )
     {
         _vestingStartingTime = block.timestamp.add(180 days);
