@@ -206,7 +206,7 @@ _Inherited from `../@openzeppelin/contracts/token/ERC20/ERC20.sol`_.
 
 ### `_transfer(address from, address to, uint256 amount)` (internal) (inherited) <a name="ERC20-_transfer-address-address-uint256-" id="ERC20-_transfer-address-address-uint256-"></a>
 
-Moves `amount` of tokens from `sender` to `recipient`.
+Moves `amount` of tokens from `from` to `to`.
 This internal function is equivalent to {transfer}, and can be used to
 e.g. implement automatic token fees, slashing mechanisms, etc.
 Emits a {Transfer} event.
@@ -260,7 +260,7 @@ _Inherited from `../@openzeppelin/contracts/token/ERC20/ERC20.sol`_.
 
 ### `_spendAllowance(address owner, address spender, uint256 amount)` (internal) (inherited) <a name="ERC20-_spendAllowance-address-address-uint256-" id="ERC20-_spendAllowance-address-address-uint256-"></a>
 
-Spend `amount` form the allowance of `owner` toward `spender`.
+Updates `owner` s allowance for `spender` based on spent `amount`.
 Does not update the allowance amount in case of infinite allowance.
 Revert if not enough allowance is available.
 Might emit an {Approval} event.
