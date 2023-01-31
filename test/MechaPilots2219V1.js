@@ -992,14 +992,14 @@ contract("MechaPilots2219V1", async (accounts) => {
       const latestTime = await time.latest();
       const round2 = await instance.rounds(2);
       assert.equal(
-        round2.startTime >= latestTime.toNumber(),
+        round2.startTime <= latestTime.toNumber(),
         true,
         "Start time not correct"
       );
 
       const round3 = await instance.rounds(3);
       assert.equal(
-        round3.startTime >= latestTime.toNumber(),
+        round3.startTime <= latestTime.toNumber(),
         true,
         "Start time not correct"
       );
