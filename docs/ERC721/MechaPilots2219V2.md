@@ -1,5 +1,5 @@
-# `MechaPilots2219V1`
-**Documentation of `ERC721/MechaPilots2219V1.sol`.**
+# `MechaPilots2219V2`
+**Documentation of `ERC721/draft-MechaPilots2219V2.sol`.**
 
 MechaPilots2219 - TODO
 
@@ -8,14 +8,14 @@ MechaPilots2219 - TODO
 
 ## TABLE OF CONTENTS
 - [Events](#events)
-    - [`MintRoundSetup`](#MechaPilots2219V1-MintRoundSetup-uint256-uint32-2--uint64-uint64-address-) 
-    - [`TokenRevealed`](#MechaPilots2219V1-TokenRevealed-uint256-address-string-) 
-    - [`BaseURIChanged`](#MechaPilots2219V1-BaseURIChanged-string-) 
-    - [`BaseExtensionChanged`](#MechaPilots2219V1-BaseExtensionChanged-string-) 
-    - [`BurnableChanged`](#MechaPilots2219V1-BurnableChanged-bool-) 
-    - [`MaxMintsPerWalletChanged`](#MechaPilots2219V1-MaxMintsPerWalletChanged-uint256-) 
-    - [`Withdrawn`](#MechaPilots2219V1-Withdrawn-address-uint256-) 
-    - [`TokenWithdrawn`](#MechaPilots2219V1-TokenWithdrawn-address-address-uint256-) 
+    - [`MintRoundSetup`](#MechaPilots2219V1-MintRoundSetup-uint256-uint32-2--uint64-uint64-address-) (inherited)
+    - [`TokenRevealed`](#MechaPilots2219V1-TokenRevealed-uint256-address-string-) (inherited)
+    - [`BaseURIChanged`](#MechaPilots2219V1-BaseURIChanged-string-) (inherited)
+    - [`BaseExtensionChanged`](#MechaPilots2219V1-BaseExtensionChanged-string-) (inherited)
+    - [`BurnableChanged`](#MechaPilots2219V1-BurnableChanged-bool-) (inherited)
+    - [`MaxMintsPerWalletChanged`](#MechaPilots2219V1-MaxMintsPerWalletChanged-uint256-) (inherited)
+    - [`Withdrawn`](#MechaPilots2219V1-Withdrawn-address-uint256-) (inherited)
+    - [`TokenWithdrawn`](#MechaPilots2219V1-TokenWithdrawn-address-address-uint256-) (inherited)
     - [`Upgraded`](#ERC1967UpgradeUpgradeable-Upgraded-address-) (inherited)
     - [`AdminChanged`](#ERC1967UpgradeUpgradeable-AdminChanged-address-address-) (inherited)
     - [`BeaconUpgraded`](#ERC1967UpgradeUpgradeable-BeaconUpgraded-address-) (inherited)
@@ -31,31 +31,32 @@ MechaPilots2219 - TODO
     - [`Initialized`](#Initializable-Initialized-uint8-) (inherited)
 
 - [Public Functions](#public-functions)
-    - [`constructor`](#MechaPilots2219V1-constructor--) 
-    - [`initialize`](#MechaPilots2219V1-initialize--) 
-    - [`mint`](#MechaPilots2219V1-mint-uint256-uint256-uint256-) 
-    - [`mintWithValidation`](#MechaPilots2219V1-mintWithValidation-uint256-uint256-uint256-uint256-uint256-bytes-) 
-    - [`revealToken`](#MechaPilots2219V1-revealToken-uint256-string-uint256-bytes-) 
-    - [`airdrop`](#MechaPilots2219V1-airdrop-address-uint256-uint256-) 
-    - [`setupMintRound`](#MechaPilots2219V1-setupMintRound-uint256-uint32-2--uint64-uint64-address-uint256-uint256-uint256-uint256-) 
-    - [`pause`](#MechaPilots2219V1-pause--) 
-    - [`unpause`](#MechaPilots2219V1-unpause--) 
-    - [`setBaseURI`](#MechaPilots2219V1-setBaseURI-string-) 
-    - [`setBaseExtension`](#MechaPilots2219V1-setBaseExtension-string-) 
-    - [`setBurnable`](#MechaPilots2219V1-setBurnable-bool-) 
-    - [`setMaxMintsPerWallet`](#MechaPilots2219V1-setMaxMintsPerWallet-uint256-) 
-    - [`burn`](#MechaPilots2219V1-burn-uint256-) 
-    - [`withdraw`](#MechaPilots2219V1-withdraw-address-payable-uint256-) 
-    - [`withdrawTokens`](#MechaPilots2219V1-withdrawTokens-address-address-uint256-) 
-    - [`tokenURI`](#MechaPilots2219V1-tokenURI-uint256-) 
-    - [`isRevealed`](#MechaPilots2219V1-isRevealed-uint256-) 
-    - [`rounds`](#MechaPilots2219V1-rounds-uint256-) 
-    - [`totalSupply`](#MechaPilots2219V1-totalSupply--) 
-    - [`totalSupplyByFaction`](#MechaPilots2219V1-totalSupplyByFaction-uint256-) 
-    - [`totalMintedBy`](#MechaPilots2219V1-totalMintedBy-address-uint256-) 
-    - [`roundPrice`](#MechaPilots2219V1-roundPrice-uint256-) 
-    - [`supportsInterface`](#MechaPilots2219V1-supportsInterface-bytes4-) 
-    - [`receive`](#MechaPilots2219V1-receive--) 
+    - [`initializeV2`](#MechaPilots2219V2-initializeV2--) 
+    - [`constructor`](#MechaPilots2219V1-constructor--) (inherited)
+    - [`initialize`](#MechaPilots2219V1-initialize--) (inherited)
+    - [`mint`](#MechaPilots2219V1-mint-uint256-uint256-uint256-) (inherited)
+    - [`mintWithValidation`](#MechaPilots2219V1-mintWithValidation-uint256-uint256-uint256-uint256-uint256-bytes-) (inherited)
+    - [`revealToken`](#MechaPilots2219V1-revealToken-uint256-string-uint256-bytes-) (inherited)
+    - [`airdrop`](#MechaPilots2219V1-airdrop-address-uint256-uint256-) (inherited)
+    - [`setupMintRound`](#MechaPilots2219V1-setupMintRound-uint256-uint32-2--uint64-uint64-address-uint256-uint256-uint256-uint256-) (inherited)
+    - [`pause`](#MechaPilots2219V1-pause--) (inherited)
+    - [`unpause`](#MechaPilots2219V1-unpause--) (inherited)
+    - [`setBaseURI`](#MechaPilots2219V1-setBaseURI-string-) (inherited)
+    - [`setBaseExtension`](#MechaPilots2219V1-setBaseExtension-string-) (inherited)
+    - [`setBurnable`](#MechaPilots2219V1-setBurnable-bool-) (inherited)
+    - [`setMaxMintsPerWallet`](#MechaPilots2219V1-setMaxMintsPerWallet-uint256-) (inherited)
+    - [`burn`](#MechaPilots2219V1-burn-uint256-) (inherited)
+    - [`withdraw`](#MechaPilots2219V1-withdraw-address-payable-uint256-) (inherited)
+    - [`withdrawTokens`](#MechaPilots2219V1-withdrawTokens-address-address-uint256-) (inherited)
+    - [`tokenURI`](#MechaPilots2219V1-tokenURI-uint256-) (inherited)
+    - [`isRevealed`](#MechaPilots2219V1-isRevealed-uint256-) (inherited)
+    - [`rounds`](#MechaPilots2219V1-rounds-uint256-) (inherited)
+    - [`totalSupply`](#MechaPilots2219V1-totalSupply--) (inherited)
+    - [`totalSupplyByFaction`](#MechaPilots2219V1-totalSupplyByFaction-uint256-) (inherited)
+    - [`totalMintedBy`](#MechaPilots2219V1-totalMintedBy-address-uint256-) (inherited)
+    - [`roundPrice`](#MechaPilots2219V1-roundPrice-uint256-) (inherited)
+    - [`supportsInterface`](#MechaPilots2219V1-supportsInterface-bytes4-) (inherited)
+    - [`receive`](#MechaPilots2219V1-receive--) (inherited)
     - [`proxiableUUID`](#UUPSUpgradeable-proxiableUUID--) (inherited)
     - [`upgradeTo`](#UUPSUpgradeable-upgradeTo-address-) (inherited)
     - [`upgradeToAndCall`](#UUPSUpgradeable-upgradeToAndCall-address-bytes-) (inherited)
@@ -81,13 +82,13 @@ MechaPilots2219 - TODO
     - [`safeTransferFrom`](#ERC721Upgradeable-safeTransferFrom-address-address-uint256-bytes-) (inherited)
 
 - [Internal Functions](#internal-functions)
-    - [`_roundMint`](#MechaPilots2219V1-_roundMint-address-uint256-uint256-uint256-) 
-    - [`_safeMint`](#MechaPilots2219V1-_safeMint-address-uint256-uint256-) 
-    - [`_getRandomToken`](#MechaPilots2219V1-_getRandomToken-address-uint256-) 
-    - [`_checkSignature`](#MechaPilots2219V1-_checkSignature-uint256-bytes-bytes-address-) 
-    - [`_checkSignatureFromRole`](#MechaPilots2219V1-_checkSignatureFromRole-uint256-bytes-bytes-bytes32-) 
-    - [`_beforeTokenTransfer`](#MechaPilots2219V1-_beforeTokenTransfer-address-address-uint256-uint256-) 
-    - [`_authorizeUpgrade`](#MechaPilots2219V1-_authorizeUpgrade-address-) 
+    - [`_roundMint`](#MechaPilots2219V1-_roundMint-address-uint256-uint256-uint256-) (inherited)
+    - [`_safeMint`](#MechaPilots2219V1-_safeMint-address-uint256-uint256-) (inherited)
+    - [`_getRandomToken`](#MechaPilots2219V1-_getRandomToken-address-uint256-) (inherited)
+    - [`_checkSignature`](#MechaPilots2219V1-_checkSignature-uint256-bytes-bytes-address-) (inherited)
+    - [`_checkSignatureFromRole`](#MechaPilots2219V1-_checkSignatureFromRole-uint256-bytes-bytes-bytes32-) (inherited)
+    - [`_beforeTokenTransfer`](#MechaPilots2219V1-_beforeTokenTransfer-address-address-uint256-uint256-) (inherited)
+    - [`_authorizeUpgrade`](#MechaPilots2219V1-_authorizeUpgrade-address-) (inherited)
     - [`__UUPSUpgradeable_init`](#UUPSUpgradeable-__UUPSUpgradeable_init--) (inherited)
     - [`__UUPSUpgradeable_init_unchained`](#UUPSUpgradeable-__UUPSUpgradeable_init_unchained--) (inherited)
     - [`__ERC1967Upgrade_init`](#ERC1967UpgradeUpgradeable-__ERC1967Upgrade_init--) (inherited)
@@ -160,70 +161,78 @@ MechaPilots2219 - TODO
     - [`onlyInitializing`](#Initializable-onlyInitializing--) (inherited)
 
 - [Structs](#structs)
-    - [`MintRound`](#MechaPilots2219V1-MintRound) 
-    - [`MintPrice`](#MechaPilots2219V1-MintPrice) 
+    - [`MintRound`](#MechaPilots2219V1-MintRound) (inherited)
+    - [`MintPrice`](#MechaPilots2219V1-MintPrice) (inherited)
     - [`RoleData`](#AccessControlUpgradeable-RoleData) (inherited)
 
 - [Enums](#enums)
-    - [`Faction`](#MechaPilots2219V1-Faction) 
+    - [`Faction`](#MechaPilots2219V1-Faction) (inherited)
 
 
 ## EVENTS
 
-### `MintRoundSetup(uint256 roundId, uint32[2] supply, uint64 startTime, uint64 duration, address validator)`  <a name="MechaPilots2219V1-MintRoundSetup-uint256-uint32-2--uint64-uint64-address-" id="MechaPilots2219V1-MintRoundSetup-uint256-uint32-2--uint64-uint64-address-"></a>
+### `MintRoundSetup(uint256 roundId, uint32[2] supply, uint64 startTime, uint64 duration, address validator)` (inherited) <a name="MechaPilots2219V1-MintRoundSetup-uint256-uint32-2--uint64-uint64-address-" id="MechaPilots2219V1-MintRoundSetup-uint256-uint32-2--uint64-uint64-address-"></a>
 Event emitted when a mint round is created or edited
 
 
 
+_Inherited from `ERC721/MechaPilots2219V1.sol`_.
 
 
-### `TokenRevealed(uint256 tokenId, address by, string uri)`  <a name="MechaPilots2219V1-TokenRevealed-uint256-address-string-" id="MechaPilots2219V1-TokenRevealed-uint256-address-string-"></a>
+### `TokenRevealed(uint256 tokenId, address by, string uri)` (inherited) <a name="MechaPilots2219V1-TokenRevealed-uint256-address-string-" id="MechaPilots2219V1-TokenRevealed-uint256-address-string-"></a>
 Event emitted when a token has been revealed
 
 
 
+_Inherited from `ERC721/MechaPilots2219V1.sol`_.
 
 
-### `BaseURIChanged(string newBaseURI)`  <a name="MechaPilots2219V1-BaseURIChanged-string-" id="MechaPilots2219V1-BaseURIChanged-string-"></a>
+### `BaseURIChanged(string newBaseURI)` (inherited) <a name="MechaPilots2219V1-BaseURIChanged-string-" id="MechaPilots2219V1-BaseURIChanged-string-"></a>
 Event emitted when `baseURI` has been modified
 
 
 
+_Inherited from `ERC721/MechaPilots2219V1.sol`_.
 
 
-### `BaseExtensionChanged(string newBaseExtension)`  <a name="MechaPilots2219V1-BaseExtensionChanged-string-" id="MechaPilots2219V1-BaseExtensionChanged-string-"></a>
+### `BaseExtensionChanged(string newBaseExtension)` (inherited) <a name="MechaPilots2219V1-BaseExtensionChanged-string-" id="MechaPilots2219V1-BaseExtensionChanged-string-"></a>
 Event emitted when `baseExtension` has been modified
 
 
 
+_Inherited from `ERC721/MechaPilots2219V1.sol`_.
 
 
-### `BurnableChanged(bool newBurnable)`  <a name="MechaPilots2219V1-BurnableChanged-bool-" id="MechaPilots2219V1-BurnableChanged-bool-"></a>
+### `BurnableChanged(bool newBurnable)` (inherited) <a name="MechaPilots2219V1-BurnableChanged-bool-" id="MechaPilots2219V1-BurnableChanged-bool-"></a>
 Event emitted when `burnable` option has been modified
 
 
 
+_Inherited from `ERC721/MechaPilots2219V1.sol`_.
 
 
-### `MaxMintsPerWalletChanged(uint256 newMaxMintsPerWallet)`  <a name="MechaPilots2219V1-MaxMintsPerWalletChanged-uint256-" id="MechaPilots2219V1-MaxMintsPerWalletChanged-uint256-"></a>
+### `MaxMintsPerWalletChanged(uint256 newMaxMintsPerWallet)` (inherited) <a name="MechaPilots2219V1-MaxMintsPerWalletChanged-uint256-" id="MechaPilots2219V1-MaxMintsPerWalletChanged-uint256-"></a>
 Event emitted when `maxMintsPerWallet` has been modified
 
 
 
+_Inherited from `ERC721/MechaPilots2219V1.sol`_.
 
 
-### `Withdrawn(address to, uint256 amount)`  <a name="MechaPilots2219V1-Withdrawn-address-uint256-" id="MechaPilots2219V1-Withdrawn-address-uint256-"></a>
+### `Withdrawn(address to, uint256 amount)` (inherited) <a name="MechaPilots2219V1-Withdrawn-address-uint256-" id="MechaPilots2219V1-Withdrawn-address-uint256-"></a>
 Event emitted when native coin were removed from the contract
 
 
 
+_Inherited from `ERC721/MechaPilots2219V1.sol`_.
 
 
-### `TokenWithdrawn(address to, address token, uint256 amount)`  <a name="MechaPilots2219V1-TokenWithdrawn-address-address-uint256-" id="MechaPilots2219V1-TokenWithdrawn-address-address-uint256-"></a>
+### `TokenWithdrawn(address to, address token, uint256 amount)` (inherited) <a name="MechaPilots2219V1-TokenWithdrawn-address-address-uint256-" id="MechaPilots2219V1-TokenWithdrawn-address-address-uint256-"></a>
 Event emitted when some ERC20 were removed from the contract
 
 
 
+_Inherited from `ERC721/MechaPilots2219V1.sol`_.
 
 
 ### `Upgraded(address implementation)` (inherited) <a name="ERC1967UpgradeUpgradeable-Upgraded-address-" id="ERC1967UpgradeUpgradeable-Upgraded-address-"></a>
@@ -341,21 +350,32 @@ _Inherited from `../@openzeppelin/contracts-upgradeable/proxy/utils/Initializabl
 
 ## PUBLIC FUNCTIONS
 
-### `constructor()` (public) <a name="MechaPilots2219V1-constructor--" id="MechaPilots2219V1-constructor--"></a>
+### `initializeV2()` (public) <a name="MechaPilots2219V2-initializeV2--" id="MechaPilots2219V2-initializeV2--"></a>
+========================
+         Public
+========================
 
 
 
 
 
+### `constructor()` (public) (inherited)<a name="MechaPilots2219V1-constructor--" id="MechaPilots2219V1-constructor--"></a>
 
-### `initialize()` (public) <a name="MechaPilots2219V1-initialize--" id="MechaPilots2219V1-initialize--"></a>
+
+
+
+_Inherited from `ERC721/MechaPilots2219V1.sol`_.
+
+
+### `initialize()` (public) (inherited)<a name="MechaPilots2219V1-initialize--" id="MechaPilots2219V1-initialize--"></a>
 Initialize contract
 
 
 
+_Inherited from `ERC721/MechaPilots2219V1.sol`_.
 
 
-### `mint(uint256 roundId, uint256 factionId, uint256 amount)` (external) <a name="MechaPilots2219V1-mint-uint256-uint256-uint256-" id="MechaPilots2219V1-mint-uint256-uint256-uint256-"></a>
+### `mint(uint256 roundId, uint256 factionId, uint256 amount)` (external) (inherited)<a name="MechaPilots2219V1-mint-uint256-uint256-uint256-" id="MechaPilots2219V1-mint-uint256-uint256-uint256-"></a>
 Mint the `amount` of `factionId` token in a round without validator
 
 
@@ -373,9 +393,10 @@ Parameters:
 
 - `amount`: The number of tokens to mint
 
+_Inherited from `ERC721/MechaPilots2219V1.sol`_.
 
 
-### `mintWithValidation(uint256 roundId, uint256 factionId, uint256 amount, uint256 maxMint, uint256 payloadExpiration, bytes sig)` (external) <a name="MechaPilots2219V1-mintWithValidation-uint256-uint256-uint256-uint256-uint256-bytes-" id="MechaPilots2219V1-mintWithValidation-uint256-uint256-uint256-uint256-uint256-bytes-"></a>
+### `mintWithValidation(uint256 roundId, uint256 factionId, uint256 amount, uint256 maxMint, uint256 payloadExpiration, bytes sig)` (external) (inherited)<a name="MechaPilots2219V1-mintWithValidation-uint256-uint256-uint256-uint256-uint256-bytes-" id="MechaPilots2219V1-mintWithValidation-uint256-uint256-uint256-uint256-uint256-bytes-"></a>
 Mint the `amount` of tokens with the signature of the round validator.
 
 
@@ -400,9 +421,10 @@ Parameters:
 
 - `sig`: The EC signature generated by the round validator
 
+_Inherited from `ERC721/MechaPilots2219V1.sol`_.
 
 
-### `revealToken(uint256 tokenId, string uri, uint256 payloadExpiration, bytes sig)` (external) <a name="MechaPilots2219V1-revealToken-uint256-string-uint256-bytes-" id="MechaPilots2219V1-revealToken-uint256-string-uint256-bytes-"></a>
+### `revealToken(uint256 tokenId, string uri, uint256 payloadExpiration, bytes sig)` (external) (inherited)<a name="MechaPilots2219V1-revealToken-uint256-string-uint256-bytes-" id="MechaPilots2219V1-revealToken-uint256-string-uint256-bytes-"></a>
 Reveals a user's token using the signature of a URI_UPDATER_ROLE
 
 
@@ -422,9 +444,10 @@ Parameters:
 
 - `sig`: The EC signature generated by the round validator
 
+_Inherited from `ERC721/MechaPilots2219V1.sol`_.
 
 
-### `airdrop(address wallet, uint256 factionId, uint256 amount)` (external) <a name="MechaPilots2219V1-airdrop-address-uint256-uint256-" id="MechaPilots2219V1-airdrop-address-uint256-uint256-"></a>
+### `airdrop(address wallet, uint256 factionId, uint256 amount)` (external) (inherited)<a name="MechaPilots2219V1-airdrop-address-uint256-uint256-" id="MechaPilots2219V1-airdrop-address-uint256-uint256-"></a>
 Mint the `amount` of token and transfers it to `wallet`.
 
 
@@ -442,9 +465,10 @@ Parameters:
 
 - `amount`: The number of tokens to mint
 
+_Inherited from `ERC721/MechaPilots2219V1.sol`_.
 
 
-### `setupMintRound(uint256 roundId, uint32[2] supply, uint64 startTime, uint64 duration, address validator, uint256 maxPrice, uint256 minPrice, uint256 priceDecreaseTime, uint256 priceDecreaseAmount)` (public) <a name="MechaPilots2219V1-setupMintRound-uint256-uint32-2--uint64-uint64-address-uint256-uint256-uint256-uint256-" id="MechaPilots2219V1-setupMintRound-uint256-uint32-2--uint64-uint64-address-uint256-uint256-uint256-uint256-"></a>
+### `setupMintRound(uint256 roundId, uint32[2] supply, uint64 startTime, uint64 duration, address validator, uint256 maxPrice, uint256 minPrice, uint256 priceDecreaseTime, uint256 priceDecreaseAmount)` (public) (inherited)<a name="MechaPilots2219V1-setupMintRound-uint256-uint32-2--uint64-uint64-address-uint256-uint256-uint256-uint256-" id="MechaPilots2219V1-setupMintRound-uint256-uint32-2--uint64-uint64-address-uint256-uint256-uint256-uint256-"></a>
 Create or edit a mint round
 
 
@@ -473,37 +497,42 @@ Parameters:
 
 - `priceDecreaseAmount`: The number of seconds to wait between each decreasing (must be > 900)
 
+_Inherited from `ERC721/MechaPilots2219V1.sol`_.
 
 
-### `pause()` (public) <a name="MechaPilots2219V1-pause--" id="MechaPilots2219V1-pause--"></a>
+### `pause()` (public) (inherited)<a name="MechaPilots2219V1-pause--" id="MechaPilots2219V1-pause--"></a>
 Pause the contract : disables mints, transactions and burns until `unpause`
 
 
 
+_Inherited from `ERC721/MechaPilots2219V1.sol`_.
 
 
-### `unpause()` (public) <a name="MechaPilots2219V1-unpause--" id="MechaPilots2219V1-unpause--"></a>
+### `unpause()` (public) (inherited)<a name="MechaPilots2219V1-unpause--" id="MechaPilots2219V1-unpause--"></a>
 Unpause the contract
 
 
 
+_Inherited from `ERC721/MechaPilots2219V1.sol`_.
 
 
-### `setBaseURI(string newBaseURI)` (external) <a name="MechaPilots2219V1-setBaseURI-string-" id="MechaPilots2219V1-setBaseURI-string-"></a>
+### `setBaseURI(string newBaseURI)` (external) (inherited)<a name="MechaPilots2219V1-setBaseURI-string-" id="MechaPilots2219V1-setBaseURI-string-"></a>
 Change the baseURI for unrevealed tokens
 
 
 
+_Inherited from `ERC721/MechaPilots2219V1.sol`_.
 
 
-### `setBaseExtension(string newBaseExtension)` (external) <a name="MechaPilots2219V1-setBaseExtension-string-" id="MechaPilots2219V1-setBaseExtension-string-"></a>
+### `setBaseExtension(string newBaseExtension)` (external) (inherited)<a name="MechaPilots2219V1-setBaseExtension-string-" id="MechaPilots2219V1-setBaseExtension-string-"></a>
 Change the URI base extension for unrevealed tokens
 
 
 
+_Inherited from `ERC721/MechaPilots2219V1.sol`_.
 
 
-### `setBurnable(bool newBurnable)` (public) <a name="MechaPilots2219V1-setBurnable-bool-" id="MechaPilots2219V1-setBurnable-bool-"></a>
+### `setBurnable(bool newBurnable)` (public) (inherited)<a name="MechaPilots2219V1-setBurnable-bool-" id="MechaPilots2219V1-setBurnable-bool-"></a>
 Activate burnable option
 
 
@@ -511,16 +540,18 @@ Activate burnable option
 Parameters:
 - `newBurnable`: If users are authorized to burn their tokens or not
 
+_Inherited from `ERC721/MechaPilots2219V1.sol`_.
 
 
-### `setMaxMintsPerWallet(uint256 newMaxMints)` (external) <a name="MechaPilots2219V1-setMaxMintsPerWallet-uint256-" id="MechaPilots2219V1-setMaxMintsPerWallet-uint256-"></a>
+### `setMaxMintsPerWallet(uint256 newMaxMints)` (external) (inherited)<a name="MechaPilots2219V1-setMaxMintsPerWallet-uint256-" id="MechaPilots2219V1-setMaxMintsPerWallet-uint256-"></a>
 Change number of tokens that a wallet can mint in a public round
 
 
 
+_Inherited from `ERC721/MechaPilots2219V1.sol`_.
 
 
-### `burn(uint256 tokenId)` (public) <a name="MechaPilots2219V1-burn-uint256-" id="MechaPilots2219V1-burn-uint256-"></a>
+### `burn(uint256 tokenId)` (public) (inherited)<a name="MechaPilots2219V1-burn-uint256-" id="MechaPilots2219V1-burn-uint256-"></a>
 
 Burns `tokenId`. See {ERC721-_burn}.
 
@@ -529,9 +560,10 @@ Requirements:
 - The caller must own `tokenId` or be an approved operator.
 
 
+_Inherited from `ERC721/MechaPilots2219V1.sol`_.
 
 
-### `withdraw(address payable to, uint256 amount)` (public) <a name="MechaPilots2219V1-withdraw-address-payable-uint256-" id="MechaPilots2219V1-withdraw-address-payable-uint256-"></a>
+### `withdraw(address payable to, uint256 amount)` (public) (inherited)<a name="MechaPilots2219V1-withdraw-address-payable-uint256-" id="MechaPilots2219V1-withdraw-address-payable-uint256-"></a>
 Withdraw network native coins
 
 
@@ -542,9 +574,10 @@ Parameters:
 
 - `amount`: Amount to claim.
 
+_Inherited from `ERC721/MechaPilots2219V1.sol`_.
 
 
-### `withdrawTokens(address to, address token, uint256 amount)` (public) <a name="MechaPilots2219V1-withdrawTokens-address-address-uint256-" id="MechaPilots2219V1-withdrawTokens-address-address-uint256-"></a>
+### `withdrawTokens(address to, address token, uint256 amount)` (public) (inherited)<a name="MechaPilots2219V1-withdrawTokens-address-address-uint256-" id="MechaPilots2219V1-withdrawTokens-address-address-uint256-"></a>
 Withdraw ERC20
 
 
@@ -557,53 +590,60 @@ Parameters:
 
 - `amount`: Amount to claim.
 
+_Inherited from `ERC721/MechaPilots2219V1.sol`_.
 
 
-### `tokenURI(uint256 tokenId) → string` (public) <a name="MechaPilots2219V1-tokenURI-uint256-" id="MechaPilots2219V1-tokenURI-uint256-"></a>
+### `tokenURI(uint256 tokenId) → string` (public) (inherited)<a name="MechaPilots2219V1-tokenURI-uint256-" id="MechaPilots2219V1-tokenURI-uint256-"></a>
 Returns the URI of `tokenId`, according to its condition (revealed or not)
 
 
 
+_Inherited from `ERC721/MechaPilots2219V1.sol`_.
 
 
-### `isRevealed(uint256 tokenId) → bool` (public) <a name="MechaPilots2219V1-isRevealed-uint256-" id="MechaPilots2219V1-isRevealed-uint256-"></a>
+### `isRevealed(uint256 tokenId) → bool` (public) (inherited)<a name="MechaPilots2219V1-isRevealed-uint256-" id="MechaPilots2219V1-isRevealed-uint256-"></a>
 Returns true if the `tokenId` is not revealed yet
 
 
 
+_Inherited from `ERC721/MechaPilots2219V1.sol`_.
 
 
-### `rounds(uint256 roundId) → struct MechaPilots2219V1.MintRound` (external) <a name="MechaPilots2219V1-rounds-uint256-" id="MechaPilots2219V1-rounds-uint256-"></a>
+### `rounds(uint256 roundId) → struct MechaPilots2219V1.MintRound` (external) (inherited)<a name="MechaPilots2219V1-rounds-uint256-" id="MechaPilots2219V1-rounds-uint256-"></a>
 Returns the MintRound structure of `roundId`
 
 
 Better web3 accessibility that a public variable (includes arrays)
 
 
+_Inherited from `ERC721/MechaPilots2219V1.sol`_.
 
 
-### `totalSupply() → uint256` (public) <a name="MechaPilots2219V1-totalSupply--" id="MechaPilots2219V1-totalSupply--"></a>
+### `totalSupply() → uint256` (public) (inherited)<a name="MechaPilots2219V1-totalSupply--" id="MechaPilots2219V1-totalSupply--"></a>
 Returns the total amount of tokens minted.
 
 
 
+_Inherited from `ERC721/MechaPilots2219V1.sol`_.
 
 
-### `totalSupplyByFaction(uint256 factionId) → uint256` (public) <a name="MechaPilots2219V1-totalSupplyByFaction-uint256-" id="MechaPilots2219V1-totalSupplyByFaction-uint256-"></a>
+### `totalSupplyByFaction(uint256 factionId) → uint256` (public) (inherited)<a name="MechaPilots2219V1-totalSupplyByFaction-uint256-" id="MechaPilots2219V1-totalSupplyByFaction-uint256-"></a>
 Returns the total amount of tokens minted for `factionId`.
 
 
 
+_Inherited from `ERC721/MechaPilots2219V1.sol`_.
 
 
-### `totalMintedBy(address wallet, uint256 roundId) → uint256` (public) <a name="MechaPilots2219V1-totalMintedBy-address-uint256-" id="MechaPilots2219V1-totalMintedBy-address-uint256-"></a>
+### `totalMintedBy(address wallet, uint256 roundId) → uint256` (public) (inherited)<a name="MechaPilots2219V1-totalMintedBy-address-uint256-" id="MechaPilots2219V1-totalMintedBy-address-uint256-"></a>
 Returns the total amount of tokens minted by `wallet` for `roundId`.
 
 
 
+_Inherited from `ERC721/MechaPilots2219V1.sol`_.
 
 
-### `roundPrice(uint256 roundId) → uint256` (public) <a name="MechaPilots2219V1-roundPrice-uint256-" id="MechaPilots2219V1-roundPrice-uint256-"></a>
+### `roundPrice(uint256 roundId) → uint256` (public) (inherited)<a name="MechaPilots2219V1-roundPrice-uint256-" id="MechaPilots2219V1-roundPrice-uint256-"></a>
 Get the round price according to the Dutch Auction configuration
 
 
@@ -611,20 +651,23 @@ Get the round price according to the Dutch Auction configuration
 Parameters:
 - `roundId`: The round index
 
+_Inherited from `ERC721/MechaPilots2219V1.sol`_.
 
 
-### `supportsInterface(bytes4 interfaceId) → bool` (public) <a name="MechaPilots2219V1-supportsInterface-bytes4-" id="MechaPilots2219V1-supportsInterface-bytes4-"></a>
-
-
-
-
-
-
-### `receive()` (external) <a name="MechaPilots2219V1-receive--" id="MechaPilots2219V1-receive--"></a>
+### `supportsInterface(bytes4 interfaceId) → bool` (public) (inherited)<a name="MechaPilots2219V1-supportsInterface-bytes4-" id="MechaPilots2219V1-supportsInterface-bytes4-"></a>
 
 
 
 
+_Inherited from `ERC721/MechaPilots2219V1.sol`_.
+
+
+### `receive()` (external) (inherited)<a name="MechaPilots2219V1-receive--" id="MechaPilots2219V1-receive--"></a>
+
+
+
+
+_Inherited from `ERC721/MechaPilots2219V1.sol`_.
 
 
 ### `proxiableUUID() → bytes32` (external) (inherited)<a name="UUPSUpgradeable-proxiableUUID--" id="UUPSUpgradeable-proxiableUUID--"></a>
@@ -845,7 +888,7 @@ _Inherited from `../@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgra
 
 ## INTERNAL FUNCTIONS
 
-### `_roundMint(address wallet, uint256 roundId, uint256 factionId, uint256 amount)` (internal)  <a name="MechaPilots2219V1-_roundMint-address-uint256-uint256-uint256-" id="MechaPilots2219V1-_roundMint-address-uint256-uint256-uint256-"></a>
+### `_roundMint(address wallet, uint256 roundId, uint256 factionId, uint256 amount)` (internal) (inherited) <a name="MechaPilots2219V1-_roundMint-address-uint256-uint256-uint256-" id="MechaPilots2219V1-_roundMint-address-uint256-uint256-uint256-"></a>
 Safely mint the `amount` of token for `wallet` in a `round`
 If `faction` is sold out, automatically mint the other
 
@@ -871,9 +914,10 @@ Parameters:
 
 - `amount`: The number of tokens to mint
 
+_Inherited from `ERC721/MechaPilots2219V1.sol`_.
 
 
-### `_safeMint(address wallet, uint256 factionId, uint256 amount)` (internal)  <a name="MechaPilots2219V1-_safeMint-address-uint256-uint256-" id="MechaPilots2219V1-_safeMint-address-uint256-uint256-"></a>
+### `_safeMint(address wallet, uint256 factionId, uint256 amount)` (internal) (inherited) <a name="MechaPilots2219V1-_safeMint-address-uint256-uint256-" id="MechaPilots2219V1-_safeMint-address-uint256-uint256-"></a>
 Safely mint the `amount` of token for `wallet`.
 If `faction` is sold out, automatically mint the other
 
@@ -894,9 +938,10 @@ Parameters:
 
 - `amount`: The number of tokens to mint
 
+_Inherited from `ERC721/MechaPilots2219V1.sol`_.
 
 
-### `_getRandomToken(address wallet, uint256 totalMinted) → uint256` (internal)  <a name="MechaPilots2219V1-_getRandomToken-address-uint256-" id="MechaPilots2219V1-_getRandomToken-address-uint256-"></a>
+### `_getRandomToken(address wallet, uint256 totalMinted) → uint256` (internal) (inherited) <a name="MechaPilots2219V1-_getRandomToken-address-uint256-" id="MechaPilots2219V1-_getRandomToken-address-uint256-"></a>
 Gives a identifier from a pseudo random function (inspired by Cyberkongs VX)
 
 
@@ -907,9 +952,10 @@ Parameters:
 
 - `totalMinted`: Updated total minted
 
+_Inherited from `ERC721/MechaPilots2219V1.sol`_.
 
 
-### `_checkSignature(uint256 payloadExpiration, bytes data, bytes sig, address signer)` (internal)  <a name="MechaPilots2219V1-_checkSignature-uint256-bytes-bytes-address-" id="MechaPilots2219V1-_checkSignature-uint256-bytes-bytes-address-"></a>
+### `_checkSignature(uint256 payloadExpiration, bytes data, bytes sig, address signer)` (internal) (inherited) <a name="MechaPilots2219V1-_checkSignature-uint256-bytes-bytes-address-" id="MechaPilots2219V1-_checkSignature-uint256-bytes-bytes-address-"></a>
 Reverts if the data does not correspond to the signature, to the correct signer or if it has expired
 
 
@@ -929,9 +975,10 @@ Parameters:
 
 - `signer`: The address that is supposed to be the signatory
 
+_Inherited from `ERC721/MechaPilots2219V1.sol`_.
 
 
-### `_checkSignatureFromRole(uint256 payloadExpiration, bytes data, bytes sig, bytes32 role)` (internal)  <a name="MechaPilots2219V1-_checkSignatureFromRole-uint256-bytes-bytes-bytes32-" id="MechaPilots2219V1-_checkSignatureFromRole-uint256-bytes-bytes-bytes32-"></a>
+### `_checkSignatureFromRole(uint256 payloadExpiration, bytes data, bytes sig, bytes32 role)` (internal) (inherited) <a name="MechaPilots2219V1-_checkSignatureFromRole-uint256-bytes-bytes-bytes32-" id="MechaPilots2219V1-_checkSignatureFromRole-uint256-bytes-bytes-bytes32-"></a>
 Reverts if the data does not correspond to the signature, the signer has not corresponding `role` or if it has expired
 
 
@@ -951,20 +998,23 @@ Parameters:
 
 - `role`: The role that the signer must have
 
+_Inherited from `ERC721/MechaPilots2219V1.sol`_.
 
 
-### `_beforeTokenTransfer(address from, address to, uint256 tokenId, uint256 batchSize)` (internal)  <a name="MechaPilots2219V1-_beforeTokenTransfer-address-address-uint256-uint256-" id="MechaPilots2219V1-_beforeTokenTransfer-address-address-uint256-uint256-"></a>
-
-
-
-
-
-
-### `_authorizeUpgrade(address)` (internal)  <a name="MechaPilots2219V1-_authorizeUpgrade-address-" id="MechaPilots2219V1-_authorizeUpgrade-address-"></a>
+### `_beforeTokenTransfer(address from, address to, uint256 tokenId, uint256 batchSize)` (internal) (inherited) <a name="MechaPilots2219V1-_beforeTokenTransfer-address-address-uint256-uint256-" id="MechaPilots2219V1-_beforeTokenTransfer-address-address-uint256-uint256-"></a>
 
 
 
 
+_Inherited from `ERC721/MechaPilots2219V1.sol`_.
+
+
+### `_authorizeUpgrade(address)` (internal) (inherited) <a name="MechaPilots2219V1-_authorizeUpgrade-address-" id="MechaPilots2219V1-_authorizeUpgrade-address-"></a>
+
+
+
+
+_Inherited from `ERC721/MechaPilots2219V1.sol`_.
 
 
 ### `__UUPSUpgradeable_init()` (internal) (inherited) <a name="UUPSUpgradeable-__UUPSUpgradeable_init--" id="UUPSUpgradeable-__UUPSUpgradeable_init--"></a>
@@ -1621,7 +1671,7 @@ _Inherited from `../@openzeppelin/contracts-upgradeable/proxy/utils/Initializabl
 
 ## STRUCTS
 
-### `MintRound`  <a name="MechaPilots2219V1-MintRound" id="MechaPilots2219V1-MintRound"></a>
+### `MintRound` (inherited) <a name="MechaPilots2219V1-MintRound" id="MechaPilots2219V1-MintRound"></a>
 - uint64 startTime
 - uint64 duration
 - uint32[2] supply
@@ -1629,14 +1679,16 @@ _Inherited from `../@openzeppelin/contracts-upgradeable/proxy/utils/Initializabl
 - address validator
 - struct MechaPilots2219V1.MintPrice price
 
+_Inherited from `ERC721/MechaPilots2219V1.sol`_.
 
 
-### `MintPrice`  <a name="MechaPilots2219V1-MintPrice" id="MechaPilots2219V1-MintPrice"></a>
+### `MintPrice` (inherited) <a name="MechaPilots2219V1-MintPrice" id="MechaPilots2219V1-MintPrice"></a>
 - uint256 max
 - uint256 min
 - uint256 decreaseTime
 - uint256 decreaseAmount
 
+_Inherited from `ERC721/MechaPilots2219V1.sol`_.
 
 
 ### `RoleData` (inherited) <a name="AccessControlUpgradeable-RoleData" id="AccessControlUpgradeable-RoleData"></a>
@@ -1648,8 +1700,9 @@ _Inherited from `../@openzeppelin/contracts-upgradeable/access/AccessControlUpgr
 
 ## ENUMS
 
-### `Faction`  <a name="MechaPilots2219V1-Faction" id="MechaPilots2219V1-Faction"></a>
+### `Faction` (inherited) <a name="MechaPilots2219V1-Faction" id="MechaPilots2219V1-Faction"></a>
 
 
 
+_Inherited from `ERC721/MechaPilots2219V1.sol`_.
 
