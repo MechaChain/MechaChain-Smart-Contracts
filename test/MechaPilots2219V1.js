@@ -1401,29 +1401,6 @@ contract("MechaPilots2219V1", async (accounts) => {
       assert.equal(uri, baseURI + tokenId + baseExtension);
     });
 
-    it(`User can't set TokenURI (Reason: missing role URI_UPDATER_ROLE)`, async () => {
-      const tokenId = getUserRandomToken(user1);
-      await expectRevert(
-        instance.setTokenURI(tokenId, URIForRevealed(tokenId), {
-          from: user1,
-        }),
-        `AccessControl:`
-      );
-    });
-
-    it(`User can't set TokenURI per batch (Reason: missing role URI_UPDATER_ROLE)`, async () => {
-      const tokenIds = Array(10)
-        .fill()
-        .map(() => getRandomToken());
-      const uri = tokenIds.map((id) => URIForRevealed(id));
-      await expectRevert(
-        instance.setTokenURIPerBatch(tokenIds, uri, {
-          from: user1,
-        }),
-        `AccessControl:`
-      );
-    });
-
     it("Admin should be able to set URI_UPDATER_ROLE", async () => {
       await instance.grantRole(URI_UPDATER_ROLE, tokenURIUpdater);
       const hasRole = await instance.hasRole(URI_UPDATER_ROLE, tokenURIUpdater);
@@ -1469,36 +1446,6 @@ contract("MechaPilots2219V1", async (accounts) => {
       const newUri = await instance.tokenURI(tpmData.tokenId);
       const uri = URIForRevealed(tpmData.tokenId);
       assert.equal(newUri, uri, "Bad URI");
-    });
-
-    it(`Owner can set TokenURI`, async () => {
-      const tokenId = getRandomToken(user1);
-      const uri = URIForRevealed(tokenId);
-      const tx = await instance.setTokenURI(tokenId, uri);
-      await gasTracker.addCost(`Set Token URI x1`, tx);
-
-      const newUri = await instance.tokenURI(tokenId);
-      assert.equal(newUri, uri, "Bad URI");
-
-      const isRevealed = await instance.isRevealed(tokenId);
-      assert.equal(isRevealed, true, "Not revealed");
-    });
-
-    it(`Owner can set TokenURI per batch`, async () => {
-      const tokenIds = Array(10)
-        .fill()
-        .map(() => getRandomToken().toNumber());
-      const uriList = tokenIds.map((id) => URIForRevealed(id));
-      const tx = await instance.setTokenURIPerBatch(tokenIds, uriList);
-      await gasTracker.addCost(`Set Token URI x${tokenIds.length}`, tx);
-
-      for (const [tokenId, uri] in uriList.entries()) {
-        const newUri = await instance.tokenURI(tokenId);
-        assert.equal(newUri, uri, "Bad URI");
-
-        const isRevealed = await instance.isRevealed(tokenId);
-        assert.equal(isRevealed, true, "Not revealed");
-      }
     });
   });
 

@@ -345,44 +345,6 @@ contract MechaPilots2219V1 is
     }
 
     /**
-     * @notice Change the tokenURI of a token
-     *
-     * @dev Requirements:
-     * - Only for URI_UPDATER_ROLE.
-     *
-     * @param tokenId The tokenId
-     * @param uri The new token uri
-     */
-    function setTokenURI(uint256 tokenId, string memory uri)
-        external
-        onlyRole(URI_UPDATER_ROLE)
-    {
-        _requireMinted(tokenId);
-        _tokenURIs[tokenId] = uri;
-        emit TokenRevealed(tokenId, msg.sender, uri);
-    }
-
-    /**
-     * @notice Change tokenURI of each token
-     *
-     * @dev Requirements:
-     * - Only for URI_UPDATER_ROLE.
-     *
-     * @param tokenIds List of tokenIds
-     * @param uri List of new token URI
-     */
-    function setTokenURIPerBatch(uint256[] memory tokenIds, string[] memory uri)
-        external
-        onlyRole(URI_UPDATER_ROLE)
-    {
-        for (uint256 i; i < tokenIds.length; i++) {
-            _requireMinted(tokenIds[i]);
-            _tokenURIs[tokenIds[i]] = uri[i];
-            emit TokenRevealed(tokenIds[i], msg.sender, uri[i]);
-        }
-    }
-
-    /**
      * @notice Mint the `amount` of token and transfers it to `wallet`.
      *
      * @dev Call {MechaPilots2219V1-_safeMint}.
