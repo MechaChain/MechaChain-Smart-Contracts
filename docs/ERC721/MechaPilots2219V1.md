@@ -8,8 +8,7 @@ MechaPilots2219 - TODO
 
 ## TABLE OF CONTENTS
 - [Events](#events)
-    - [`MintRoundSetup`](#MechaPilots2219V1-MintRoundSetup-uint256-uint32-2--uint64-uint64-address-) 
-    - [`MintPaid`](#MechaPilots2219V1-MintPaid-uint256-address-uint256-uint256-) 
+    - [`MintRoundSetup`](#MechaPilots2219V1-MintRoundSetup-uint256-uint32-2--uint64-uint64-address-uint256-) 
     - [`TokenRevealed`](#MechaPilots2219V1-TokenRevealed-uint256-address-string-) 
     - [`BaseURIChanged`](#MechaPilots2219V1-BaseURIChanged-string-) 
     - [`BaseExtensionChanged`](#MechaPilots2219V1-BaseExtensionChanged-string-) 
@@ -40,7 +39,7 @@ MechaPilots2219 - TODO
     - [`setTokenURI`](#MechaPilots2219V1-setTokenURI-uint256-string-) 
     - [`setTokenURIPerBatch`](#MechaPilots2219V1-setTokenURIPerBatch-uint256---string---) 
     - [`airdrop`](#MechaPilots2219V1-airdrop-address-uint256-uint256-) 
-    - [`setupMintRound`](#MechaPilots2219V1-setupMintRound-uint256-uint32-2--uint64-uint64-address-uint256-uint256-uint256-uint256-) 
+    - [`setupMintRound`](#MechaPilots2219V1-setupMintRound-uint256-uint32-2--uint64-uint64-address-uint256-) 
     - [`pause`](#MechaPilots2219V1-pause--) 
     - [`unpause`](#MechaPilots2219V1-unpause--) 
     - [`setBaseURI`](#MechaPilots2219V1-setBaseURI-string-) 
@@ -51,10 +50,11 @@ MechaPilots2219 - TODO
     - [`withdraw`](#MechaPilots2219V1-withdraw-address-payable-uint256-) 
     - [`withdrawTokens`](#MechaPilots2219V1-withdrawTokens-address-address-uint256-) 
     - [`tokenURI`](#MechaPilots2219V1-tokenURI-uint256-) 
+    - [`isRevealed`](#MechaPilots2219V1-isRevealed-uint256-) 
     - [`rounds`](#MechaPilots2219V1-rounds-uint256-) 
     - [`totalSupply`](#MechaPilots2219V1-totalSupply--) 
+    - [`totalSupplyByFaction`](#MechaPilots2219V1-totalSupplyByFaction-uint256-) 
     - [`totalMintedBy`](#MechaPilots2219V1-totalMintedBy-address-uint256-) 
-    - [`roundPrice`](#MechaPilots2219V1-roundPrice-uint256-) 
     - [`supportsInterface`](#MechaPilots2219V1-supportsInterface-bytes4-) 
     - [`receive`](#MechaPilots2219V1-receive--) 
     - [`proxiableUUID`](#UUPSUpgradeable-proxiableUUID--) (inherited)
@@ -87,7 +87,7 @@ MechaPilots2219 - TODO
     - [`_getRandomToken`](#MechaPilots2219V1-_getRandomToken-address-uint256-) 
     - [`_checkSignature`](#MechaPilots2219V1-_checkSignature-uint256-bytes-bytes-address-) 
     - [`_checkSignatureFromRole`](#MechaPilots2219V1-_checkSignatureFromRole-uint256-bytes-bytes-bytes32-) 
-    - [`_beforeTokenTransfer`](#MechaPilots2219V1-_beforeTokenTransfer-address-address-uint256-) 
+    - [`_beforeTokenTransfer`](#MechaPilots2219V1-_beforeTokenTransfer-address-address-uint256-uint256-) 
     - [`_authorizeUpgrade`](#MechaPilots2219V1-_authorizeUpgrade-address-) 
     - [`__UUPSUpgradeable_init`](#UUPSUpgradeable-__UUPSUpgradeable_init--) (inherited)
     - [`__UUPSUpgradeable_init_unchained`](#UUPSUpgradeable-__UUPSUpgradeable_init_unchained--) (inherited)
@@ -125,6 +125,7 @@ MechaPilots2219 - TODO
     - [`__ERC721_init_unchained`](#ERC721Upgradeable-__ERC721_init_unchained-string-string-) (inherited)
     - [`_baseURI`](#ERC721Upgradeable-_baseURI--) (inherited)
     - [`_safeTransfer`](#ERC721Upgradeable-_safeTransfer-address-address-uint256-bytes-) (inherited)
+    - [`_ownerOf`](#ERC721Upgradeable-_ownerOf-uint256-) (inherited)
     - [`_exists`](#ERC721Upgradeable-_exists-uint256-) (inherited)
     - [`_isApprovedOrOwner`](#ERC721Upgradeable-_isApprovedOrOwner-address-uint256-) (inherited)
     - [`_safeMint`](#ERC721Upgradeable-_safeMint-address-uint256-) (inherited)
@@ -135,7 +136,7 @@ MechaPilots2219 - TODO
     - [`_approve`](#ERC721Upgradeable-_approve-address-uint256-) (inherited)
     - [`_setApprovalForAll`](#ERC721Upgradeable-_setApprovalForAll-address-address-bool-) (inherited)
     - [`_requireMinted`](#ERC721Upgradeable-_requireMinted-uint256-) (inherited)
-    - [`_afterTokenTransfer`](#ERC721Upgradeable-_afterTokenTransfer-address-address-uint256-) (inherited)
+    - [`_afterTokenTransfer`](#ERC721Upgradeable-_afterTokenTransfer-address-address-uint256-uint256-) (inherited)
     - [`__ERC165_init`](#ERC165Upgradeable-__ERC165_init--) (inherited)
     - [`__ERC165_init_unchained`](#ERC165Upgradeable-__ERC165_init_unchained--) (inherited)
     - [`__Context_init`](#ContextUpgradeable-__Context_init--) (inherited)
@@ -143,6 +144,8 @@ MechaPilots2219 - TODO
     - [`_msgSender`](#ContextUpgradeable-_msgSender--) (inherited)
     - [`_msgData`](#ContextUpgradeable-_msgData--) (inherited)
     - [`_disableInitializers`](#Initializable-_disableInitializers--) (inherited)
+    - [`_getInitializedVersion`](#Initializable-_getInitializedVersion--) (inherited)
+    - [`_isInitializing`](#Initializable-_isInitializing--) (inherited)
 
 
 
@@ -159,7 +162,6 @@ MechaPilots2219 - TODO
 
 - [Structs](#structs)
     - [`MintRound`](#MechaPilots2219V1-MintRound) 
-    - [`MintPrice`](#MechaPilots2219V1-MintPrice) 
     - [`RoleData`](#AccessControlUpgradeable-RoleData) (inherited)
 
 - [Enums](#enums)
@@ -168,15 +170,8 @@ MechaPilots2219 - TODO
 
 ## EVENTS
 
-### `MintRoundSetup(uint256 roundId, uint32[2] supply, uint64 startTime, uint64 duration, address validator)`  <a name="MechaPilots2219V1-MintRoundSetup-uint256-uint32-2--uint64-uint64-address-" id="MechaPilots2219V1-MintRoundSetup-uint256-uint32-2--uint64-uint64-address-"></a>
+### `MintRoundSetup(uint256 roundId, uint32[2] supply, uint64 startTime, uint64 duration, address validator, uint256 price)`  <a name="MechaPilots2219V1-MintRoundSetup-uint256-uint32-2--uint64-uint64-address-uint256-" id="MechaPilots2219V1-MintRoundSetup-uint256-uint32-2--uint64-uint64-address-uint256-"></a>
 Event emitted when a mint round is created or edited
-
-
-
-
-
-### `MintPaid(uint256 roundId, address wallet, uint256 amount, uint256 payement)`  <a name="MechaPilots2219V1-MintPaid-uint256-address-uint256-uint256-" id="MechaPilots2219V1-MintPaid-uint256-address-uint256-uint256-"></a>
-Event emitted when a user mint for the Fair Dutch Auction
 
 
 
@@ -481,7 +476,7 @@ Parameters:
 
 
 
-### `setupMintRound(uint256 roundId, uint32[2] supply, uint64 startTime, uint64 duration, address validator, uint256 maxPrice, uint256 minPrice, uint256 priceDecreaseTime, uint256 priceDecreaseAmount)` (public) <a name="MechaPilots2219V1-setupMintRound-uint256-uint32-2--uint64-uint64-address-uint256-uint256-uint256-uint256-" id="MechaPilots2219V1-setupMintRound-uint256-uint32-2--uint64-uint64-address-uint256-uint256-uint256-uint256-"></a>
+### `setupMintRound(uint256 roundId, uint32[2] supply, uint64 startTime, uint64 duration, address validator, uint256 price)` (public) <a name="MechaPilots2219V1-setupMintRound-uint256-uint32-2--uint64-uint64-address-uint256-" id="MechaPilots2219V1-setupMintRound-uint256-uint32-2--uint64-uint64-address-uint256-"></a>
 Create or edit a mint round
 
 
@@ -502,13 +497,7 @@ Parameters:
 
 - `validator`: The address of the whitelist validator. Can be 'address(0)' for no whitelist.
 
-- `maxPrice`: The maximum price which will be decreasing in wei
-
-- `minPrice`: The minimum price after which it no longer decreases in wei
-
-- `priceDecreaseTime`: The number of wei that will be subtracted from the price every `decreaseTime` (0 if no decrease)
-
-- `priceDecreaseAmount`: The number of seconds to wait between each decreasing (must be > 900)
+- `price`: The price in wei
 
 
 
@@ -603,6 +592,13 @@ Returns the URI of `tokenId`, according to its condition (revealed or not)
 
 
 
+### `isRevealed(uint256 tokenId) → bool` (public) <a name="MechaPilots2219V1-isRevealed-uint256-" id="MechaPilots2219V1-isRevealed-uint256-"></a>
+Returns true if the `tokenId` is not revealed yet
+
+
+
+
+
 ### `rounds(uint256 roundId) → struct MechaPilots2219V1.MintRound` (external) <a name="MechaPilots2219V1-rounds-uint256-" id="MechaPilots2219V1-rounds-uint256-"></a>
 Returns the MintRound structure of `roundId`
 
@@ -619,20 +615,17 @@ Returns the total amount of tokens minted.
 
 
 
+### `totalSupplyByFaction(uint256 factionId) → uint256` (public) <a name="MechaPilots2219V1-totalSupplyByFaction-uint256-" id="MechaPilots2219V1-totalSupplyByFaction-uint256-"></a>
+Returns the total amount of tokens minted for `factionId`.
+
+
+
+
+
 ### `totalMintedBy(address wallet, uint256 roundId) → uint256` (public) <a name="MechaPilots2219V1-totalMintedBy-address-uint256-" id="MechaPilots2219V1-totalMintedBy-address-uint256-"></a>
 Returns the total amount of tokens minted by `wallet` for `roundId`.
 
 
-
-
-
-### `roundPrice(uint256 roundId) → uint256` (public) <a name="MechaPilots2219V1-roundPrice-uint256-" id="MechaPilots2219V1-roundPrice-uint256-"></a>
-Get the round price according to the Dutch Auction configuration
-
-
-
-Parameters:
-- `roundId`: The round index
 
 
 
@@ -653,7 +646,7 @@ Parameters:
 ### `proxiableUUID() → bytes32` (external) (inherited)<a name="UUPSUpgradeable-proxiableUUID--" id="UUPSUpgradeable-proxiableUUID--"></a>
 
 Implementation of the ERC1822 {proxiableUUID} function. This returns the storage slot used by the
-implementation. It is used to validate that the this implementation remains valid after an upgrade.
+implementation. It is used to validate the implementation's compatibility when performing an upgrade.
 IMPORTANT: A proxy pointing at a proxiable contract should not be considered proxiable itself, because this risks
 bricking a proxy that upgrades to it, by delegating to itself until out of gas. Thus it is critical that this
 function revert if invoked through a proxy. This is guaranteed by the `notDelegated` modifier.
@@ -870,6 +863,7 @@ _Inherited from `../@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgra
 
 ### `_roundMint(address wallet, uint256 roundId, uint256 factionId, uint256 amount)` (internal)  <a name="MechaPilots2219V1-_roundMint-address-uint256-uint256-uint256-" id="MechaPilots2219V1-_roundMint-address-uint256-uint256-uint256-"></a>
 Safely mint the `amount` of token for `wallet` in a `round`
+If `faction` is sold out, automatically mint the other
 
 
 Call {MechaPilots2219V1-_safeMint}.
@@ -896,7 +890,8 @@ Parameters:
 
 
 ### `_safeMint(address wallet, uint256 factionId, uint256 amount)` (internal)  <a name="MechaPilots2219V1-_safeMint-address-uint256-uint256-" id="MechaPilots2219V1-_safeMint-address-uint256-uint256-"></a>
-Safely mint the `amount` of token for `wallet`
+Safely mint the `amount` of token for `wallet`.
+If `faction` is sold out, automatically mint the other
 
 
 Requirements:
@@ -904,7 +899,7 @@ Requirements:
 - `faction` must exist
 - The supply of the faction must not be exceeded with amount
 
-Increase `_totalMinted`
+Increase `_totalMinted` and `_totalMintedByFaction`
 
 
 
@@ -974,14 +969,14 @@ Parameters:
 
 
 
-### `_beforeTokenTransfer(address from, address to, uint256 tokenId)` (internal)  <a name="MechaPilots2219V1-_beforeTokenTransfer-address-address-uint256-" id="MechaPilots2219V1-_beforeTokenTransfer-address-address-uint256-"></a>
+### `_beforeTokenTransfer(address from, address to, uint256 tokenId, uint256 batchSize)` (internal)  <a name="MechaPilots2219V1-_beforeTokenTransfer-address-address-uint256-uint256-" id="MechaPilots2219V1-_beforeTokenTransfer-address-address-uint256-uint256-"></a>
 
 
 
 
 
 
-### `_authorizeUpgrade(address newImplementation)` (internal)  <a name="MechaPilots2219V1-_authorizeUpgrade-address-" id="MechaPilots2219V1-_authorizeUpgrade-address-"></a>
+### `_authorizeUpgrade(address)` (internal)  <a name="MechaPilots2219V1-_authorizeUpgrade-address-" id="MechaPilots2219V1-_authorizeUpgrade-address-"></a>
 
 
 
@@ -1321,6 +1316,14 @@ Emits a {Transfer} event.
 _Inherited from `../@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol`_.
 
 
+### `_ownerOf(uint256 tokenId) → address` (internal) (inherited) <a name="ERC721Upgradeable-_ownerOf-uint256-" id="ERC721Upgradeable-_ownerOf-uint256-"></a>
+
+Returns the owner of the `tokenId`. Does NOT revert if token doesn't exist
+
+
+_Inherited from `../@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol`_.
+
+
 ### `_exists(uint256 tokenId) → bool` (internal) (inherited) <a name="ERC721Upgradeable-_exists-uint256-" id="ERC721Upgradeable-_exists-uint256-"></a>
 
 Returns whether `tokenId` exists.
@@ -1380,6 +1383,7 @@ _Inherited from `../@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgra
 
 Destroys `tokenId`.
 The approval is cleared when the token is burned.
+This is an internal function that does not check if the sender is authorized to operate on the token.
 Requirements:
 - `tokenId` must exist.
 Emits a {Transfer} event.
@@ -1427,13 +1431,16 @@ Reverts if the `tokenId` has not been minted yet.
 _Inherited from `../@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol`_.
 
 
-### `_afterTokenTransfer(address from, address to, uint256 tokenId)` (internal) (inherited) <a name="ERC721Upgradeable-_afterTokenTransfer-address-address-uint256-" id="ERC721Upgradeable-_afterTokenTransfer-address-address-uint256-"></a>
+### `_afterTokenTransfer(address from, address to, uint256 firstTokenId, uint256 batchSize)` (internal) (inherited) <a name="ERC721Upgradeable-_afterTokenTransfer-address-address-uint256-uint256-" id="ERC721Upgradeable-_afterTokenTransfer-address-address-uint256-uint256-"></a>
 
-Hook that is called after any transfer of tokens. This includes
-minting and burning.
+Hook that is called after any token transfer. This includes minting and burning. If {ERC721Consecutive} is
+used, the hook may be called as part of a consecutive (batch) mint, as indicated by `batchSize` greater than 1.
 Calling conditions:
-- when `from` and `to` are both non-zero.
+- When `from` and `to` are both non-zero, ``from``'s tokens were transferred to `to`.
+- When `from` is zero, the tokens were minted for `to`.
+- When `to` is zero, ``from``'s tokens were burned.
 - `from` and `to` are never both zero.
+- `batchSize` is non-zero.
 To learn more about hooks, head to xref:ROOT:extending-contracts.adoc#using-hooks[Using Hooks].
 
 
@@ -1494,6 +1501,23 @@ Locks the contract, preventing any future reinitialization. This cannot be part 
 Calling this in the constructor of a contract will prevent that contract from being initialized or reinitialized
 to any version. It is recommended to use this to lock implementation contracts that are designed to be called
 through proxies.
+Emits an {Initialized} event the first time it is successfully executed.
+
+
+_Inherited from `../@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol`_.
+
+
+### `_getInitializedVersion() → uint8` (internal) (inherited) <a name="Initializable-_getInitializedVersion--" id="Initializable-_getInitializedVersion--"></a>
+
+Internal function that returns the initialized version. Returns `_initialized`
+
+
+_Inherited from `../@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol`_.
+
+
+### `_isInitializing() → bool` (internal) (inherited) <a name="Initializable-_isInitializing--" id="Initializable-_isInitializing--"></a>
+
+Internal function that returns the initialized version. Returns `_initializing`
 
 
 _Inherited from `../@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol`_.
@@ -1573,7 +1597,10 @@ _Inherited from `../@openzeppelin/contracts-upgradeable/security/PausableUpgrade
 
 
 A modifier that defines a protected initializer function that can be invoked at most once. In its scope,
-`onlyInitializing` functions can be used to initialize parent contracts. Equivalent to `reinitializer(1)`.
+`onlyInitializing` functions can be used to initialize parent contracts.
+Similar to `reinitializer(1)`, except that functions marked with `initializer` can be nested in the context of a
+constructor.
+Emits an {Initialized} event.
 
 
 _Inherited from `../@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol`_.
@@ -1585,11 +1612,14 @@ _Inherited from `../@openzeppelin/contracts-upgradeable/proxy/utils/Initializabl
 A modifier that defines a protected reinitializer function that can be invoked at most once, and only if the
 contract hasn't been initialized to a greater version before. In its scope, `onlyInitializing` functions can be
 used to initialize parent contracts.
-`initializer` is equivalent to `reinitializer(1)`, so a reinitializer may be used after the original
-initialization step. This is essential to configure modules that are added through upgrades and that require
-initialization.
+A reinitializer may be used after the original initialization step. This is essential to configure modules that
+are added through upgrades and that require initialization.
+When `version` is 1, this modifier is similar to `initializer`, except that functions marked with `reinitializer`
+cannot be nested. If one is invoked in the context of another, execution will revert.
 Note that versions can jump in increments greater than 1; this implies that if multiple reinitializers coexist in
 a contract, executing them in the right order is up to the developer or operator.
+WARNING: setting the version to 255 will prevent any future reinitialization.
+Emits an {Initialized} event.
 
 
 _Inherited from `../@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol`_.
@@ -1613,15 +1643,7 @@ _Inherited from `../@openzeppelin/contracts-upgradeable/proxy/utils/Initializabl
 - uint32[2] supply
 - uint32[2] totalMinted
 - address validator
-- struct MechaPilots2219V1.MintPrice price
-
-
-
-### `MintPrice`  <a name="MechaPilots2219V1-MintPrice" id="MechaPilots2219V1-MintPrice"></a>
-- uint256 max
-- uint256 min
-- uint256 decreaseTime
-- uint256 decreaseAmount
+- uint256 price
 
 
 
