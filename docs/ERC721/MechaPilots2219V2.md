@@ -508,7 +508,7 @@ Create or edit a mint round
 
 Requirements:
 - `roundId` must exist or increment `roundsLength` for create one.
-- `roundId` can be 0.
+- `roundId` can't be 0.
 
 
 

@@ -393,7 +393,7 @@ contract MechaPilots2219V1 is
      *
      * @dev Requirements:
      * - `roundId` must exist or increment `roundsLength` for create one.
-     * - `roundId` can be 0.
+     * - `roundId` can't be 0.
      *
      * @param roundId The index of the mint round.
      * @param supply Number of tokens that can be minted in this round by faction. Can be 0 for use the total faction supply
