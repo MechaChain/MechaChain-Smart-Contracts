@@ -165,6 +165,9 @@ contract MechaPilots2219V1 is
     /// Total of minted token by faction
     uint256[] internal _totalMintedByFaction;
 
+    /// Total of burned token by faction
+    uint256[] internal _totalBurnedByFaction;
+
     /// Map of faction by tokenId
     mapping(uint256 => Faction) public tokenFaction;
 
@@ -210,6 +213,7 @@ contract MechaPilots2219V1 is
         // Storage initialisation
         version = 1;
         _totalMintedByFaction = [0, 0];
+        _totalBurnedByFaction = [0, 0];
         baseExtension = ".json";
         maxMintsPerWallet = 2;
         MAX_SUPPLY_BY_FACTION = [1109, 1110];
@@ -490,12 +494,14 @@ contract MechaPilots2219V1 is
      * @dev Burns `tokenId`. See {ERC721-_burn}.
      *
      * Requirements:
-     * - The planet of `tokenId` must be burnable.
+     * - The burnable feature must be active.
      * - The caller must own `tokenId` or be an approved operator.
      */
     function burn(uint256 tokenId) public virtual override whenNotPaused {
         require(burnable, "Not burnable");
         totalBurned++;
+        Faction faction = tokenFaction[tokenId];
+        _totalBurnedByFaction[uint256(faction)]++;
         super.burn(tokenId);
     }
 
@@ -580,19 +586,38 @@ contract MechaPilots2219V1 is
     }
 
     /**
-     * @notice Returns the total amount of tokens minted.
+     * @notice Returns the total balances of tokens. Takes into account the burned ones.
      */
     function totalSupply() public view returns (uint256) {
         return _totalMinted - totalBurned;
     }
 
     /**
-     * @notice Returns the total amount of tokens minted for `factionId`.
+     * @notice Returns the total balances of tokens for `factionId`. Takes into account the burned ones.
      */
     function totalSupplyByFaction(
         uint256 factionId
     ) public view returns (uint256) {
+        return
+            _totalMintedByFaction[factionId] - _totalBurnedByFaction[factionId];
+    }
+
+    /**
+     * @notice Returns the total amount of tokens minted for `factionId`.
+     */
+    function totalMintedByFaction(
+        uint256 factionId
+    ) public view returns (uint256) {
         return _totalMintedByFaction[factionId];
+    }
+
+    /**
+     * @notice Returns the total amount of tokens burned for `factionId`.
+     */
+    function totalBurnedByFaction(
+        uint256 factionId
+    ) public view returns (uint256) {
+        return _totalBurnedByFaction[factionId];
     }
 
     /**

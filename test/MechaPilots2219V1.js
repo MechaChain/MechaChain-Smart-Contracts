@@ -1419,7 +1419,22 @@ contract("MechaPilots2219V1", async (accounts) => {
       assert.equal(burnable, true, "Burnable not activated");
     });
 
-    it(`User1 can burn tokens !`, async () => {
+    it(`User1 can burn 1 token!`, async () => {
+      const tokenId = getUserRandomToken(user1);
+      const tx = await instance.burn(tokenId, {
+        from: user1,
+      });
+      getTokensFromTransferEvent(tx, true);
+      await gasTracker.addCost(`Burn x1`, tx);
+
+      // Token not exist anymore
+      await expectRevert(instance.ownerOf(tokenId), "ERC721: invalid token ID");
+
+      // Remove token from the user list
+      usersTokens[user1] = usersTokens[user1].filter((id) => id !== tokenId);
+    });
+
+    it(`After a burn, the totalSupply decrease accordingly`, async () => {
       const oldSupply = await instance.totalSupply();
       const tokenId = getUserRandomToken(user1);
       const tx = await instance.burn(tokenId, {
@@ -1438,6 +1453,54 @@ contract("MechaPilots2219V1", async (accounts) => {
         oldSupply.toNumber() - 1,
         "Incorrect supply"
       );
+
+      // Remove token from the user list
+      usersTokens[user1] = usersTokens[user1].filter((id) => id !== tokenId);
+    });
+
+    it(`After a burn, the totalBurnedByFaction increase and the totalSupplyByFaction decrease`, async () => {
+      const tokenId = getUserRandomToken(user1);
+
+      const faction = await instance.tokenFaction(tokenId);
+      const oldTotalBurnedByFaction = await instance.totalBurnedByFaction(
+        faction
+      );
+      const oldTotalSupplyByFaction = await instance.totalSupplyByFaction(
+        faction
+      );
+
+      const tx = await instance.burn(tokenId, {
+        from: user1,
+      });
+      getTokensFromTransferEvent(tx, true);
+      await gasTracker.addCost(`Burn x1`, tx);
+
+      // Token not exist anymore
+      await expectRevert(instance.ownerOf(tokenId), "ERC721: invalid token ID");
+
+      const newTotalBurnedByFaction = await instance.totalBurnedByFaction(
+        faction
+      );
+      const newTotalSupplyByFaction = await instance.totalSupplyByFaction(
+        faction
+      );
+
+      // totalBurnedByFaction test
+      assert.equal(
+        newTotalBurnedByFaction.toNumber(),
+        oldTotalBurnedByFaction.toNumber() + 1,
+        "Incorrect totalBurnedByFaction"
+      );
+
+      // totalSupplyByFaction test
+      assert.equal(
+        newTotalSupplyByFaction.toNumber(),
+        oldTotalSupplyByFaction.toNumber() - 1,
+        "Incorrect totalSupplyByFaction"
+      );
+
+      // Remove token from the user list
+      usersTokens[user1] = usersTokens[user1].filter((id) => id !== tokenId);
     });
 
     it(`Owner can't burn a token of an user (Reason: not owner nor approved)`, async () => {
