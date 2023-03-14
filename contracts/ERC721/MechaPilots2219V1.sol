@@ -709,11 +709,11 @@ contract MechaPilots2219V1 is
         // Increase `totalMinted`
         round.totalMinted[factionId] += uint32(amount);
 
-        // Safe mint
-        _safeMint(wallet, factionId, amount);
-
         // Increase round total minted
         ownerToRoundTotalMinted[msg.sender][roundId] += amount;
+
+        // Safe mint
+        _safeMint(wallet, factionId, amount);
     }
 
     /**
@@ -753,16 +753,22 @@ contract MechaPilots2219V1 is
             );
         }
 
+        // Increase totalMinted
+        uint256 beforeMintTotalMinted = _totalMinted;
+        _totalMinted += amount;
+        _totalMintedByFaction[factionId] += amount;
+
         // Mint
         for (uint256 i = 0; i < amount; i++) {
-            uint256 tokenId = _getRandomToken(wallet, _totalMinted + i);
+            uint256 tokenId = _getRandomToken(
+                wallet,
+                beforeMintTotalMinted + i
+            );
             _mint(wallet, tokenId);
             if (factionId != 0) {
                 tokenFaction[tokenId] = faction;
             }
         }
-        _totalMinted += amount;
-        _totalMintedByFaction[factionId] += amount;
     }
 
     /**
