@@ -43,13 +43,7 @@ contract("MechaPilots2219V1", async (accounts) => {
       startTime: time.duration.days(1), // to add to `testStartTime`
       duration: time.duration.days(2),
       // no validator
-      price: {
-        // Fixed to 2 Eth
-        max: getAmount(2),
-        min: getAmount(0.2),
-        decreaseAmount: getAmount(0.1),
-        decreaseTime: time.duration.hours(1),
-      },
+      price: getAmount(0.2),
     },
     {
       name: "Whitelist 1",
@@ -60,13 +54,7 @@ contract("MechaPilots2219V1", async (accounts) => {
       validator: "0x6F76846f7C90EcEC371e1d96cA93bfE9d36eEb83",
       validator_private_key:
         "0xfeae30926cea7dfa8fb803c348aef7f06941b9af7770e6b62c0dcb543d3391a7",
-      price: {
-        // Fixed to 0.2
-        max: getAmount(0.002),
-        min: getAmount(0.002),
-        decreaseAmount: getAmount(0),
-        decreaseTime: time.duration.hours(0),
-      },
+      price: getAmount(0.002),
     },
     {
       name: "Whitelist 2",
@@ -77,13 +65,7 @@ contract("MechaPilots2219V1", async (accounts) => {
       validator: "0x6F76846f7C90EcEC371e1d96cA93bfE9d36eEb83",
       validator_private_key:
         "0xfeae30926cea7dfa8fb803c348aef7f06941b9af7770e6b62c0dcb543d3391a7",
-      price: {
-        // Fixed to 0.002
-        max: getAmount(0.002),
-        min: getAmount(0.002),
-        decreaseAmount: getAmount(0),
-        decreaseTime: time.duration.hours(0),
-      },
+      price: getAmount(0.002),
     },
     {
       name: "Free (tests)",
@@ -94,12 +76,7 @@ contract("MechaPilots2219V1", async (accounts) => {
       validator: "0x6F76846f7C90EcEC371e1d96cA93bfE9d36eEb83",
       validator_private_key:
         "0xfeae30926cea7dfa8fb803c348aef7f06941b9af7770e6b62c0dcb543d3391a7",
-      price: {
-        max: getAmount(0),
-        min: getAmount(0),
-        decreaseAmount: getAmount(0),
-        decreaseTime: time.duration.hours(0),
-      },
+      price: getAmount(0),
     },
   ];
 
@@ -136,10 +113,7 @@ contract("MechaPilots2219V1", async (accounts) => {
       testStartTime.add(startTime),
       duration,
       validator,
-      price.max,
-      price.min,
-      price.decreaseTime,
-      price.decreaseAmount,
+      price,
       { from: from }
     );
     await gasTracker.addCost("Setup Mint Round", tx);
@@ -160,26 +134,7 @@ contract("MechaPilots2219V1", async (accounts) => {
       validator.toString(),
       "Bad validator"
     );
-    assert.equal(
-      round.price.max.toString(),
-      price.max.toString(),
-      "Bad max price"
-    );
-    assert.equal(
-      round.price.min.toString(),
-      price.min.toString(),
-      "Bad min price"
-    );
-    assert.equal(
-      round.price.decreaseTime.toString(),
-      price.decreaseTime.toString(),
-      "Bad decreaseTime price"
-    );
-    assert.equal(
-      round.price.decreaseAmount.toString(),
-      price.decreaseAmount.toString(),
-      "Bad decreaseAmount price"
-    );
+    assert.equal(round.price.toString(), price.toString(), "Bad price");
   };
 
   /**
@@ -249,7 +204,7 @@ contract("MechaPilots2219V1", async (accounts) => {
         expectedFactionId
       );
     }
-    const unitPrice = await instance.roundPrice(roundId);
+    const unitPrice = getBN(round.price);
     const price = overrideData?.price || unitPrice.mul(getBN(amount));
     let tx;
     if (round.validator === ZERO_ADDRESS) {
@@ -480,8 +435,6 @@ contract("MechaPilots2219V1", async (accounts) => {
       const version = await instance.version();
       assert.equal(version.toString(), "1", "Bad version");
       chainid = await web3.eth.getChainId();
-      chainid = 1;
-
       maxMintsPerWallet = await instance.maxMintsPerWallet();
       maxMintsPerWallet = maxMintsPerWallet.toNumber();
       MAX_SUPPLY = await instance.MAX_SUPPLY();
@@ -705,15 +658,6 @@ contract("MechaPilots2219V1", async (accounts) => {
       );
     });
 
-    it(`User can't mint with the minimum price for now (Reason: Wrong price)`, async () => {
-      await expectRevert(
-        mint({ roundId: 1, amount: 1, factionId: 1 }, user1, {
-          price: rounds[1].price.min,
-        }),
-        `Wrong price`
-      );
-    });
-
     it(`User can't mint 0 tokens (Reason: Zero amount)`, async () => {
       await expectRevert(
         mint({ roundId: 1, amount: 0, factionId: 1 }, user1),
@@ -777,55 +721,6 @@ contract("MechaPilots2219V1", async (accounts) => {
         const tokenFaction = await instance.tokenFaction(tokenId);
         assert.equal(tokenFaction.toString(), "0", "tokenFaction not valid");
       }
-    });
-
-    it("Price should have decreased of 2 decreaseAmount after 2 hours", async () => {
-      const round = rounds[1];
-      await time.increase(round.price.decreaseTime.mul(getBN(2)));
-      const latestTime = await time.latest();
-
-      const actualPrice = await instance.roundPrice(1);
-      const timePassed = latestTime.sub(testStartTime.add(round.startTime));
-      const decreaseNb = timePassed.div(round.price.decreaseTime);
-      const expectedPrice = round.price.max.sub(
-        decreaseNb.mul(round.price.decreaseAmount)
-      );
-      assert.equal(
-        actualPrice.toString(),
-        expectedPrice.toString(),
-        "Incorrect price decrease"
-      );
-    });
-
-    it(`User can mint with the new price`, async () => {
-      const actualPrice = await instance.roundPrice(1);
-      await mint({ roundId: 1, factionId: 0, amount: 1 }, users[0], {
-        price: actualPrice,
-      });
-    });
-
-    it("Price should now be the minimum", async () => {
-      const round = rounds[1];
-
-      const oldPrice = await instance.roundPrice(1);
-      const remainingDecrease = oldPrice
-        .sub(round.price.min)
-        .div(round.price.decreaseAmount)
-        .add(getBN(1));
-
-      await time.increase(round.price.decreaseTime.mul(remainingDecrease));
-      const newPrice = await instance.roundPrice(1);
-      assert.equal(
-        newPrice.toString(),
-        round.price.min.toString(),
-        "Incorrect price decrease"
-      );
-    });
-
-    it(`User can mint with the minimum price`, async () => {
-      await mint({ roundId: 1, factionId: 0, amount: 1 }, users[0], {
-        price: rounds[1].price.min,
-      });
     });
 
     it(`Round 1 ended, users can't mint anymore (Reason: Round not in progress)`, async () => {
@@ -1081,15 +976,6 @@ contract("MechaPilots2219V1", async (accounts) => {
         await mint({ roundId, factionId: 1, amount: 3, maxMint: 5 }, user1);
       });
     }
-
-    it(`2 hours later, the price has not changed`, async () => {
-      const roundId = 2;
-      const round = rounds[roundId];
-      const oldPrice = await instance.roundPrice(roundId);
-      await time.increase(time.duration.hours(2));
-      const newPrice = await instance.roundPrice(roundId);
-      assert.equal(newPrice.toString(), oldPrice.toString(), "Incorrect price");
-    });
   });
 
   /**

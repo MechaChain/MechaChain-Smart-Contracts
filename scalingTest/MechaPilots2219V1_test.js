@@ -5,8 +5,6 @@ const seedrandom = require("seedrandom");
 
 // Load artifacts
 const MechaPilots2219V1 = artifacts.require("MechaPilots2219V1");
-const DummyMintConstructor = artifacts.require("DummyMintConstructor");
-const MechaPilots2219V2 = artifacts.require("MechaPilots2219V2");
 
 // Load utils
 const {
@@ -24,7 +22,6 @@ contract("MechaPilots2219V1", async (accounts) => {
 
   const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
   let instance,
-    testStartTime,
     chainid,
     maxMintsPerWallet,
     MAX_SUPPLY_BY_FACTION,
@@ -37,12 +34,7 @@ contract("MechaPilots2219V1", async (accounts) => {
 
   const defaultPublicRound = {
     supplyInPercentage: 80, // Percentage of the total supply in %
-    price: {
-      max: getAmount(1),
-      min: getAmount(0.2),
-      decreaseAmount: getAmount(0.1),
-      decreaseTime: time.duration.hours(1),
-    },
+    price: getAmount(1),
     decreaseNumber: 5, // Number of decrease
   };
 
@@ -128,7 +120,7 @@ contract("MechaPilots2219V1", async (accounts) => {
     overrideData = {}
   ) => {
     const round = await instance.rounds(roundId);
-    const unitPrice = await instance.roundPrice(roundId);
+    const unitPrice = getBN(round.price);
     const price = overrideData?.price || unitPrice.mul(getBN(amount));
     let tx;
     if (round.validator === ZERO_ADDRESS) {
@@ -239,8 +231,7 @@ contract("MechaPilots2219V1", async (accounts) => {
 
       const version = await instance.version();
       assert.equal(version.toString(), "1", "Bad version");
-      // chainid = await web3.eth.getChainId();
-      chainid = 1;
+      chainid = await web3.eth.getChainId();
       maxMintsPerWallet = await instance.maxMintsPerWallet();
       maxMintsPerWallet = maxMintsPerWallet.toNumber();
       MAX_SUPPLY = await instance.MAX_SUPPLY();
@@ -272,10 +263,7 @@ contract("MechaPilots2219V1", async (accounts) => {
         latestTime, // Start now
         0, // Infinite
         ZERO_ADDRESS,
-        defaultPublicRound.price.max,
-        defaultPublicRound.price.min,
-        defaultPublicRound.price.decreaseTime,
-        defaultPublicRound.price.decreaseAmount
+        defaultPublicRound.price
       );
 
       console.log(`
@@ -284,11 +272,7 @@ contract("MechaPilots2219V1", async (accounts) => {
           - Supply = [${defaultPublicRound.supply.join(", ")}] (${
         defaultPublicRound.supplyInPercentage
       }% of the supply)
-          - Max Price = ${web3Utils.fromWei(defaultPublicRound.price.max)} Eth
-          - Min Price = ${web3Utils.fromWei(defaultPublicRound.price.min)} Eth
-          - Decrease = ${web3Utils.fromWei(
-            defaultPublicRound.price.decreaseAmount
-          )} Eth`);
+          - Price = ${web3Utils.fromWei(defaultPublicRound.price)} Eth`);
     });
 
     it(`Create the Whitelist round`, async () => {
@@ -302,10 +286,7 @@ contract("MechaPilots2219V1", async (accounts) => {
         1, // Start now
         0, // Infinite
         validator,
-        defaultWhitelistRound.price,
-        defaultWhitelistRound.price,
-        0,
-        0
+        defaultWhitelistRound.price
       );
 
       console.log(`
@@ -331,9 +312,7 @@ contract("MechaPilots2219V1", async (accounts) => {
    */
   describe("\n PUBLIC MINT", () => {
     for (let i = 0; i < defaultPublicRound.decreaseNumber; i++) {
-      const price = defaultPublicRound.price.max.sub(
-        defaultPublicRound.price.decreaseAmount.mul(getBN(i))
-      );
+      const price = getBN(defaultPublicRound.price);
 
       // Mint all decreased batch by faction
       ["PURE_GENE", "ASSIMILEE"].forEach((factionName, factionId, arr) => {
@@ -406,26 +385,6 @@ contract("MechaPilots2219V1", async (accounts) => {
           progressBar.stop();
         });
       });
-
-      // Decrease price
-      if (i !== defaultPublicRound.decreaseNumber) {
-        it(`Decrease Price of ${web3Utils.fromWei(
-          defaultPublicRound.price.decreaseAmount
-        )} Eth`, async () => {
-          await time.increase(
-            defaultPublicRound.price.decreaseTime.add(getBN(1))
-          );
-          const actualPrice = await instance.roundPrice(1);
-          const expectedPrice = defaultPublicRound.price.max.sub(
-            defaultPublicRound.price.decreaseAmount.mul(getBN(i + 1))
-          );
-          assert.equal(
-            actualPrice.toString(),
-            expectedPrice.toString(),
-            "Incorrect price decrease"
-          );
-        });
-      }
     }
 
     it(`All factions are now sold out for the round`, async () => {
@@ -445,11 +404,7 @@ contract("MechaPilots2219V1", async (accounts) => {
     });
 
     it(`Calculate reimbursement data for script testing`, async () => {
-      const lastPrice = defaultPublicRound.price.max.sub(
-        defaultPublicRound.price.decreaseAmount.mul(
-          getBN(defaultPublicRound.decreaseNumber - 1)
-        )
-      );
+      const lastPrice = getBN(defaultPublicRound.price);
       const totalSupply = await instance.totalSupply();
       const totalToRefound = contractBalance.sub(lastPrice.mul(totalSupply));
 
@@ -617,7 +572,7 @@ contract("MechaPilots2219V1", async (accounts) => {
       progressBar.start(transfersNumber, 0);
       for (let i = 0; i < transfersNumber; i++) {
         const usersWithoutFirst = Object.keys(usersTokens).filter(
-          (address) => address !== to && address && usersTokens[address].length
+          (address) => address !== to && address && usersTokens[address]?.length
         );
         const user =
           usersWithoutFirst[getRandom(0, usersWithoutFirst.length - 1)];

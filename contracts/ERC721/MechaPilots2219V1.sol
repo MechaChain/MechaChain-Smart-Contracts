@@ -45,7 +45,8 @@ contract MechaPilots2219V1 is
         uint32[2] supply,
         uint64 startTime,
         uint64 duration,
-        address validator
+        address validator,
+        uint256 price
     );
 
     /**
@@ -101,7 +102,7 @@ contract MechaPilots2219V1 is
      * @member supply Number of tokens that can be minted in this round by faction. Can be 0 for use the total faction supply
      * @member totalMinted Number of token minted in this round by faction
      * @member validator The address of the whitelist validator. Can be 'address(0)' for no whitelist
-     * @member price The price configuration for a single token in the round
+     * @member price The price in wei for the round
      */
     struct MintRound {
         uint64 startTime;
@@ -109,21 +110,7 @@ contract MechaPilots2219V1 is
         uint32[2] supply;
         uint32[2] totalMinted;
         address validator;
-        MintPrice price;
-    }
-
-    /**
-     * @notice Container for packing the configuration of a price variation
-     * @member max The maximum price which will be decreasing in wei
-     * @member min The minimum price after which it no longer decreases in wei
-     * @member decreaseAmount The number of wei that will be subtracted from the price every `decreaseTime`
-     * @member decreaseTime The number of seconds to wait between each decreasing (0 if no decrease)
-     */
-    struct MintPrice {
-        uint256 max;
-        uint256 min;
-        uint256 decreaseTime;
-        uint256 decreaseAmount;
+        uint256 price;
     }
 
     /**
@@ -353,10 +340,10 @@ contract MechaPilots2219V1 is
      * @param tokenId The tokenId
      * @param uri The new token uri
      */
-    function setTokenURI(uint256 tokenId, string memory uri)
-        external
-        onlyRole(URI_UPDATER_ROLE)
-    {
+    function setTokenURI(
+        uint256 tokenId,
+        string memory uri
+    ) external onlyRole(URI_UPDATER_ROLE) {
         _requireMinted(tokenId);
         _tokenURIs[tokenId] = uri;
         emit TokenRevealed(tokenId, msg.sender, uri);
@@ -371,10 +358,10 @@ contract MechaPilots2219V1 is
      * @param tokenIds List of tokenIds
      * @param uri List of new token URI
      */
-    function setTokenURIPerBatch(uint256[] memory tokenIds, string[] memory uri)
-        external
-        onlyRole(URI_UPDATER_ROLE)
-    {
+    function setTokenURIPerBatch(
+        uint256[] memory tokenIds,
+        string[] memory uri
+    ) external onlyRole(URI_UPDATER_ROLE) {
         for (uint256 i; i < tokenIds.length; i++) {
             _requireMinted(tokenIds[i]);
             _tokenURIs[tokenIds[i]] = uri[i];
@@ -414,10 +401,7 @@ contract MechaPilots2219V1 is
      * @param startTime The start time of the round in unix seconds timestamp. 0 if not set.
      * @param duration The duration of the round in seconds. 0 if ends at sold out.
      * @param validator The address of the whitelist validator. Can be 'address(0)' for no whitelist.
-     * @param maxPrice The maximum price which will be decreasing in wei
-     * @param minPrice The minimum price after which it no longer decreases in wei
-     * @param priceDecreaseTime The number of wei that will be subtracted from the price every `decreaseTime` (0 if no decrease)
-     * @param priceDecreaseAmount The number of seconds to wait between each decreasing (must be > 900)
+     * @param price The price in wei
      */
     function setupMintRound(
         uint256 roundId,
@@ -425,14 +409,10 @@ contract MechaPilots2219V1 is
         uint64 startTime,
         uint64 duration,
         address validator,
-        uint256 maxPrice,
-        uint256 minPrice,
-        uint256 priceDecreaseTime,
-        uint256 priceDecreaseAmount
+        uint256 price
     ) public onlyOwner {
         require(roundId > 0, "Id can't be 0");
         require(roundId <= roundsLength + 1, "Invalid roundId");
-        require(maxPrice >= minPrice, "Wrong price");
 
         // Create a new round
         if (roundId == roundsLength + 1) {
@@ -444,14 +424,16 @@ contract MechaPilots2219V1 is
         round.supply = supply;
         round.duration = duration;
         round.validator = validator;
-        round.price = MintPrice({
-            max: maxPrice,
-            min: minPrice,
-            decreaseTime: priceDecreaseTime,
-            decreaseAmount: priceDecreaseAmount
-        });
+        round.price = price;
 
-        emit MintRoundSetup(roundId, supply, startTime, duration, validator);
+        emit MintRoundSetup(
+            roundId,
+            supply,
+            startTime,
+            duration,
+            validator,
+            price
+        );
     }
 
     /**
@@ -479,10 +461,9 @@ contract MechaPilots2219V1 is
     /**
      * @notice Change the URI base extension for unrevealed tokens
      */
-    function setBaseExtension(string memory newBaseExtension)
-        external
-        onlyOwner
-    {
+    function setBaseExtension(
+        string memory newBaseExtension
+    ) external onlyOwner {
         baseExtension = newBaseExtension;
         emit BaseExtensionChanged(newBaseExtension);
     }
@@ -499,11 +480,9 @@ contract MechaPilots2219V1 is
     /**
      * @notice Change number of tokens that a wallet can mint in a public round
      */
-    function setMaxMintsPerWallet(uint256 newMaxMints)
-        external
-        virtual
-        onlyOwner
-    {
+    function setMaxMintsPerWallet(
+        uint256 newMaxMints
+    ) external virtual onlyOwner {
         maxMintsPerWallet = newMaxMints;
         emit MaxMintsPerWalletChanged(newMaxMints);
     }
@@ -559,13 +538,9 @@ contract MechaPilots2219V1 is
     /**
      * @notice Returns the URI of `tokenId`, according to its condition (revealed or not)
      */
-    function tokenURI(uint256 tokenId)
-        public
-        view
-        virtual
-        override
-        returns (string memory)
-    {
+    function tokenURI(
+        uint256 tokenId
+    ) public view virtual override returns (string memory) {
         _requireMinted(tokenId);
 
         // Revealed token
@@ -615,46 +590,25 @@ contract MechaPilots2219V1 is
     /**
      * @notice Returns the total amount of tokens minted for `factionId`.
      */
-    function totalSupplyByFaction(uint256 factionId)
-        public
-        view
-        returns (uint256)
-    {
+    function totalSupplyByFaction(
+        uint256 factionId
+    ) public view returns (uint256) {
         return _totalMintedByFaction[factionId];
     }
 
     /**
      * @notice Returns the total amount of tokens minted by `wallet` for `roundId`.
      */
-    function totalMintedBy(address wallet, uint256 roundId)
-        public
-        view
-        returns (uint256)
-    {
+    function totalMintedBy(
+        address wallet,
+        uint256 roundId
+    ) public view returns (uint256) {
         return ownerToRoundTotalMinted[wallet][roundId];
     }
 
-    /**
-     * @notice Get the round price according to the Dutch Auction configuration
-     * @param roundId The round index
-     */
-    function roundPrice(uint256 roundId) public view returns (uint256) {
-        MintRound memory round = _rounds[roundId];
-        MintPrice memory price = round.price;
-
-        if (price.decreaseTime == 0 || block.timestamp < round.startTime) {
-            return price.max;
-        }
-        uint256 decreaseBy = ((block.timestamp - round.startTime) /
-            price.decreaseTime) * price.decreaseAmount;
-
-        if (decreaseBy > price.max || price.max - decreaseBy <= price.min) {
-            return price.min;
-        }
-        return price.max - decreaseBy;
-    }
-
-    function supportsInterface(bytes4 interfaceId)
+    function supportsInterface(
+        bytes4 interfaceId
+    )
         public
         view
         override(ERC721Upgradeable, AccessControlUpgradeable)
@@ -712,7 +666,7 @@ contract MechaPilots2219V1 is
         );
 
         // Correct price
-        require(roundPrice(roundId) * amount <= msg.value, "Wrong price");
+        require(round.price * amount <= msg.value, "Wrong price");
 
         // If faction supply is sold out, try the other supply
         if (
@@ -793,10 +747,10 @@ contract MechaPilots2219V1 is
      * @param wallet The wallet to complexify the random
      * @param totalMinted Updated total minted
      */
-    function _getRandomToken(address wallet, uint256 totalMinted)
-        internal
-        returns (uint256)
-    {
+    function _getRandomToken(
+        address wallet,
+        uint256 totalMinted
+    ) internal returns (uint256) {
         uint256 remaining = MAX_SUPPLY - totalMinted;
         uint256 rand = (uint256(
             keccak256(
