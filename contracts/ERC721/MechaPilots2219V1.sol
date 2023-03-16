@@ -3,6 +3,7 @@ pragma solidity 0.8.17;
 
 import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721BurnableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721RoyaltyUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
@@ -21,6 +22,7 @@ contract MechaPilots2219V1 is
     Initializable,
     ERC721Upgradeable,
     ERC721BurnableUpgradeable,
+    ERC721RoyaltyUpgradeable,
     PausableUpgradeable,
     OwnableUpgradeable,
     AccessControlUpgradeable,
@@ -209,6 +211,9 @@ contract MechaPilots2219V1 is
         // Roles
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _grantRole(URI_UPDATER_ROLE, msg.sender);
+
+        // Set default royalty to 5% (denominator out of 10000).
+        _setDefaultRoyalty(0x3cCC90302A4c9d21AC18D9a6b6666B59Ae459416, 500);
 
         // Storage initialisation
         version = 1;
@@ -534,6 +539,30 @@ contract MechaPilots2219V1 is
         emit TokenWithdrawn(to, token, amount);
     }
 
+    /**
+     * @notice Sets the royalty information that all ids in this contract will default to.
+     *
+     * Requirements:
+     * - `receiver` cannot be the zero address.
+     * - `feeNumerator` cannot be greater than the fee denominator: 10000.
+     *
+     * @param receiver The address who should receive the fee.
+     * @param feeNumerator The fee numerator (out of 10000)
+     */
+    function setDefaultRoyalty(
+        address receiver,
+        uint96 feeNumerator
+    ) external onlyOwner {
+        _setDefaultRoyalty(receiver, feeNumerator);
+    }
+
+    /**
+     * Remove default royalty information
+     */
+    function deleteDefaultRoyalty() external onlyOwner {
+        _deleteDefaultRoyalty();
+    }
+
     /*
      * ========================
      *          Views
@@ -635,7 +664,11 @@ contract MechaPilots2219V1 is
     )
         public
         view
-        override(ERC721Upgradeable, AccessControlUpgradeable)
+        override(
+            ERC721Upgradeable,
+            ERC721RoyaltyUpgradeable,
+            AccessControlUpgradeable
+        )
         returns (bool)
     {
         return super.supportsInterface(interfaceId);
@@ -861,6 +894,12 @@ contract MechaPilots2219V1 is
             ),
             "Invalid signature"
         );
+    }
+
+    function _burn(
+        uint256 tokenId
+    ) internal override(ERC721Upgradeable, ERC721RoyaltyUpgradeable) {
+        ERC721Upgradeable._burn(tokenId);
     }
 
     function _beforeTokenTransfer(

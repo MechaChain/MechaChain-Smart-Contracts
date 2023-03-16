@@ -14,6 +14,7 @@ const {
   gasTracker,
   getSignature,
   getRandom,
+  truncateWallet,
 } = require("../utils");
 const { upgradeProxy, deployProxy } = require("@openzeppelin/truffle-upgrades");
 
@@ -33,6 +34,11 @@ contract("MechaPilots2219V1", async (accounts) => {
   let mintedTokens = [];
   let usersTokens = {};
   let tpmData = {};
+
+  const defaultRoyalties = {
+    receiver: "0x3ccc90302a4c9d21ac18d9a6b6666b59ae459416",
+    feeNumerator: 500,
+  };
 
   const rounds = [
     {}, // 0 not possible
@@ -1385,6 +1391,62 @@ contract("MechaPilots2219V1", async (accounts) => {
         const isRevealed = await instance.isRevealed(tokenId);
         assert.equal(isRevealed, true, "Not revealed");
       }
+    });
+  });
+
+  /**
+   * ROYALTIES
+   */
+  describe("\n ROYALTIES", () => {
+    const testRoyalties = async (receiver, feeNumerator) => {
+      const salePrice = getAmount(1);
+      const expectedRoyaltyAmount = salePrice
+        .mul(getBN(feeNumerator))
+        .div(getBN(10000));
+
+      const royaltyInfo = await instance.royaltyInfo(1, salePrice);
+
+      // Correct receiver
+      assert.equal(
+        royaltyInfo["0"].toLowerCase(),
+        receiver.toLowerCase(),
+        "Incorrect receiver"
+      );
+
+      // Correct RoyaltyAmount
+      assert.equal(
+        royaltyInfo["1"].toString(),
+        expectedRoyaltyAmount.toString(),
+        "Incorrect RoyaltyAmount"
+      );
+    };
+
+    it(`Default royaltyInfo is correct: receiver = ${truncateWallet(
+      defaultRoyalties.receiver
+    )} // earnings = ${defaultRoyalties.feeNumerator / 100}%`, async () => {
+      await testRoyalties(
+        defaultRoyalties.receiver,
+        defaultRoyalties.feeNumerator
+      );
+    });
+
+    it(`Users can't change royalties (Reason: caller is not owner)`, async () => {
+      await expectRevert(
+        instance.setDefaultRoyalty(user1, 1000, {
+          from: user1,
+        }),
+        `Ownable: caller is not the owner`
+      );
+    });
+
+    it(`Owner can change royalties with a new address and new fees`, async () => {
+      await instance.setDefaultRoyalty(user1, 1000, {
+        from: owner,
+      });
+    });
+
+    it(`New royaltyInfo is correct`, async () => {
+      await testRoyalties(user1, 1000);
     });
   });
 

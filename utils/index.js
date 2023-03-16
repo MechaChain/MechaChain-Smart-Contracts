@@ -181,6 +181,14 @@ const consoleStats = () => {
   ]);
 };
 
+const truncateWallet = (wallet, number = 4) => {
+  return (
+    wallet.toString().slice(0, number + 1) +
+    "..." +
+    wallet.toString().slice(-number)
+  );
+};
+
 module.exports = {
   gasTracker: {
     addCost,
@@ -196,4 +204,5 @@ module.exports = {
   getRange,
   getBNRange,
   getRandom,
+  truncateWallet,
 };
