@@ -124,6 +124,7 @@ MechaLands - Collection of unique lands on the surface of the planets of the Mec
     - [`_setApprovalForAll`](#ERC721Upgradeable-_setApprovalForAll-address-address-bool-) (inherited)
     - [`_requireMinted`](#ERC721Upgradeable-_requireMinted-uint256-) (inherited)
     - [`_afterTokenTransfer`](#ERC721Upgradeable-_afterTokenTransfer-address-address-uint256-uint256-) (inherited)
+    - [`__unsafe_increaseBalance`](#ERC721Upgradeable-__unsafe_increaseBalance-address-uint256-) (inherited)
     - [`__ERC165_init`](#ERC165Upgradeable-__ERC165_init--) (inherited)
     - [`__ERC165_init_unchained`](#ERC165Upgradeable-__ERC165_init_unchained--) (inherited)
     - [`__Context_init`](#ContextUpgradeable-__Context_init--) (inherited)
@@ -1288,6 +1289,17 @@ To learn more about hooks, head to xref:ROOT:extending-contracts.adoc#using-hook
 _Inherited from `../@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol`_.
 
 
+### `__unsafe_increaseBalance(address account, uint256 amount)` (internal) (inherited) <a name="ERC721Upgradeable-__unsafe_increaseBalance-address-uint256-" id="ERC721Upgradeable-__unsafe_increaseBalance-address-uint256-"></a>
+
+Unsafe write access to the balances, used by extensions that "mint" tokens using an {ownerOf} override.
+WARNING: Anyone calling this MUST ensure that the balances remain consistent with the ownership. The invariant
+being that for any address `a` the value returned by `balanceOf(a)` must be equal to the number of tokens such
+that `ownerOf(tokenId)` is `a`.
+
+
+_Inherited from `../@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol`_.
+
+
 ### `__ERC165_init()` (internal) (inherited) <a name="ERC165Upgradeable-__ERC165_init--" id="ERC165Upgradeable-__ERC165_init--"></a>
 
 
@@ -1350,7 +1362,7 @@ _Inherited from `../@openzeppelin/contracts-upgradeable/proxy/utils/Initializabl
 
 ### `_getInitializedVersion() → uint8` (internal) (inherited) <a name="Initializable-_getInitializedVersion--" id="Initializable-_getInitializedVersion--"></a>
 
-Internal function that returns the initialized version. Returns `_initialized`
+Returns the highest version that has been initialized. See {reinitializer}.
 
 
 _Inherited from `../@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol`_.
@@ -1358,7 +1370,7 @@ _Inherited from `../@openzeppelin/contracts-upgradeable/proxy/utils/Initializabl
 
 ### `_isInitializing() → bool` (internal) (inherited) <a name="Initializable-_isInitializing--" id="Initializable-_isInitializing--"></a>
 
-Internal function that returns the initialized version. Returns `_initializing`
+Returns `true` if the contract is currently initializing. See {onlyInitializing}.
 
 
 _Inherited from `../@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol`_.

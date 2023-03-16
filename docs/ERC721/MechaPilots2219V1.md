@@ -19,6 +19,7 @@ MechaPilots2219 - TODO
     - [`Upgraded`](#ERC1967UpgradeUpgradeable-Upgraded-address-) (inherited)
     - [`AdminChanged`](#ERC1967UpgradeUpgradeable-AdminChanged-address-address-) (inherited)
     - [`BeaconUpgraded`](#ERC1967UpgradeUpgradeable-BeaconUpgraded-address-) (inherited)
+    - [`OperatorFilterRegistryAddressUpdated`](#UpdatableOperatorFiltererUpgradeable-OperatorFilterRegistryAddressUpdated-address-) (inherited)
     - [`OwnershipTransferred`](#OwnableUpgradeable-OwnershipTransferred-address-address-) (inherited)
     - [`Paused`](#PausableUpgradeable-Paused-address-) (inherited)
     - [`Unpaused`](#PausableUpgradeable-Unpaused-address-) (inherited)
@@ -49,23 +50,34 @@ MechaPilots2219 - TODO
     - [`burn`](#MechaPilots2219V1-burn-uint256-) 
     - [`withdraw`](#MechaPilots2219V1-withdraw-address-payable-uint256-) 
     - [`withdrawTokens`](#MechaPilots2219V1-withdrawTokens-address-address-uint256-) 
+    - [`setDefaultRoyalty`](#MechaPilots2219V1-setDefaultRoyalty-address-uint96-) 
+    - [`deleteDefaultRoyalty`](#MechaPilots2219V1-deleteDefaultRoyalty--) 
+    - [`setApprovalForAll`](#MechaPilots2219V1-setApprovalForAll-address-bool-) 
+    - [`approve`](#MechaPilots2219V1-approve-address-uint256-) 
+    - [`transferFrom`](#MechaPilots2219V1-transferFrom-address-address-uint256-) 
+    - [`safeTransferFrom`](#MechaPilots2219V1-safeTransferFrom-address-address-uint256-) 
+    - [`safeTransferFrom`](#MechaPilots2219V1-safeTransferFrom-address-address-uint256-bytes-) 
     - [`tokenURI`](#MechaPilots2219V1-tokenURI-uint256-) 
     - [`isRevealed`](#MechaPilots2219V1-isRevealed-uint256-) 
     - [`rounds`](#MechaPilots2219V1-rounds-uint256-) 
     - [`totalSupply`](#MechaPilots2219V1-totalSupply--) 
     - [`totalSupplyByFaction`](#MechaPilots2219V1-totalSupplyByFaction-uint256-) 
+    - [`totalMintedByFaction`](#MechaPilots2219V1-totalMintedByFaction-uint256-) 
+    - [`totalBurnedByFaction`](#MechaPilots2219V1-totalBurnedByFaction-uint256-) 
     - [`totalMintedBy`](#MechaPilots2219V1-totalMintedBy-address-uint256-) 
+    - [`owner`](#MechaPilots2219V1-owner--) 
     - [`supportsInterface`](#MechaPilots2219V1-supportsInterface-bytes4-) 
     - [`receive`](#MechaPilots2219V1-receive--) 
     - [`proxiableUUID`](#UUPSUpgradeable-proxiableUUID--) (inherited)
     - [`upgradeTo`](#UUPSUpgradeable-upgradeTo-address-) (inherited)
     - [`upgradeToAndCall`](#UUPSUpgradeable-upgradeToAndCall-address-bytes-) (inherited)
+    - [`updateOperatorFilterRegistryAddress`](#UpdatableOperatorFiltererUpgradeable-updateOperatorFilterRegistryAddress-address-) (inherited)
+    - [`operatorFilterRegistry`](#UpdatableOperatorFiltererUpgradeable-operatorFilterRegistry--) (inherited)
     - [`hasRole`](#AccessControlUpgradeable-hasRole-bytes32-address-) (inherited)
     - [`getRoleAdmin`](#AccessControlUpgradeable-getRoleAdmin-bytes32-) (inherited)
     - [`grantRole`](#AccessControlUpgradeable-grantRole-bytes32-address-) (inherited)
     - [`revokeRole`](#AccessControlUpgradeable-revokeRole-bytes32-address-) (inherited)
     - [`renounceRole`](#AccessControlUpgradeable-renounceRole-bytes32-address-) (inherited)
-    - [`owner`](#OwnableUpgradeable-owner--) (inherited)
     - [`renounceOwnership`](#OwnableUpgradeable-renounceOwnership--) (inherited)
     - [`transferOwnership`](#OwnableUpgradeable-transferOwnership-address-) (inherited)
     - [`paused`](#PausableUpgradeable-paused--) (inherited)
@@ -73,13 +85,9 @@ MechaPilots2219 - TODO
     - [`ownerOf`](#ERC721Upgradeable-ownerOf-uint256-) (inherited)
     - [`name`](#ERC721Upgradeable-name--) (inherited)
     - [`symbol`](#ERC721Upgradeable-symbol--) (inherited)
-    - [`approve`](#ERC721Upgradeable-approve-address-uint256-) (inherited)
     - [`getApproved`](#ERC721Upgradeable-getApproved-uint256-) (inherited)
-    - [`setApprovalForAll`](#ERC721Upgradeable-setApprovalForAll-address-bool-) (inherited)
     - [`isApprovedForAll`](#ERC721Upgradeable-isApprovedForAll-address-address-) (inherited)
-    - [`transferFrom`](#ERC721Upgradeable-transferFrom-address-address-uint256-) (inherited)
-    - [`safeTransferFrom`](#ERC721Upgradeable-safeTransferFrom-address-address-uint256-) (inherited)
-    - [`safeTransferFrom`](#ERC721Upgradeable-safeTransferFrom-address-address-uint256-bytes-) (inherited)
+    - [`royaltyInfo`](#ERC2981Upgradeable-royaltyInfo-uint256-uint256-) (inherited)
 
 - [Internal Functions](#internal-functions)
     - [`_roundMint`](#MechaPilots2219V1-_roundMint-address-uint256-uint256-uint256-) 
@@ -87,6 +95,7 @@ MechaPilots2219 - TODO
     - [`_getRandomToken`](#MechaPilots2219V1-_getRandomToken-address-uint256-) 
     - [`_checkSignature`](#MechaPilots2219V1-_checkSignature-uint256-bytes-bytes-address-) 
     - [`_checkSignatureFromRole`](#MechaPilots2219V1-_checkSignatureFromRole-uint256-bytes-bytes-bytes32-) 
+    - [`_burn`](#MechaPilots2219V1-_burn-uint256-) 
     - [`_beforeTokenTransfer`](#MechaPilots2219V1-_beforeTokenTransfer-address-address-uint256-uint256-) 
     - [`_authorizeUpgrade`](#MechaPilots2219V1-_authorizeUpgrade-address-) 
     - [`__UUPSUpgradeable_init`](#UUPSUpgradeable-__UUPSUpgradeable_init--) (inherited)
@@ -101,6 +110,9 @@ MechaPilots2219 - TODO
     - [`_changeAdmin`](#ERC1967UpgradeUpgradeable-_changeAdmin-address-) (inherited)
     - [`_getBeacon`](#ERC1967UpgradeUpgradeable-_getBeacon--) (inherited)
     - [`_upgradeBeaconToAndCall`](#ERC1967UpgradeUpgradeable-_upgradeBeaconToAndCall-address-bytes-bool-) (inherited)
+    - [`__UpdatableOperatorFiltererUpgradeable_init`](#UpdatableOperatorFiltererUpgradeable-__UpdatableOperatorFiltererUpgradeable_init-address-address-bool-) (inherited)
+    - [`_checkFilterOperator`](#UpdatableOperatorFiltererUpgradeable-_checkFilterOperator-address-) (inherited)
+    - [`__OperatorFilterer_init`](#OperatorFiltererUpgradeable-__OperatorFilterer_init-address-bool-) (inherited)
     - [`__AccessControl_init`](#AccessControlUpgradeable-__AccessControl_init--) (inherited)
     - [`__AccessControl_init_unchained`](#AccessControlUpgradeable-__AccessControl_init_unchained--) (inherited)
     - [`_checkRole`](#AccessControlUpgradeable-_checkRole-bytes32-) (inherited)
@@ -119,6 +131,8 @@ MechaPilots2219 - TODO
     - [`_requirePaused`](#PausableUpgradeable-_requirePaused--) (inherited)
     - [`_pause`](#PausableUpgradeable-_pause--) (inherited)
     - [`_unpause`](#PausableUpgradeable-_unpause--) (inherited)
+    - [`__ERC721Royalty_init`](#ERC721RoyaltyUpgradeable-__ERC721Royalty_init--) (inherited)
+    - [`__ERC721Royalty_init_unchained`](#ERC721RoyaltyUpgradeable-__ERC721Royalty_init_unchained--) (inherited)
     - [`__ERC721Burnable_init`](#ERC721BurnableUpgradeable-__ERC721Burnable_init--) (inherited)
     - [`__ERC721Burnable_init_unchained`](#ERC721BurnableUpgradeable-__ERC721Burnable_init_unchained--) (inherited)
     - [`__ERC721_init`](#ERC721Upgradeable-__ERC721_init-string-string-) (inherited)
@@ -131,12 +145,19 @@ MechaPilots2219 - TODO
     - [`_safeMint`](#ERC721Upgradeable-_safeMint-address-uint256-) (inherited)
     - [`_safeMint`](#ERC721Upgradeable-_safeMint-address-uint256-bytes-) (inherited)
     - [`_mint`](#ERC721Upgradeable-_mint-address-uint256-) (inherited)
-    - [`_burn`](#ERC721Upgradeable-_burn-uint256-) (inherited)
     - [`_transfer`](#ERC721Upgradeable-_transfer-address-address-uint256-) (inherited)
     - [`_approve`](#ERC721Upgradeable-_approve-address-uint256-) (inherited)
     - [`_setApprovalForAll`](#ERC721Upgradeable-_setApprovalForAll-address-address-bool-) (inherited)
     - [`_requireMinted`](#ERC721Upgradeable-_requireMinted-uint256-) (inherited)
     - [`_afterTokenTransfer`](#ERC721Upgradeable-_afterTokenTransfer-address-address-uint256-uint256-) (inherited)
+    - [`__unsafe_increaseBalance`](#ERC721Upgradeable-__unsafe_increaseBalance-address-uint256-) (inherited)
+    - [`__ERC2981_init`](#ERC2981Upgradeable-__ERC2981_init--) (inherited)
+    - [`__ERC2981_init_unchained`](#ERC2981Upgradeable-__ERC2981_init_unchained--) (inherited)
+    - [`_feeDenominator`](#ERC2981Upgradeable-_feeDenominator--) (inherited)
+    - [`_setDefaultRoyalty`](#ERC2981Upgradeable-_setDefaultRoyalty-address-uint96-) (inherited)
+    - [`_deleteDefaultRoyalty`](#ERC2981Upgradeable-_deleteDefaultRoyalty--) (inherited)
+    - [`_setTokenRoyalty`](#ERC2981Upgradeable-_setTokenRoyalty-uint256-address-uint96-) (inherited)
+    - [`_resetTokenRoyalty`](#ERC2981Upgradeable-_resetTokenRoyalty-uint256-) (inherited)
     - [`__ERC165_init`](#ERC165Upgradeable-__ERC165_init--) (inherited)
     - [`__ERC165_init_unchained`](#ERC165Upgradeable-__ERC165_init_unchained--) (inherited)
     - [`__Context_init`](#ContextUpgradeable-__Context_init--) (inherited)
@@ -152,6 +173,8 @@ MechaPilots2219 - TODO
 - [Modifiers](#modifiers)
     - [`onlyProxy`](#UUPSUpgradeable-onlyProxy--) (inherited)
     - [`notDelegated`](#UUPSUpgradeable-notDelegated--) (inherited)
+    - [`onlyAllowedOperator`](#OperatorFiltererUpgradeable-onlyAllowedOperator-address-) (inherited)
+    - [`onlyAllowedOperatorApproval`](#OperatorFiltererUpgradeable-onlyAllowedOperatorApproval-address-) (inherited)
     - [`onlyRole`](#AccessControlUpgradeable-onlyRole-bytes32-) (inherited)
     - [`onlyOwner`](#OwnableUpgradeable-onlyOwner--) (inherited)
     - [`whenNotPaused`](#PausableUpgradeable-whenNotPaused--) (inherited)
@@ -163,6 +186,7 @@ MechaPilots2219 - TODO
 - [Structs](#structs)
     - [`MintRound`](#MechaPilots2219V1-MintRound) 
     - [`RoleData`](#AccessControlUpgradeable-RoleData) (inherited)
+    - [`RoyaltyInfo`](#ERC2981Upgradeable-RoyaltyInfo) (inherited)
 
 - [Enums](#enums)
     - [`Faction`](#MechaPilots2219V1-Faction) 
@@ -248,6 +272,14 @@ Emitted when the beacon is upgraded.
 
 
 _Inherited from `../@openzeppelin/contracts-upgradeable/proxy/ERC1967/ERC1967UpgradeUpgradeable.sol`_.
+
+
+### `OperatorFilterRegistryAddressUpdated(address newRegistry)` (inherited) <a name="UpdatableOperatorFiltererUpgradeable-OperatorFilterRegistryAddressUpdated-address-" id="UpdatableOperatorFiltererUpgradeable-OperatorFilterRegistryAddressUpdated-address-"></a>
+Emitted when the operator filter registry address is changed by the owner of the contract
+
+
+
+_Inherited from `libs/operator-filter-registry-v1.4.1/src/upgradeable/UpdatableOperatorFiltererUpgradeable.sol`_.
 
 
 ### `OwnershipTransferred(address previousOwner, address newOwner)` (inherited) <a name="OwnableUpgradeable-OwnershipTransferred-address-address-" id="OwnableUpgradeable-OwnershipTransferred-address-address-"></a>
@@ -551,7 +583,7 @@ Change number of tokens that a wallet can mint in a public round
 Burns `tokenId`. See {ERC721-_burn}.
 
 Requirements:
-- The planet of `tokenId` must be burnable.
+- The burnable feature must be active.
 - The caller must own `tokenId` or be an approved operator.
 
 
@@ -585,6 +617,70 @@ Parameters:
 
 
 
+### `setDefaultRoyalty(address receiver, uint96 feeNumerator)` (external) <a name="MechaPilots2219V1-setDefaultRoyalty-address-uint96-" id="MechaPilots2219V1-setDefaultRoyalty-address-uint96-"></a>
+Sets the royalty information that all ids in this contract will default to.
+
+Requirements:
+- `receiver` cannot be the zero address.
+- `feeNumerator` cannot be greater than the fee denominator: 10000.
+
+
+
+
+Parameters:
+- `receiver`: The address who should receive the fee.
+
+- `feeNumerator`: The fee numerator (out of 10000)
+
+
+
+### `deleteDefaultRoyalty()` (external) <a name="MechaPilots2219V1-deleteDefaultRoyalty--" id="MechaPilots2219V1-deleteDefaultRoyalty--"></a>
+Remove default royalty information
+
+
+
+
+
+### `setApprovalForAll(address operator, bool approved)` (public) <a name="MechaPilots2219V1-setApprovalForAll-address-bool-" id="MechaPilots2219V1-setApprovalForAll-address-bool-"></a>
+
+See {IERC721-setApprovalForAll}.
+     Check if the operator is allowed by the operator-filter-registry.
+
+
+
+
+### `approve(address operator, uint256 tokenId)` (public) <a name="MechaPilots2219V1-approve-address-uint256-" id="MechaPilots2219V1-approve-address-uint256-"></a>
+
+See {IERC721-approve}.
+     Check if the operator is allowed by the operator-filter-registry.
+
+
+
+
+### `transferFrom(address from, address to, uint256 tokenId)` (public) <a name="MechaPilots2219V1-transferFrom-address-address-uint256-" id="MechaPilots2219V1-transferFrom-address-address-uint256-"></a>
+
+See {IERC721-transferFrom}.
+     Check if the operator is allowed by the operator-filter-registry.
+
+
+
+
+### `safeTransferFrom(address from, address to, uint256 tokenId)` (public) <a name="MechaPilots2219V1-safeTransferFrom-address-address-uint256-" id="MechaPilots2219V1-safeTransferFrom-address-address-uint256-"></a>
+
+See {IERC721-safeTransferFrom}.
+     Check if the operator is allowed by the operator-filter-registry.
+
+
+
+
+### `safeTransferFrom(address from, address to, uint256 tokenId, bytes data)` (public) <a name="MechaPilots2219V1-safeTransferFrom-address-address-uint256-bytes-" id="MechaPilots2219V1-safeTransferFrom-address-address-uint256-bytes-"></a>
+
+See {IERC721-safeTransferFrom}.
+     Check if the operator is allowed by the operator-filter-registry.
+
+
+
+
 ### `tokenURI(uint256 tokenId) → string` (public) <a name="MechaPilots2219V1-tokenURI-uint256-" id="MechaPilots2219V1-tokenURI-uint256-"></a>
 Returns the URI of `tokenId`, according to its condition (revealed or not)
 
@@ -609,14 +705,28 @@ Better web3 accessibility that a public variable (includes arrays)
 
 
 ### `totalSupply() → uint256` (public) <a name="MechaPilots2219V1-totalSupply--" id="MechaPilots2219V1-totalSupply--"></a>
-Returns the total amount of tokens minted.
+Returns the total balances of tokens. Takes into account the burned ones.
 
 
 
 
 
 ### `totalSupplyByFaction(uint256 factionId) → uint256` (public) <a name="MechaPilots2219V1-totalSupplyByFaction-uint256-" id="MechaPilots2219V1-totalSupplyByFaction-uint256-"></a>
+Returns the total balances of tokens for `factionId`. Takes into account the burned ones.
+
+
+
+
+
+### `totalMintedByFaction(uint256 factionId) → uint256` (public) <a name="MechaPilots2219V1-totalMintedByFaction-uint256-" id="MechaPilots2219V1-totalMintedByFaction-uint256-"></a>
 Returns the total amount of tokens minted for `factionId`.
+
+
+
+
+
+### `totalBurnedByFaction(uint256 factionId) → uint256` (public) <a name="MechaPilots2219V1-totalBurnedByFaction-uint256-" id="MechaPilots2219V1-totalBurnedByFaction-uint256-"></a>
+Returns the total amount of tokens burned for `factionId`.
 
 
 
@@ -625,6 +735,13 @@ Returns the total amount of tokens minted for `factionId`.
 ### `totalMintedBy(address wallet, uint256 roundId) → uint256` (public) <a name="MechaPilots2219V1-totalMintedBy-address-uint256-" id="MechaPilots2219V1-totalMintedBy-address-uint256-"></a>
 Returns the total amount of tokens minted by `wallet` for `roundId`.
 
+
+
+
+
+### `owner() → address` (public) <a name="MechaPilots2219V1-owner--" id="MechaPilots2219V1-owner--"></a>
+
+Returns the address of the current owner.
 
 
 
@@ -674,6 +791,26 @@ Emits an {Upgraded} event.
 
 
 _Inherited from `../@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol`_.
+
+
+### `updateOperatorFilterRegistryAddress(address newRegistry)` (public) (inherited)<a name="UpdatableOperatorFiltererUpgradeable-updateOperatorFilterRegistryAddress-address-" id="UpdatableOperatorFiltererUpgradeable-updateOperatorFilterRegistryAddress-address-"></a>
+Update the address that the contract will make OperatorFilter checks against. When set to the zero
+        address, checks will be bypassed. OnlyOwner.
+
+
+
+Parameters:
+- `newRegistry`: The address of the registry that will be used for this contract
+
+_Inherited from `libs/operator-filter-registry-v1.4.1/src/upgradeable/UpdatableOperatorFiltererUpgradeable.sol`_.
+
+
+### `operatorFilterRegistry() → address` (public) (inherited)<a name="UpdatableOperatorFiltererUpgradeable-operatorFilterRegistry--" id="UpdatableOperatorFiltererUpgradeable-operatorFilterRegistry--"></a>
+
+Helper function to return the value of the currently used registry address
+
+
+_Inherited from `libs/operator-filter-registry-v1.4.1/src/upgradeable/UpdatableOperatorFiltererUpgradeable.sol`_.
 
 
 ### `hasRole(bytes32 role, address account) → bool` (public) (inherited)<a name="AccessControlUpgradeable-hasRole-bytes32-address-" id="AccessControlUpgradeable-hasRole-bytes32-address-"></a>
@@ -733,14 +870,6 @@ May emit a {RoleRevoked} event.
 
 
 _Inherited from `../@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol`_.
-
-
-### `owner() → address` (public) (inherited)<a name="OwnableUpgradeable-owner--" id="OwnableUpgradeable-owner--"></a>
-
-Returns the address of the current owner.
-
-
-_Inherited from `../@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol`_.
 
 
 ### `renounceOwnership()` (public) (inherited)<a name="OwnableUpgradeable-renounceOwnership--" id="OwnableUpgradeable-renounceOwnership--"></a>
@@ -803,25 +932,9 @@ See {IERC721Metadata-symbol}.
 _Inherited from `../@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol`_.
 
 
-### `approve(address to, uint256 tokenId)` (public) (inherited)<a name="ERC721Upgradeable-approve-address-uint256-" id="ERC721Upgradeable-approve-address-uint256-"></a>
-
-See {IERC721-approve}.
-
-
-_Inherited from `../@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol`_.
-
-
 ### `getApproved(uint256 tokenId) → address` (public) (inherited)<a name="ERC721Upgradeable-getApproved-uint256-" id="ERC721Upgradeable-getApproved-uint256-"></a>
 
 See {IERC721-getApproved}.
-
-
-_Inherited from `../@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol`_.
-
-
-### `setApprovalForAll(address operator, bool approved)` (public) (inherited)<a name="ERC721Upgradeable-setApprovalForAll-address-bool-" id="ERC721Upgradeable-setApprovalForAll-address-bool-"></a>
-
-See {IERC721-setApprovalForAll}.
 
 
 _Inherited from `../@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol`_.
@@ -835,28 +948,13 @@ See {IERC721-isApprovedForAll}.
 _Inherited from `../@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol`_.
 
 
-### `transferFrom(address from, address to, uint256 tokenId)` (public) (inherited)<a name="ERC721Upgradeable-transferFrom-address-address-uint256-" id="ERC721Upgradeable-transferFrom-address-address-uint256-"></a>
+### `royaltyInfo(uint256 _tokenId, uint256 _salePrice) → address, uint256` (public) (inherited)<a name="ERC2981Upgradeable-royaltyInfo-uint256-uint256-" id="ERC2981Upgradeable-royaltyInfo-uint256-uint256-"></a>
 
-See {IERC721-transferFrom}.
-
-
-_Inherited from `../@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol`_.
+Returns how much royalty is owed and to whom, based on a sale price that may be denominated in any unit of
+exchange. The royalty amount is denominated and should be paid in that same unit of exchange.
 
 
-### `safeTransferFrom(address from, address to, uint256 tokenId)` (public) (inherited)<a name="ERC721Upgradeable-safeTransferFrom-address-address-uint256-" id="ERC721Upgradeable-safeTransferFrom-address-address-uint256-"></a>
-
-See {IERC721-safeTransferFrom}.
-
-
-_Inherited from `../@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol`_.
-
-
-### `safeTransferFrom(address from, address to, uint256 tokenId, bytes data)` (public) (inherited)<a name="ERC721Upgradeable-safeTransferFrom-address-address-uint256-bytes-" id="ERC721Upgradeable-safeTransferFrom-address-address-uint256-bytes-"></a>
-
-See {IERC721-safeTransferFrom}.
-
-
-_Inherited from `../@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol`_.
+_Inherited from `../@openzeppelin/contracts-upgradeable/token/common/ERC2981Upgradeable.sol`_.
 
 
 ## INTERNAL FUNCTIONS
@@ -966,6 +1064,13 @@ Parameters:
 - `sig`: The EC signature generated by the signatory
 
 - `role`: The role that the signer must have
+
+
+
+### `_burn(uint256 tokenId)` (internal)  <a name="MechaPilots2219V1-_burn-uint256-" id="MechaPilots2219V1-_burn-uint256-"></a>
+
+
+
 
 
 
@@ -1083,6 +1188,39 @@ Emits a {BeaconUpgraded} event.
 
 
 _Inherited from `../@openzeppelin/contracts-upgradeable/proxy/ERC1967/ERC1967UpgradeUpgradeable.sol`_.
+
+
+### `__UpdatableOperatorFiltererUpgradeable_init(address _registry, address subscriptionOrRegistrantToCopy, bool subscribe)` (internal) (inherited) <a name="UpdatableOperatorFiltererUpgradeable-__UpdatableOperatorFiltererUpgradeable_init-address-address-bool-" id="UpdatableOperatorFiltererUpgradeable-__UpdatableOperatorFiltererUpgradeable_init-address-address-bool-"></a>
+Initialization function in accordance with the upgradable pattern
+
+The upgradeable initialize function specific to proxied contracts
+
+
+Parameters:
+- `_registry`: Registry address to which to register to for blocking operators that do not respect royalties
+
+- `subscriptionOrRegistrantToCopy`: Subscription address to use as a template for when
+                                      imitating/copying blocked addresses and codehashes
+
+- `subscribe`: If to subscribe to the subscriptionOrRegistrantToCopy address or just copy entries from it
+
+_Inherited from `libs/operator-filter-registry-v1.4.1/src/upgradeable/UpdatableOperatorFiltererUpgradeable.sol`_.
+
+
+### `_checkFilterOperator(address operator)` (internal) (inherited) <a name="UpdatableOperatorFiltererUpgradeable-_checkFilterOperator-address-" id="UpdatableOperatorFiltererUpgradeable-_checkFilterOperator-address-"></a>
+
+A helper function to check if the operator is allowed
+
+
+_Inherited from `libs/operator-filter-registry-v1.4.1/src/upgradeable/UpdatableOperatorFiltererUpgradeable.sol`_.
+
+
+### `__OperatorFilterer_init(address subscriptionOrRegistrantToCopy, bool subscribe)` (internal) (inherited) <a name="OperatorFiltererUpgradeable-__OperatorFilterer_init-address-bool-" id="OperatorFiltererUpgradeable-__OperatorFilterer_init-address-bool-"></a>
+
+The upgradeable initialize function that should be called when the contract is being upgraded.
+
+
+_Inherited from `libs/operator-filter-registry-v1.4.1/src/upgradeable/OperatorFiltererUpgradeable.sol`_.
 
 
 ### `__AccessControl_init()` (internal) (inherited) <a name="AccessControlUpgradeable-__AccessControl_init--" id="AccessControlUpgradeable-__AccessControl_init--"></a>
@@ -1256,6 +1394,22 @@ Requirements:
 _Inherited from `../@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol`_.
 
 
+### `__ERC721Royalty_init()` (internal) (inherited) <a name="ERC721RoyaltyUpgradeable-__ERC721Royalty_init--" id="ERC721RoyaltyUpgradeable-__ERC721Royalty_init--"></a>
+
+
+
+
+_Inherited from `../@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721RoyaltyUpgradeable.sol`_.
+
+
+### `__ERC721Royalty_init_unchained()` (internal) (inherited) <a name="ERC721RoyaltyUpgradeable-__ERC721Royalty_init_unchained--" id="ERC721RoyaltyUpgradeable-__ERC721Royalty_init_unchained--"></a>
+
+
+
+
+_Inherited from `../@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721RoyaltyUpgradeable.sol`_.
+
+
 ### `__ERC721Burnable_init()` (internal) (inherited) <a name="ERC721BurnableUpgradeable-__ERC721Burnable_init--" id="ERC721BurnableUpgradeable-__ERC721Burnable_init--"></a>
 
 
@@ -1379,19 +1533,6 @@ Emits a {Transfer} event.
 _Inherited from `../@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol`_.
 
 
-### `_burn(uint256 tokenId)` (internal) (inherited) <a name="ERC721Upgradeable-_burn-uint256-" id="ERC721Upgradeable-_burn-uint256-"></a>
-
-Destroys `tokenId`.
-The approval is cleared when the token is burned.
-This is an internal function that does not check if the sender is authorized to operate on the token.
-Requirements:
-- `tokenId` must exist.
-Emits a {Transfer} event.
-
-
-_Inherited from `../@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol`_.
-
-
 ### `_transfer(address from, address to, uint256 tokenId)` (internal) (inherited) <a name="ERC721Upgradeable-_transfer-address-address-uint256-" id="ERC721Upgradeable-_transfer-address-address-uint256-"></a>
 
 Transfers `tokenId` from `from` to `to`.
@@ -1445,6 +1586,81 @@ To learn more about hooks, head to xref:ROOT:extending-contracts.adoc#using-hook
 
 
 _Inherited from `../@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol`_.
+
+
+### `__unsafe_increaseBalance(address account, uint256 amount)` (internal) (inherited) <a name="ERC721Upgradeable-__unsafe_increaseBalance-address-uint256-" id="ERC721Upgradeable-__unsafe_increaseBalance-address-uint256-"></a>
+
+Unsafe write access to the balances, used by extensions that "mint" tokens using an {ownerOf} override.
+WARNING: Anyone calling this MUST ensure that the balances remain consistent with the ownership. The invariant
+being that for any address `a` the value returned by `balanceOf(a)` must be equal to the number of tokens such
+that `ownerOf(tokenId)` is `a`.
+
+
+_Inherited from `../@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol`_.
+
+
+### `__ERC2981_init()` (internal) (inherited) <a name="ERC2981Upgradeable-__ERC2981_init--" id="ERC2981Upgradeable-__ERC2981_init--"></a>
+
+
+
+
+_Inherited from `../@openzeppelin/contracts-upgradeable/token/common/ERC2981Upgradeable.sol`_.
+
+
+### `__ERC2981_init_unchained()` (internal) (inherited) <a name="ERC2981Upgradeable-__ERC2981_init_unchained--" id="ERC2981Upgradeable-__ERC2981_init_unchained--"></a>
+
+
+
+
+_Inherited from `../@openzeppelin/contracts-upgradeable/token/common/ERC2981Upgradeable.sol`_.
+
+
+### `_feeDenominator() → uint96` (internal) (inherited) <a name="ERC2981Upgradeable-_feeDenominator--" id="ERC2981Upgradeable-_feeDenominator--"></a>
+
+The denominator with which to interpret the fee set in {_setTokenRoyalty} and {_setDefaultRoyalty} as a
+fraction of the sale price. Defaults to 10000 so fees are expressed in basis points, but may be customized by an
+override.
+
+
+_Inherited from `../@openzeppelin/contracts-upgradeable/token/common/ERC2981Upgradeable.sol`_.
+
+
+### `_setDefaultRoyalty(address receiver, uint96 feeNumerator)` (internal) (inherited) <a name="ERC2981Upgradeable-_setDefaultRoyalty-address-uint96-" id="ERC2981Upgradeable-_setDefaultRoyalty-address-uint96-"></a>
+
+Sets the royalty information that all ids in this contract will default to.
+Requirements:
+- `receiver` cannot be the zero address.
+- `feeNumerator` cannot be greater than the fee denominator.
+
+
+_Inherited from `../@openzeppelin/contracts-upgradeable/token/common/ERC2981Upgradeable.sol`_.
+
+
+### `_deleteDefaultRoyalty()` (internal) (inherited) <a name="ERC2981Upgradeable-_deleteDefaultRoyalty--" id="ERC2981Upgradeable-_deleteDefaultRoyalty--"></a>
+
+Removes default royalty information.
+
+
+_Inherited from `../@openzeppelin/contracts-upgradeable/token/common/ERC2981Upgradeable.sol`_.
+
+
+### `_setTokenRoyalty(uint256 tokenId, address receiver, uint96 feeNumerator)` (internal) (inherited) <a name="ERC2981Upgradeable-_setTokenRoyalty-uint256-address-uint96-" id="ERC2981Upgradeable-_setTokenRoyalty-uint256-address-uint96-"></a>
+
+Sets the royalty information for a specific token id, overriding the global default.
+Requirements:
+- `receiver` cannot be the zero address.
+- `feeNumerator` cannot be greater than the fee denominator.
+
+
+_Inherited from `../@openzeppelin/contracts-upgradeable/token/common/ERC2981Upgradeable.sol`_.
+
+
+### `_resetTokenRoyalty(uint256 tokenId)` (internal) (inherited) <a name="ERC2981Upgradeable-_resetTokenRoyalty-uint256-" id="ERC2981Upgradeable-_resetTokenRoyalty-uint256-"></a>
+
+Resets royalty information for the token id back to the global default.
+
+
+_Inherited from `../@openzeppelin/contracts-upgradeable/token/common/ERC2981Upgradeable.sol`_.
 
 
 ### `__ERC165_init()` (internal) (inherited) <a name="ERC165Upgradeable-__ERC165_init--" id="ERC165Upgradeable-__ERC165_init--"></a>
@@ -1509,7 +1725,7 @@ _Inherited from `../@openzeppelin/contracts-upgradeable/proxy/utils/Initializabl
 
 ### `_getInitializedVersion() → uint8` (internal) (inherited) <a name="Initializable-_getInitializedVersion--" id="Initializable-_getInitializedVersion--"></a>
 
-Internal function that returns the initialized version. Returns `_initialized`
+Returns the highest version that has been initialized. See {reinitializer}.
 
 
 _Inherited from `../@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol`_.
@@ -1517,7 +1733,7 @@ _Inherited from `../@openzeppelin/contracts-upgradeable/proxy/utils/Initializabl
 
 ### `_isInitializing() → bool` (internal) (inherited) <a name="Initializable-_isInitializing--" id="Initializable-_isInitializing--"></a>
 
-Internal function that returns the initialized version. Returns `_initializing`
+Returns `true` if the contract is currently initializing. See {onlyInitializing}.
 
 
 _Inherited from `../@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol`_.
@@ -1547,6 +1763,24 @@ callable on the implementing contract but not through proxies.
 
 
 _Inherited from `../@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol`_.
+
+
+### `onlyAllowedOperator(address from)` (inherited) <a name="OperatorFiltererUpgradeable-onlyAllowedOperator-address-" id="OperatorFiltererUpgradeable-onlyAllowedOperator-address-"></a>
+
+
+A helper modifier to check if the operator is allowed.
+
+
+_Inherited from `libs/operator-filter-registry-v1.4.1/src/upgradeable/OperatorFiltererUpgradeable.sol`_.
+
+
+### `onlyAllowedOperatorApproval(address operator)` (inherited) <a name="OperatorFiltererUpgradeable-onlyAllowedOperatorApproval-address-" id="OperatorFiltererUpgradeable-onlyAllowedOperatorApproval-address-"></a>
+
+
+A helper modifier to check if the operator approval is allowed.
+
+
+_Inherited from `libs/operator-filter-registry-v1.4.1/src/upgradeable/OperatorFiltererUpgradeable.sol`_.
 
 
 ### `onlyRole(bytes32 role)` (inherited) <a name="AccessControlUpgradeable-onlyRole-bytes32-" id="AccessControlUpgradeable-onlyRole-bytes32-"></a>
@@ -1652,6 +1886,13 @@ _Inherited from `../@openzeppelin/contracts-upgradeable/proxy/utils/Initializabl
 - bytes32 adminRole
 
 _Inherited from `../@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol`_.
+
+
+### `RoyaltyInfo` (inherited) <a name="ERC2981Upgradeable-RoyaltyInfo" id="ERC2981Upgradeable-RoyaltyInfo"></a>
+- address receiver
+- uint96 royaltyFraction
+
+_Inherited from `../@openzeppelin/contracts-upgradeable/token/common/ERC2981Upgradeable.sol`_.
 
 
 ## ENUMS
