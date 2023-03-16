@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.17;
 
+import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721BurnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721RoyaltyUpgradeable.sol";
@@ -10,7 +11,7 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
-import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+import "../../libs/operator-filter-registry-v1.4.1/src/upgradeable/UpdatableOperatorFiltererUpgradeable.sol";
 
 /**
  * @title MechaPilots2219 - TODO
@@ -26,6 +27,7 @@ contract MechaPilots2219V1 is
     PausableUpgradeable,
     OwnableUpgradeable,
     AccessControlUpgradeable,
+    UpdatableOperatorFiltererUpgradeable,
     UUPSUpgradeable
 {
     using Strings for uint256;
@@ -207,6 +209,13 @@ contract MechaPilots2219V1 is
         __Pausable_init();
         __Ownable_init();
         __UUPSUpgradeable_init();
+
+        // Subscribe to the operator filterer
+        __UpdatableOperatorFiltererUpgradeable_init(
+            0x000000000000AAeB6D7670E522A718067333cd4E,
+            0x3cc6CddA760b79bAfa08dF41ECFA224f810dCeB6,
+            true
+        );
 
         // Roles
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
@@ -557,10 +566,69 @@ contract MechaPilots2219V1 is
     }
 
     /**
-     * Remove default royalty information
+     * @notice Remove default royalty information
      */
     function deleteDefaultRoyalty() external onlyOwner {
         _deleteDefaultRoyalty();
+    }
+
+    /**
+     * @dev See {IERC721-setApprovalForAll}.
+     *      Check if the operator is allowed by the operator-filter-registry.
+     */
+    function setApprovalForAll(
+        address operator,
+        bool approved
+    ) public override onlyAllowedOperatorApproval(operator) {
+        super.setApprovalForAll(operator, approved);
+    }
+
+    /**
+     * @dev See {IERC721-approve}.
+     *      Check if the operator is allowed by the operator-filter-registry.
+     */
+    function approve(
+        address operator,
+        uint256 tokenId
+    ) public override onlyAllowedOperatorApproval(operator) {
+        super.approve(operator, tokenId);
+    }
+
+    /**
+     * @dev See {IERC721-transferFrom}.
+     *      Check if the operator is allowed by the operator-filter-registry.
+     */
+    function transferFrom(
+        address from,
+        address to,
+        uint256 tokenId
+    ) public override onlyAllowedOperator(from) {
+        super.transferFrom(from, to, tokenId);
+    }
+
+    /**
+     * @dev See {IERC721-safeTransferFrom}.
+     *      Check if the operator is allowed by the operator-filter-registry.
+     */
+    function safeTransferFrom(
+        address from,
+        address to,
+        uint256 tokenId
+    ) public override onlyAllowedOperator(from) {
+        super.safeTransferFrom(from, to, tokenId);
+    }
+
+    /**
+     * @dev See {IERC721-safeTransferFrom}.
+     *      Check if the operator is allowed by the operator-filter-registry.
+     */
+    function safeTransferFrom(
+        address from,
+        address to,
+        uint256 tokenId,
+        bytes memory data
+    ) public override onlyAllowedOperator(from) {
+        super.safeTransferFrom(from, to, tokenId, data);
     }
 
     /*
@@ -657,6 +725,18 @@ contract MechaPilots2219V1 is
         uint256 roundId
     ) public view returns (uint256) {
         return ownerToRoundTotalMinted[wallet][roundId];
+    }
+
+    /**
+     * @dev Returns the address of the current owner.
+     */
+    function owner()
+        public
+        view
+        override(OwnableUpgradeable, UpdatableOperatorFiltererUpgradeable)
+        returns (address)
+    {
+        return OwnableUpgradeable.owner();
     }
 
     function supportsInterface(
