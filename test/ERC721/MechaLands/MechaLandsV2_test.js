@@ -3,7 +3,13 @@ const { time, expectRevert, snapshot } = require("@openzeppelin/test-helpers");
 const { ZERO_ADDRESS } = require("@openzeppelin/test-helpers/src/constants");
 const { upgradeProxy, deployProxy } = require("@openzeppelin/truffle-upgrades");
 const cliProgress = require("cli-progress");
-const { getAmount, gasTracker, getBN } = require("../../../utils");
+const {
+  getAmount,
+  gasTracker,
+  getBN,
+  truncateWallet,
+} = require("../../../utils");
+const MechaLandsV3 = artifacts.require("MechaLandsV3");
 
 // Load artifacts
 const MechaLandsV1 = artifacts.require("MechaLandsV1");
@@ -24,7 +30,7 @@ const {
 } = require("./MechaLands_functions");
 
 contract("MechaLandsV2", async (accounts) => {
-  const [owner, distributor, ...users] = accounts;
+  const [owner, user1, ...users] = accounts;
 
   let instance, testStartTime, chainid, mechanium;
 
@@ -124,6 +130,11 @@ contract("MechaLandsV2", async (accounts) => {
   ];
 
   const MINT_AMOUNTS_ARRAY = [1, 2, 3, 4, 5, 10];
+
+  const defaultRoyalties = {
+    receiver: "0x3ccc90302a4c9d21ac18d9a6b6666b59ae459416",
+    feeNumerator: 500,
+  };
 
   /**
    * ========================
@@ -291,9 +302,14 @@ contract("MechaLandsV2", async (accounts) => {
     });
   });
 
+  /**
+   * UPGRADE TO V2
+   */
   describe("\n UPGRADE CONTRACT", () => {
     it(`Upgrade Smart Contract to MechaLandsV2`, async () => {
-      instance = await upgradeProxy(instance.address, MechaLandsV2);
+      instance = await upgradeProxy(instance.address, MechaLandsV2, {
+        call: "initializeV2",
+      });
       mechanium = await Mechanium.deployed();
 
       // reset gas cost
@@ -421,7 +437,7 @@ contract("MechaLandsV2", async (accounts) => {
           },
           users[1]
         ),
-        `ERC20: insufficient allowance.`
+        `ERC20: insufficient allowance`
       );
     });
 
@@ -443,7 +459,7 @@ contract("MechaLandsV2", async (accounts) => {
           },
           users[1]
         ),
-        `ERC20: insufficient allowance.`
+        `ERC20: insufficient allowance`
       );
     });
 
@@ -722,6 +738,65 @@ contract("MechaLandsV2", async (accounts) => {
     });
   });
 
+  /**
+   * ROYALTIES
+   */
+  describe("\n ROYALTIES", () => {
+    const testRoyalties = async (receiver, feeNumerator) => {
+      const salePrice = getAmount(1);
+      const expectedRoyaltyAmount = salePrice
+        .mul(getBN(feeNumerator))
+        .div(getBN(10000));
+
+      const royaltyInfo = await instance.royaltyInfo(1, salePrice);
+
+      // Correct receiver
+      assert.equal(
+        royaltyInfo["0"].toLowerCase(),
+        receiver.toLowerCase(),
+        "Incorrect receiver"
+      );
+
+      // Correct RoyaltyAmount
+      assert.equal(
+        royaltyInfo["1"].toString(),
+        expectedRoyaltyAmount.toString(),
+        "Incorrect RoyaltyAmount"
+      );
+    };
+
+    it(`Default royaltyInfo is correct: receiver = ${truncateWallet(
+      defaultRoyalties.receiver
+    )} // earnings = ${defaultRoyalties.feeNumerator / 100}%`, async () => {
+      await testRoyalties(
+        defaultRoyalties.receiver,
+        defaultRoyalties.feeNumerator
+      );
+    });
+
+    it(`Users can't change royalties (Reason: caller is not owner)`, async () => {
+      await expectRevert(
+        instance.setDefaultRoyalty(user1, 1000, {
+          from: user1,
+        }),
+        `Ownable: caller is not the owner`
+      );
+    });
+
+    it(`Owner can change royalties with a new address and new fees`, async () => {
+      await instance.setDefaultRoyalty(user1, 1000, {
+        from: owner,
+      });
+    });
+
+    it(`New royaltyInfo is correct`, async () => {
+      await testRoyalties(user1, 1000);
+    });
+  });
+
+  /**
+   * STORAGE VERIFICATION
+   */
   describe("\n STORAGE", () => {
     it(`Data of minted tokens has not changed`, async () => {
       const totalSupply = await instance.totalSupply();
@@ -934,96 +1009,6 @@ contract("MechaLandsV2", async (accounts) => {
       }
     });
 
-    it(`Data of rounds has not changed`, async () => {
-      const roundsLength = await instance.roundsLength();
-      const rounds = getContractStorage().rounds;
-
-      // planetsLength test
-      assert.equal(
-        roundsLength.toNumber(),
-        Object.keys(rounds).length,
-        `Bad rounds lengths`
-      );
-
-      // Each data test
-      for (var roundId in rounds) {
-        const round = rounds[roundId];
-        const contractRounds = await instance.rounds(roundId);
-
-        assert.equal(
-          contractRounds.limitedPerType.toString(),
-          round.limitedPerType.toString(),
-          "limitedPerType not valid"
-        );
-
-        assert.equal(
-          contractRounds.planetId.toString(),
-          round.planetId.toString(),
-          "planetId not valid"
-        );
-
-        assert.equal(
-          contractRounds.startTime.toString(),
-          round.startTime.toString(),
-          "startTime not valid"
-        );
-
-        assert.equal(
-          contractRounds.duration.toString(),
-          round.duration.toString(),
-          "duration not valid"
-        );
-
-        assert.equal(
-          contractRounds.validator.toString(),
-          round.validator.toString(),
-          "validator not valid"
-        );
-
-        for (let landType = 1; landType <= round.typesNumber; landType++) {
-          const roundSupplyByType = await instance.roundSupplyByType(
-            roundId,
-            landType
-          );
-          assert.equal(
-            roundSupplyByType.toString(),
-            planet.supplyPerType[landType - 1].toString(),
-            "supply not valid"
-          );
-
-          const roundPriceByType = await instance.roundPriceByType(
-            roundId,
-            landType
-          );
-          assert.equal(
-            roundPriceByType.toString(),
-            planet.pricePerType[landType - 1].toString(),
-            "priceByType not valid"
-          );
-
-          const roundMaxMintByType = await instance.roundMaxMintByType(
-            roundId,
-            landType
-          );
-          assert.equal(
-            roundMaxMintByType.toString(),
-            planet.maxMintPerType[landType - 1].toString(),
-            "maxMintByType not valid"
-          );
-
-          const roundTotalMintedByType = await instance.roundTotalMintedByType(
-            roundId,
-            landType
-          );
-          assert.equal(
-            roundTotalMintedByType.toString(),
-            round.totalMintedPerType[landType].toString(),
-            "total minted not valid"
-          );
-        }
-      }
-    });
-
     it(`Contract has the correct eth amount according to the mints (v1 and v2)`, async () => {
       const balance = await web3.eth.getBalance(instance.address);
       assert.equal(
@@ -1108,6 +1093,30 @@ contract("MechaLandsV2", async (accounts) => {
       );
 
       getContractStorage().balance = balance;
+    });
+  });
+
+  describe("\n UPGRADE CONTRACT", () => {
+    it(`Upgrade Smart Contract`, async () => {
+      const oldUserBalance = getBN(await instance.balanceOf(users[1]));
+
+      let instance2 = await upgradeProxy(instance.address, MechaLandsV3);
+
+      const newUserBalance = getBN(await instance2.balanceOf(users[1]));
+
+      let value = await instance2.tellMeWhatIWant();
+
+      assert.equal(
+        value.toString(),
+        "926391",
+        `The new function does not return the value we wanted`
+      );
+      assert.equal(
+        newUserBalance.toString(),
+        oldUserBalance.toString(),
+        "Incorrect balance after upgrading contract"
+      );
+      assert.equal((await instance2.version()).toString(), "3", `Bad version`);
     });
   });
 

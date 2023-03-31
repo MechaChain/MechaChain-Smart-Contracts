@@ -81,7 +81,7 @@ function getSignature(validator_private_key, data) {
 }
 
 // gasTracker;
-const costs = [];
+let costs = [];
 let statsToCompare = {};
 let gasPrice = 0;
 const addCost = async (action, data) => {
@@ -101,7 +101,9 @@ const addCost = async (action, data) => {
   costs.push(cost);
   return cost;
 };
-
+const resetCost = () => {
+  costs = [];
+};
 const addStatsToCompare = (oldStats) => {
   statsToCompare = { ...statsToCompare, ...oldStats };
 };

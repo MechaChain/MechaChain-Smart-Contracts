@@ -868,7 +868,7 @@ contract MechaLandsV1 is
         address to,
         uint256 tokenId,
         uint256 batchSize
-    ) internal override whenNotPaused {
+    ) internal virtual override whenNotPaused {
         super._beforeTokenTransfer(from, to, tokenId, batchSize);
     }
 
