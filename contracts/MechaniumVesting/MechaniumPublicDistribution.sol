@@ -113,7 +113,7 @@ contract MechaniumPublicDistribution is MechaniumVesting {
     constructor(IERC20 token_)
         MechaniumVesting(
             token_,
-            25, // once the schedule has started, unlock 20%
+            25, // once the schedule has started, unlock 25%
             30 days // and repeat every month
         )
     {

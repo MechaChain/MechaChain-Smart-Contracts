@@ -81,7 +81,8 @@ function getSignature(validator_private_key, data) {
 }
 
 // gasTracker;
-let costs = [];
+const costs = [];
+let statsToCompare = {};
 let gasPrice = 0;
 const addCost = async (action, data) => {
   const tx = await web3.eth.getTransaction(data.tx);
@@ -100,9 +101,11 @@ const addCost = async (action, data) => {
   costs.push(cost);
   return cost;
 };
-const resetCost = () => {
-  costs = [];
+
+const addStatsToCompare = (oldStats) => {
+  statsToCompare = { ...statsToCompare, ...oldStats };
 };
+
 const getStats = () => {
   const stats = costs.reduce((prev, curr) => {
     // Init
@@ -117,6 +120,7 @@ const getStats = () => {
       minPriceETH: curr.priceETH,
       maxGasUsed: 0,
       maxPriceETH: 0,
+      minMaxVariation: 0,
     };
 
     // Calcul
@@ -142,6 +146,24 @@ const getStats = () => {
       value.maxPriceETH = curr.priceETH;
     }
 
+    const minMaxVariationNumber =
+      (value.maxGasUsed - value.minGasUsed) / value.minGasUsed;
+    value.minMaxVariation = `${(minMaxVariationNumber * 100).toLocaleString(
+      "en-US",
+      { minimumIntegerDigits: 2, useGrouping: false }
+    )}%`;
+
+    if (statsToCompare[curr.action]?.avgGasUsed) {
+      const avgVariationFromLast =
+        (value.avgGasUsed - statsToCompare[curr.action].avgGasUsed) /
+        statsToCompare[curr.action].avgGasUsed;
+      value.avgVariationFromLast = `${(
+        avgVariationFromLast * 100
+      ).toLocaleString("en-US", {
+        minimumIntegerDigits: 2,
+        useGrouping: false,
+      })}%`;
+    }
     return prev;
   }, {});
 
@@ -159,20 +181,31 @@ const consoleStats = () => {
 
   console.table(getStats(), [
     "totalCalls",
-    "totalGasUsed",
+    // "totalGasUsed",
     "avgGasUsed",
     //"totalPriceETH",
     "avgPriceETH",
     "minGasUsed",
-    "minPriceETH",
+    //  "minPriceETH",
     "maxGasUsed",
-    "maxPriceETH",
+    // "maxPriceETH",
+    // "minMaxVariation",
+    ...(statsToCompare !== {} ? ["avgVariationFromLast"] : []),
   ]);
+};
+
+const truncateWallet = (wallet, number = 4) => {
+  return (
+    wallet.toString().slice(0, number + 1) +
+    "..." +
+    wallet.toString().slice(-number)
+  );
 };
 
 module.exports = {
   gasTracker: {
     addCost,
+    addStatsToCompare,
     getStats,
     consoleStats,
     resetCost,
@@ -186,4 +219,5 @@ module.exports = {
   getRange,
   getBNRange,
   getRandom,
+  truncateWallet,
 };

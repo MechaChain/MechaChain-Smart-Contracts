@@ -405,10 +405,10 @@ contract MechaLandsV1 is
      * @param planetId The index of the planet.
      * @param burnable If users are authorized to burn their tokens for this planet.
      */
-    function setPlanetBurnable(uint256 planetId, bool burnable)
-        public
-        onlyOwner
-    {
+    function setPlanetBurnable(
+        uint256 planetId,
+        bool burnable
+    ) public onlyOwner {
         planets[planetId].burnable = burnable;
         emit PlanetBurnableChanged(planetId, burnable);
     }
@@ -419,10 +419,10 @@ contract MechaLandsV1 is
      * @param planetId The index of the planet.
      * @param distributor The distributor address.
      */
-    function setPlanetDistributor(uint256 planetId, address distributor)
-        public
-        onlyOwner
-    {
+    function setPlanetDistributor(
+        uint256 planetId,
+        address distributor
+    ) public onlyOwner {
         planets[planetId].distributor = distributor;
     }
 
@@ -580,13 +580,9 @@ contract MechaLandsV1 is
     /**
      * @notice Returns the URI of `tokenId` or the not revealed uri, according to its planet and land type
      */
-    function tokenURI(uint256 tokenId)
-        public
-        view
-        virtual
-        override
-        returns (string memory)
-    {
+    function tokenURI(
+        uint256 tokenId
+    ) public view virtual override returns (string memory) {
         require(
             _exists(tokenId),
             "ERC721Metadata: URI query for nonexistent token"
@@ -623,77 +619,70 @@ contract MechaLandsV1 is
     /**
      * @notice Return the supply of `landType` for `planetId`
      */
-    function planetSupplyByType(uint256 planetId, uint256 landType)
-        public
-        view
-        returns (uint256)
-    {
+    function planetSupplyByType(
+        uint256 planetId,
+        uint256 landType
+    ) public view returns (uint256) {
         return planets[planetId].supplyPerType[landType];
     }
 
     /**
      * @notice Return the total minted of `landType` for `planetId`
      */
-    function planetTotalMintedByType(uint256 planetId, uint256 landType)
-        public
-        view
-        returns (uint256)
-    {
+    function planetTotalMintedByType(
+        uint256 planetId,
+        uint256 landType
+    ) public view returns (uint256) {
         return planets[planetId].totalMintedPerType[landType];
     }
 
     /**
      * @notice Return the not reveal URI of `landType` for `planetId`
      */
-    function planetNotRevealUriByType(uint256 planetId, uint256 landType)
-        public
-        view
-        returns (string memory)
-    {
+    function planetNotRevealUriByType(
+        uint256 planetId,
+        uint256 landType
+    ) public view returns (string memory) {
         return planets[planetId].notRevealUriPerType[landType];
     }
 
     /**
      * @notice Return the supply of `landType` for `roundId`
      */
-    function roundSupplyByType(uint256 roundId, uint256 landType)
-        public
-        view
-        returns (uint256)
-    {
+    function roundSupplyByType(
+        uint256 roundId,
+        uint256 landType
+    ) public view returns (uint256) {
         return rounds[roundId].supplyPerType[landType];
     }
 
     /**
      * @notice Return the price of a single `landType` for `roundId`
      */
-    function roundPriceByType(uint256 roundId, uint256 landType)
-        public
-        view
-        returns (uint256)
-    {
+    function roundPriceByType(
+        uint256 roundId,
+        uint256 landType
+    ) public view returns (uint256) {
         return rounds[roundId].pricePerType[landType];
     }
 
     /**
      * @notice Return the maximum number of `landType` tokens that a user can mint for `roundId`
      */
-    function roundMaxMintByType(uint256 roundId, uint256 landType)
-        public
-        view
-        returns (uint256)
-    {
+    function roundMaxMintByType(
+        uint256 roundId,
+        uint256 landType
+    ) public view returns (uint256) {
         return rounds[roundId].maxMintPerType[landType];
     }
 
     /**
      * @notice Return the total minted of `landType` for `roundId`
      */
-    function roundTotalMintedByType(uint256 roundId, uint256 landType)
-        public
-        view
-        returns (uint256)
-    {
+    function roundTotalMintedByType(
+        uint256 roundId,
+        uint256 landType
+    ) public view returns (uint256) {
         return rounds[roundId].totalMintedPerType[landType];
     }
 
@@ -711,11 +700,10 @@ contract MechaLandsV1 is
     /**
      * @notice Return the total minted for `user` in `roundId` for all lands
      */
-    function roundTotalMintedForUser(address user, uint256 roundId)
-        public
-        view
-        returns (uint256)
-    {
+    function roundTotalMintedForUser(
+        address user,
+        uint256 roundId
+    ) public view returns (uint256) {
         return rounds[roundId].totalMintedPerUser[user];
     }
 
@@ -878,16 +866,15 @@ contract MechaLandsV1 is
     function _beforeTokenTransfer(
         address from,
         address to,
-        uint256 tokenId
+        uint256 tokenId,
+        uint256 batchSize
     ) internal override whenNotPaused {
-        super._beforeTokenTransfer(from, to, tokenId);
+        super._beforeTokenTransfer(from, to, tokenId, batchSize);
     }
 
-    function _authorizeUpgrade(address newImplementation)
-        internal
-        override
-        onlyOwner
-    {
+    function _authorizeUpgrade(
+        address newImplementation
+    ) internal override onlyOwner {
         version++;
     }
 

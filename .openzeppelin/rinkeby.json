@@ -10,6 +10,11 @@
       "address": "0xE1d522E5B879D846633Abe9217f43452cea366D9",
       "txHash": "0x09e45366a97ee801e0f2ec46d35b2381adb7c30fea0d27711897541d609d63dc",
       "kind": "uups"
+    },
+    {
+      "address": "0x2B9017C07fB918158Df4e6A777ae4fEC861fED8e",
+      "txHash": "0x906423e5d310c64cbdeb3529a4e28baa33d5ceaf810a46b9b96f75ca98021311",
+      "kind": "uups"
     }
   ],
   "impls": {
@@ -651,6 +656,372 @@
           },
           "t_array(t_uint256)44_storage": {
             "label": "uint256[44]"
+          }
+        }
+      }
+    },
+    "37aa176fdcfd3865499d9b317fb311213778372d25cd1e0552e52ce0ced963cf": {
+      "address": "0xf7515eF3436C8DaD953C0BCA57739Df04bE402A6",
+      "txHash": "0xa5cdbbaadb08aa865c3fcafbe2293f95d88c12a77a751a7aa848fd7d74475bdc",
+      "layout": {
+        "storage": [
+          {
+            "contract": "Initializable",
+            "label": "_initialized",
+            "type": "t_uint8",
+            "src": "../@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:62",
+            "retypedFrom": "bool"
+          },
+          {
+            "contract": "Initializable",
+            "label": "_initializing",
+            "type": "t_bool",
+            "src": "../@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:67"
+          },
+          {
+            "contract": "ContextUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "../@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:36"
+          },
+          {
+            "contract": "ERC165Upgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "../@openzeppelin/contracts-upgradeable/utils/introspection/ERC165Upgradeable.sol:41"
+          },
+          {
+            "contract": "ERC721Upgradeable",
+            "label": "_name",
+            "type": "t_string_storage",
+            "src": "../@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:25"
+          },
+          {
+            "contract": "ERC721Upgradeable",
+            "label": "_symbol",
+            "type": "t_string_storage",
+            "src": "../@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:28"
+          },
+          {
+            "contract": "ERC721Upgradeable",
+            "label": "_owners",
+            "type": "t_mapping(t_uint256,t_address)",
+            "src": "../@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:31"
+          },
+          {
+            "contract": "ERC721Upgradeable",
+            "label": "_balances",
+            "type": "t_mapping(t_address,t_uint256)",
+            "src": "../@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:34"
+          },
+          {
+            "contract": "ERC721Upgradeable",
+            "label": "_tokenApprovals",
+            "type": "t_mapping(t_uint256,t_address)",
+            "src": "../@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:37"
+          },
+          {
+            "contract": "ERC721Upgradeable",
+            "label": "_operatorApprovals",
+            "type": "t_mapping(t_address,t_mapping(t_address,t_bool))",
+            "src": "../@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:40"
+          },
+          {
+            "contract": "ERC721Upgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)44_storage",
+            "src": "../@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:465"
+          },
+          {
+            "contract": "ERC721BurnableUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "../@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721BurnableUpgradeable.sol:38"
+          },
+          {
+            "contract": "PausableUpgradeable",
+            "label": "_paused",
+            "type": "t_bool",
+            "src": "../@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol:29"
+          },
+          {
+            "contract": "PausableUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "../@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol:116"
+          },
+          {
+            "contract": "OwnableUpgradeable",
+            "label": "_owner",
+            "type": "t_address",
+            "src": "../@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:22"
+          },
+          {
+            "contract": "OwnableUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "../@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:94"
+          },
+          {
+            "contract": "AccessControlUpgradeable",
+            "label": "_roles",
+            "type": "t_mapping(t_bytes32,t_struct(RoleData)34_storage)",
+            "src": "../@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol:61"
+          },
+          {
+            "contract": "AccessControlUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "../@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol:259"
+          },
+          {
+            "contract": "ERC1967UpgradeUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "../@openzeppelin/contracts-upgradeable/proxy/ERC1967/ERC1967UpgradeUpgradeable.sol:211"
+          },
+          {
+            "contract": "UUPSUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "../@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol:107"
+          },
+          {
+            "contract": "MechaPilots2219V1",
+            "label": "MAX_SUPPLY_BY_FACTION",
+            "type": "t_array(t_uint256)dyn_storage",
+            "src": "../project:/contracts/ERC721/MechaPilots2219V1.sol:160"
+          },
+          {
+            "contract": "MechaPilots2219V1",
+            "label": "MAX_SUPPLY",
+            "type": "t_uint256",
+            "src": "../project:/contracts/ERC721/MechaPilots2219V1.sol:163"
+          },
+          {
+            "contract": "MechaPilots2219V1",
+            "label": "version",
+            "type": "t_uint256",
+            "src": "../project:/contracts/ERC721/MechaPilots2219V1.sol:166"
+          },
+          {
+            "contract": "MechaPilots2219V1",
+            "label": "maxMintsPerWallet",
+            "type": "t_uint256",
+            "src": "../project:/contracts/ERC721/MechaPilots2219V1.sol:169"
+          },
+          {
+            "contract": "MechaPilots2219V1",
+            "label": "roundsLength",
+            "type": "t_uint256",
+            "src": "../project:/contracts/ERC721/MechaPilots2219V1.sol:172"
+          },
+          {
+            "contract": "MechaPilots2219V1",
+            "label": "totalBurned",
+            "type": "t_uint256",
+            "src": "../project:/contracts/ERC721/MechaPilots2219V1.sol:175"
+          },
+          {
+            "contract": "MechaPilots2219V1",
+            "label": "burnable",
+            "type": "t_bool",
+            "src": "../project:/contracts/ERC721/MechaPilots2219V1.sol:178"
+          },
+          {
+            "contract": "MechaPilots2219V1",
+            "label": "baseURI",
+            "type": "t_string_storage",
+            "src": "../project:/contracts/ERC721/MechaPilots2219V1.sol:181"
+          },
+          {
+            "contract": "MechaPilots2219V1",
+            "label": "baseExtension",
+            "type": "t_string_storage",
+            "src": "../project:/contracts/ERC721/MechaPilots2219V1.sol:184"
+          },
+          {
+            "contract": "MechaPilots2219V1",
+            "label": "_totalMinted",
+            "type": "t_uint256",
+            "src": "../project:/contracts/ERC721/MechaPilots2219V1.sol:187"
+          },
+          {
+            "contract": "MechaPilots2219V1",
+            "label": "_totalMintedByFaction",
+            "type": "t_array(t_uint256)dyn_storage",
+            "src": "../project:/contracts/ERC721/MechaPilots2219V1.sol:190"
+          },
+          {
+            "contract": "MechaPilots2219V1",
+            "label": "tokenFaction",
+            "type": "t_mapping(t_uint256,t_enum(Faction)9789)",
+            "src": "../project:/contracts/ERC721/MechaPilots2219V1.sol:193"
+          },
+          {
+            "contract": "MechaPilots2219V1",
+            "label": "_rounds",
+            "type": "t_mapping(t_uint256,t_struct(MintRound)9777_storage)",
+            "src": "../project:/contracts/ERC721/MechaPilots2219V1.sol:196"
+          },
+          {
+            "contract": "MechaPilots2219V1",
+            "label": "_availableIds",
+            "type": "t_mapping(t_uint256,t_uint256)",
+            "src": "../project:/contracts/ERC721/MechaPilots2219V1.sol:199"
+          },
+          {
+            "contract": "MechaPilots2219V1",
+            "label": "_tokenURIs",
+            "type": "t_mapping(t_uint256,t_string_storage)",
+            "src": "../project:/contracts/ERC721/MechaPilots2219V1.sol:202"
+          },
+          {
+            "contract": "MechaPilots2219V1",
+            "label": "ownerToRoundTotalMinted",
+            "type": "t_mapping(t_address,t_mapping(t_uint256,t_uint256))",
+            "src": "../project:/contracts/ERC721/MechaPilots2219V1.sol:205"
+          }
+        ],
+        "types": {
+          "t_array(t_uint256)dyn_storage": {
+            "label": "uint256[]"
+          },
+          "t_uint256": {
+            "label": "uint256"
+          },
+          "t_bool": {
+            "label": "bool"
+          },
+          "t_string_storage": {
+            "label": "string"
+          },
+          "t_mapping(t_uint256,t_enum(Faction)9789)": {
+            "label": "mapping(uint256 => enum MechaPilots2219V1.Faction)"
+          },
+          "t_enum(Faction)9789": {
+            "label": "enum MechaPilots2219V1.Faction",
+            "members": [
+              "PURE_GENE",
+              "ASSIMILEE"
+            ]
+          },
+          "t_mapping(t_uint256,t_struct(MintRound)9777_storage)": {
+            "label": "mapping(uint256 => struct MechaPilots2219V1.MintRound)"
+          },
+          "t_struct(MintRound)9777_storage": {
+            "label": "struct MechaPilots2219V1.MintRound",
+            "members": [
+              {
+                "label": "startTime",
+                "type": "t_uint64"
+              },
+              {
+                "label": "duration",
+                "type": "t_uint64"
+              },
+              {
+                "label": "supply",
+                "type": "t_array(t_uint32)2_storage"
+              },
+              {
+                "label": "totalMinted",
+                "type": "t_array(t_uint32)2_storage"
+              },
+              {
+                "label": "validator",
+                "type": "t_address"
+              },
+              {
+                "label": "price",
+                "type": "t_struct(MintPrice)9786_storage"
+              }
+            ]
+          },
+          "t_uint64": {
+            "label": "uint64"
+          },
+          "t_array(t_uint32)2_storage": {
+            "label": "uint32[2]"
+          },
+          "t_uint32": {
+            "label": "uint32"
+          },
+          "t_address": {
+            "label": "address"
+          },
+          "t_struct(MintPrice)9786_storage": {
+            "label": "struct MechaPilots2219V1.MintPrice",
+            "members": [
+              {
+                "label": "max",
+                "type": "t_uint256"
+              },
+              {
+                "label": "min",
+                "type": "t_uint256"
+              },
+              {
+                "label": "decreaseTime",
+                "type": "t_uint256"
+              },
+              {
+                "label": "decreaseAmount",
+                "type": "t_uint256"
+              }
+            ]
+          },
+          "t_mapping(t_uint256,t_uint256)": {
+            "label": "mapping(uint256 => uint256)"
+          },
+          "t_mapping(t_uint256,t_string_storage)": {
+            "label": "mapping(uint256 => string)"
+          },
+          "t_mapping(t_address,t_mapping(t_uint256,t_uint256))": {
+            "label": "mapping(address => mapping(uint256 => uint256))"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]"
+          },
+          "t_mapping(t_bytes32,t_struct(RoleData)34_storage)": {
+            "label": "mapping(bytes32 => struct AccessControlUpgradeable.RoleData)"
+          },
+          "t_bytes32": {
+            "label": "bytes32"
+          },
+          "t_struct(RoleData)34_storage": {
+            "label": "struct AccessControlUpgradeable.RoleData",
+            "members": [
+              {
+                "label": "members",
+                "type": "t_mapping(t_address,t_bool)"
+              },
+              {
+                "label": "adminRole",
+                "type": "t_bytes32"
+              }
+            ]
+          },
+          "t_mapping(t_address,t_bool)": {
+            "label": "mapping(address => bool)"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]"
+          },
+          "t_mapping(t_uint256,t_address)": {
+            "label": "mapping(uint256 => address)"
+          },
+          "t_mapping(t_address,t_uint256)": {
+            "label": "mapping(address => uint256)"
+          },
+          "t_mapping(t_address,t_mapping(t_address,t_bool))": {
+            "label": "mapping(address => mapping(address => bool))"
+          },
+          "t_array(t_uint256)44_storage": {
+            "label": "uint256[44]"
+          },
+          "t_uint8": {
+            "label": "uint8"
           }
         }
       }
