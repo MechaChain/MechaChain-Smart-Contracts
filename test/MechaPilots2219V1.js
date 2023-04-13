@@ -305,11 +305,24 @@ contract("MechaPilots2219V1", async (accounts) => {
     const mintedTokens = getTokensFromTransferEvent(tx);
     for (tokenId of mintedTokens) {
       const tokenFaction = await instance.tokenFaction(tokenId);
+      const factionId = tokenFaction.toNumber();
       assert.equal(
         tokenFaction.toString(),
         expectedFactionId,
         "tokenFaction not valid"
       );
+
+      if (factionId > 0) {
+        expect(tokenId).gt(
+          MAX_SUPPLY_BY_FACTION[factionId - 1].toNumber(),
+          "tokenId is lower than the max supply of the previous faction"
+        );
+      } else {
+        expect(tokenId).lte(
+          MAX_SUPPLY_BY_FACTION[factionId].toNumber(),
+          "tokenId is greater than the max supply of it's faction"
+        );
+      }
 
       const tokenOwner = await instance.ownerOf(tokenId);
       assert.equal(
@@ -1123,16 +1136,6 @@ contract("MechaPilots2219V1", async (accounts) => {
       );
     });
 
-    it(`Owner can't airdrop more tokens than the faction total remaining supply (Reason: All factions supply exceeded)`, async () => {
-      const supply = await instance.totalSupplyByFaction(1);
-      const factionMaxSupply = MAX_SUPPLY_BY_FACTION[1];
-      const amount = factionMaxSupply.sub(supply).toNumber() + 1;
-      await expectRevert(
-        airdrop({ factionId: 1, amount }, user1),
-        `All factions supply exceeded`
-      );
-    });
-
     it(`Owner do severals airdrops`, async () => {
       for (let i = 1; i < 5; i++) {
         await airdrop({ factionId: i % 2, amount: i }, accounts[i]);
@@ -1258,13 +1261,43 @@ contract("MechaPilots2219V1", async (accounts) => {
       assert.equal(min, 1, `Minimum is ${min} not 1`);
     });
 
-    it(`Last token is MAX_SUPPLY`, async () => {
+    it(`Last token is ${MAX_SUPPLY} (MAX_SUPPLY)`, async () => {
       const max = Math.max(...mintedTokens);
       assert.equal(
         max,
         MAX_SUPPLY.toNumber(),
         `Maximum is ${max} not ${MAX_SUPPLY.toNumber()}`
       );
+    });
+
+    it(`All token bellow or equal to 1110 is PURE_GENE`, async () => {
+      for (
+        let tokenId = 1;
+        tokenId <= MAX_SUPPLY_BY_FACTION[0].toNumber();
+        tokenId++
+      ) {
+        const tokenFaction = await instance.tokenFaction(tokenId);
+        assert.equal(
+          tokenFaction.toString(),
+          0,
+          `${tokenId} is not a PURE_GENE`
+        );
+      }
+    });
+
+    it(`All token greater or equal to 1111 is ASSIMILEE`, async () => {
+      for (
+        let tokenId = MAX_SUPPLY_BY_FACTION[0] + 1;
+        tokenId <= MAX_SUPPLY.toNumber();
+        tokenId++
+      ) {
+        const tokenFaction = await instance.tokenFaction(tokenId);
+        assert.equal(
+          tokenFaction.toString(),
+          1,
+          `${tokenId} is not a ASSIMILEE`
+        );
+      }
     });
   });
 

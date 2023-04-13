@@ -178,15 +178,16 @@ contract MechaPilots2219V1 is
     /// All mint rounds (starts at index 1)
     mapping(uint256 => MintRound) internal _rounds;
 
-    /// Identifier that can still be minted
-    mapping(uint256 => uint256) internal _availableIds;
-
     // Optional mapping for token reveal URIs
     mapping(uint256 => string) internal _tokenURIs;
 
     /// Total of minted token by address and round
     mapping(address => mapping(uint256 => uint256))
         public ownerToRoundTotalMinted;
+
+    /// Identifier that can still be minted by faction
+    mapping(uint256 => mapping(uint256 => uint256))
+        internal _availableIdsByFaction;
 
     /**
      * ========================
@@ -230,7 +231,7 @@ contract MechaPilots2219V1 is
         _totalBurnedByFaction = [0, 0];
         baseExtension = ".json";
         maxMintsPerWallet = 2;
-        MAX_SUPPLY_BY_FACTION = [1109, 1110];
+        MAX_SUPPLY_BY_FACTION = [1110, 1109];
         MAX_SUPPLY = 2219;
     }
 
@@ -867,7 +868,9 @@ contract MechaPilots2219V1 is
         }
 
         // Increase totalMinted
-        uint256 beforeMintTotalMinted = _totalMinted;
+        uint256 beforeMintTotalMintedByFaction = _totalMintedByFaction[
+            factionId
+        ];
         _totalMinted += amount;
         _totalMintedByFaction[factionId] += amount;
 
@@ -875,7 +878,8 @@ contract MechaPilots2219V1 is
         for (uint256 i = 0; i < amount; i++) {
             uint256 tokenId = _getRandomToken(
                 wallet,
-                beforeMintTotalMinted + i
+                beforeMintTotalMintedByFaction + i,
+                factionId
             );
             _mint(wallet, tokenId);
             if (factionId != 0) {
@@ -889,12 +893,17 @@ contract MechaPilots2219V1 is
      *
      * @param wallet The wallet to complexify the random
      * @param totalMinted Updated total minted
+     * @param factionId The faction
      */
     function _getRandomToken(
         address wallet,
-        uint256 totalMinted
+        uint256 totalMinted,
+        uint256 factionId
     ) internal returns (uint256) {
-        uint256 remaining = MAX_SUPPLY - totalMinted;
+        uint256 remaining = MAX_SUPPLY_BY_FACTION[factionId] - totalMinted;
+        mapping(uint256 => uint256)
+            storage availableIds = _availableIdsByFaction[factionId];
+
         uint256 rand = (uint256(
             keccak256(
                 abi.encodePacked(
@@ -907,17 +916,21 @@ contract MechaPilots2219V1 is
         ) % remaining);
         uint256 value = rand;
 
-        if (_availableIds[rand] != 0) {
-            value = _availableIds[rand];
+        if (availableIds[rand] != 0) {
+            value = availableIds[rand];
         }
 
-        if (_availableIds[remaining - 1] == 0) {
-            _availableIds[rand] = remaining - 1;
+        if (availableIds[remaining - 1] == 0) {
+            availableIds[rand] = remaining - 1;
         } else {
-            _availableIds[rand] = _availableIds[remaining - 1];
-            delete _availableIds[remaining - 1];
+            availableIds[rand] = availableIds[remaining - 1];
+            delete availableIds[remaining - 1];
         }
 
+        // Add the max supply of the previous faction if it exists
+        if (factionId > 0) {
+            return value + 1 + MAX_SUPPLY_BY_FACTION[factionId - 1];
+        }
         return value + 1;
     }
 
