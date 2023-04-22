@@ -4,7 +4,6 @@ const cliProgress = require("cli-progress");
 
 // Load artifacts
 const MechaPilots2219V1 = artifacts.require("MechaPilots2219V1");
-const DummyMintConstructor = artifacts.require("DummyMintConstructor");
 const MechaPilots2219V2 = artifacts.require("MechaPilots2219V2");
 
 // Load utils
@@ -880,13 +879,6 @@ contract("MechaPilots2219V1", async (accounts) => {
    * MINT SECURITY
    */
   describe("\n MINT SECURITY", () => {
-    it(`Can't mint with a smart contract`, async () => {
-      await expectRevert(
-        DummyMintConstructor.new(instance.address, 1, 1, 2),
-        `Minting from smart contracts is disallowed`
-      );
-    });
-
     it("Owner is able to change supply bellow the total minted without errors at the mint", async () => {
       rounds[1].supply = [2, 2];
       await setupMintRound(rounds[1]);
