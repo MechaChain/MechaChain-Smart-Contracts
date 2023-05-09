@@ -69,6 +69,11 @@ contract MechaPilots2219V1 is
     event BaseURIChanged(string newBaseURI);
 
     /**
+     * @notice Event emitted when `revealedBaseURI` has been modified
+     */
+    event RevealedBaseURIChanged(string newBaseURI);
+
+    /**
      * @notice Event emitted when `baseExtension` has been modified
      */
     event BaseExtensionChanged(string newBaseExtension);
@@ -162,6 +167,9 @@ contract MechaPilots2219V1 is
     /// The base token URI to add before unrevealed token id
     string public baseURI;
 
+    /// The base token URI to add before revealed token id
+    string public revealedBaseURI;
+
     /// Base extension for the end of token id in `tokenURI` for unrevealed tokens
     string public baseExtension;
 
@@ -229,13 +237,14 @@ contract MechaPilots2219V1 is
         _setDefaultRoyalty(0x3cCC90302A4c9d21AC18D9a6b6666B59Ae459416, 500);
 
         // Storage initialisation
-        version = 1;
-        _totalMintedByFaction = [0, 0];
-        _totalBurnedByFaction = [0, 0];
-        baseExtension = ".json";
-        maxMintsPerWallet = 2;
-        MAX_SUPPLY_BY_FACTION = [1110, 1109];
-        MAX_SUPPLY = 2219;
+        version = 2;
+        // TO-DO : I removed init of storage ; is that ocrrect ?
+        // _totalMintedByFaction = [0, 0];
+        // _totalBurnedByFaction = [0, 0];
+        // baseExtension = ".json";
+        // maxMintsPerWallet = 2;
+        // MAX_SUPPLY_BY_FACTION = [1110, 1109];
+        // MAX_SUPPLY = 2219;
     }
 
     /**
@@ -480,6 +489,14 @@ contract MechaPilots2219V1 is
     }
 
     /**
+     * @notice Change the baseURI for revealed tokens
+     */
+    function setRevealedBaseURI(string memory newBaseURI) external virtual onlyOwner {
+        revealedBaseURI = newBaseURI;
+        emit RevealedBaseURIChanged(newBaseURI);
+    }
+
+    /**
      * @notice Change the URI base extension for unrevealed tokens
      */
     function setBaseExtension(
@@ -648,6 +665,17 @@ contract MechaPilots2219V1 is
         uint256 tokenId
     ) public view virtual override returns (string memory) {
         _requireMinted(tokenId);
+
+        // If mass reveal
+        string memory _revealedBaseURI = revealedBaseURI;
+        if (bytes(_revealedBaseURI).length > 0) {
+            return string(
+                    abi.encodePacked(
+                        _revealedBaseURI,
+                        tokenId.toString(),
+                        baseExtension
+                    );
+        }
 
         // Revealed token
         string memory _tokenURI = _tokenURIs[tokenId];
