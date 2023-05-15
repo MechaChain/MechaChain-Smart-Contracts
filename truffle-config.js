@@ -27,6 +27,14 @@ module.exports = {
       gas: 7500000,
       gasPrice: 5000000000,
     },
+    mainnet: {
+      network_id: 1,
+      provider: () =>
+        new HDWalletProvider(
+          process.env.DEV_WALLET_PRIVATE_KEY,
+          "https://mainnet.infura.io/v3/" + process.env.INFURA_PROJECT_ID
+        ),
+    },
     mumbai: {
       provider: () =>
         new HDWalletProvider(
