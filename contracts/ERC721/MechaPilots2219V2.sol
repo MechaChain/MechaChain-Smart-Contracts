@@ -674,7 +674,7 @@ contract MechaPilots2219V1 is
                         _revealedBaseURI,
                         tokenId.toString(),
                         baseExtension
-                    );
+                    ));
         }
 
         // Revealed token
