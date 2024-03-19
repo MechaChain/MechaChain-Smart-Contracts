@@ -26,11 +26,11 @@ contract MechaModulesV1 is Initializable, ERC721Upgradeable, ERC721BurnableUpgra
         __ERC721_init("MechaModulesV1", "$MECHAMODULES");
         __ERC721Burnable_init();
         __AccessControl_init();
-        __UUPSUpgradeable_init();
 
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _grantRole(MINTER_ROLE, msg.sender);
 
+        __UUPSUpgradeable_init();
         version = 1;
     }
 
