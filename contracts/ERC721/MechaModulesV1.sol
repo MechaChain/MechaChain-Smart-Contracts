@@ -39,7 +39,7 @@ contract MechaModulesV1 is Initializable, ERC721Upgradeable, ERC721BurnableUpgra
         _safeMint(to, tokenId);
     }
 
-    function _authorizeUpgrade(address newImplementation)
+    function _authorizeUpgrade(address)
     internal
     onlyRole(DEFAULT_ADMIN_ROLE)
     override
