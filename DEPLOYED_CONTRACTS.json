@@ -121,6 +121,10 @@
     "MechaPilots2219V1": {
       "address": "0xe1d21f3b83C6CF18A34443d9e4c8360fC3EA731A",
       "date": "01/09/2022, 12:12:50"
+    },
+    "MechaModulesV1": {
+      "address": "0x72c18eE0f6B8Be39C9234436Dfa3c2eF82E2e0Ca",
+      "date": "04/06/2024, 12:35:48"
     }
   }
 }
